@@ -82,7 +82,7 @@ function compileCode()
             {
                 if (line.indexOf("__SECRET__") > -1 && line.indexOf("__LINE__") > -1)
                 {
-                    var line_nr = parseInt(line.split("__LINE__")[1], 16);
+                    var line_nr = parseInt(line.split("__LINE__").pop(), 16);
                     var addr = line.split(" ")[0].split(":");
                     addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
                     addr_to_line[addr] = line_nr;
