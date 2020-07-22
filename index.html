@@ -1,0 +1,164 @@
+<html>
+<head>
+
+<script src="wasm/rgbasm"></script>
+<script src="wasm/rgblink"></script>
+<script src="wasm/rgbfix"></script>
+<script src="js/lz-string.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-tomorrow.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-assembly_x86.min.js"></script>
+
+<script type="text/javascript" src="js/GameBoyCore.js"></script>
+
+<script>
+"use strict";
+
+function logFunction(str) {
+    var output = document.getElementById('output');
+    output.value += str + "\n";
+    output.scrollTop = output.clientHeight;
+}
+function cout(str) { logFunction(str); }
+var build_busy = false;
+var editor;
+var gb;
+
+function initNewCanvas() {}
+
+function compileCode()
+{
+    if (build_busy)
+        return;
+    build_busy = true;
+    destroyEmulator();
+    var code = editor.getValue();
+    document.getElementById('output').value = "";
+    location.hash = LZString.compressToEncodedURIComponent(code);
+
+    logFunction("Running rgbasm");
+    createRgbAsm({
+        'arguments': ['input.asm', '-o', 'output.o'],
+        'preRun': function(m) {
+            var FS = m['FS'];
+            FS.writeFile("input.asm", code);
+        },
+        'print': logFunction,
+        'printErr': logFunction,
+    }).then(function(m) {
+        var FS = m['FS'];
+        try { var obj_file = FS.readFile("output.o"); } catch { build_busy = false; return; }
+        logFunction("Running rgblink");
+        createRgbLink({
+            'arguments': ['input.o', '-o', 'output.gb', '-x'],
+            'preRun': function(m) {
+                var FS = m['FS'];
+                FS.writeFile("input.o", obj_file);
+            },
+            'print': logFunction,
+            'printErr': logFunction,
+        }).then(function(m) {
+            var FS = m['FS'];
+            try { var gb_file = FS.readFile("output.gb"); } catch { build_busy = false; return; }
+            var hex = Array.prototype.map.call(gb_file, x => ('00' + x.toString(16)).slice(-2)).join(' ');
+            for(var n=0; n<hex.length; n+=3*32)
+                logFunction(hex.slice(n, n + 3*32));
+            build_busy = false;
+            initEmulator(gb_file);
+        });
+    });
+}
+
+function destroyEmulator()
+{
+    gb = undefined;
+}
+
+function initEmulator(ROM)
+{
+    gb = new GameBoyCore(document.getElementById("gbcanvas"), ROM, [
+        false,                              //Turn on sound.
+        false,                              //Boot with boot ROM first?
+        false,                              //Give priority to GameBoy mode
+        1,                                  //Volume level set.
+        true,                               //Colorize GB mode?
+        false,                              //Disallow typed arrays?
+        8,                                  //Interval for the emulator loop.
+        10,                                 //Audio buffer minimum span amount over x interpreter iterations.
+        20,                                 //Audio buffer maximum span amount over x interpreter iterations.
+        false,                              //Override to allow for MBC1 instead of ROM only (compatibility for broken 3rd-party cartridges).
+        false,                              //Override MBC RAM disabling and always allow reading and writing to the banks.
+        false,                              //Use the GameBoy boot ROM instead of the GameBoy Color boot ROM.
+        false,                              //Scale the canvas in JS, or let the browser scale the canvas?
+        true,                               //Use image smoothing based scaling?
+        [true, true, true, true]            //User controlled channel enables.
+    ]);
+    gb.start();
+    gb.programCounter = 0;
+    gb.stopEmulator &= 1;
+    updateCpuState();
+}
+
+function stepEmulator()
+{
+    if (typeof(gb) == "undefined") return;
+    gb.run();
+    updateCpuState();
+}
+
+function toHex(num, digits)
+{
+    return "$" + ("0000" + num.toString(16)).slice(-digits);
+}
+
+function updateCpuState()
+{
+    document.getElementById("cpu_pc").innerHTML = toHex(gb.programCounter, 4)
+    document.getElementById("cpu_a").innerHTML = toHex(gb.registerA, 2);
+    document.getElementById("cpu_bc").innerHTML = toHex((gb.registerB << 8) | gb.registerC, 4);
+    document.getElementById("cpu_de").innerHTML = toHex((gb.registerD << 8) | gb.registerE, 4);
+    document.getElementById("cpu_hl").innerHTML = toHex((gb.registerH << 8) | gb.registerL, 4);
+    var flags = "";
+    if (gb.FZero) flags += "Z ";
+    if (gb.FCarry) flags += "C ";
+    if (gb.FHalfCarry) flags += "H ";
+    if (gb.FSubstract) flags += "N ";
+    document.getElementById("cpu_flags").innerHTML = flags;
+}
+
+window.addEventListener('DOMContentLoaded', (event) => {
+    editor = ace.edit("input");
+    editor.setTheme("ace/theme/tomorrow");
+    editor.session.setMode("ace/mode/assembly_x86");
+
+    if (location.hash.length > 1)
+    {
+        editor.setValue(LZString.decompressFromEncodedURIComponent(location.hash.slice(1)));
+    }
+    editor.session.on('change', function(delta) { compileCode() });
+    compileCode();
+
+    document.getElementById("cpu_step").onclick = stepEmulator;
+});
+
+</script>
+</head>
+<body style="margin: 0">
+<div id="input" style="height: 50%; width: 100%">
+SECTION "bank00", ROM0[$0000]
+  stop
+</div>
+<textarea style="height: 50%; width: 100%" id="output" readonly></textarea>
+<table style="position: absolute; top: 0; right: 0">
+<tr><td>PC:<td id="cpu_pc">-
+<tr><td>A:<td id="cpu_a">-
+<tr><td>BC:<td id="cpu_bc">-
+<tr><td>DE:<td id="cpu_de">-
+<tr><td>HL:<td id="cpu_hl">-
+<tr><td>Flags:<td id="cpu_flags">-
+<tr><td><td><button id="cpu_step">step</button>
+<tr><td colspan="2"><canvas id="gbcanvas" width="160" height="144"></canvas>
+</table>
+</body>
+</html>
