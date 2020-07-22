@@ -10,6 +10,12 @@ fi
 rm -rf rgbds
 git clone https://github.com/rednex/rgbds.git
 cd rgbds
+
+patch -p1 < ../rgbds.patch
+echo "Allowing patching"
+read
+git diff > ../rgbds.patch
+
 MAKE_ARGS="Q= PNGCFLAGS= PNGLDFLAGS= PNGLDLIBS="
 CFLAGS="-O3 -s MODULARIZE=1 -s EXTRA_EXPORTED_RUNTIME_METHODS=['FS'] -s USE_LIBPNG"
 emmake make ${MAKE_ARGS} CFLAGS="${CFLAGS} -s 'EXPORT_NAME=createRgbAsm'" rgbasm

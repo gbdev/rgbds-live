@@ -1,0 +1,57 @@
+diff --git a/include/asm/symbol.h b/include/asm/symbol.h
+index e1a420e..4df87e6 100644
+--- a/include/asm/symbol.h
++++ b/include/asm/symbol.h
+@@ -109,6 +109,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
+ 
+ int32_t sym_GetValue(struct Symbol const *sym);
+ void sym_SetExportAll(bool set);
++struct Symbol *sym_AddSecret();
+ struct Symbol *sym_AddLocalReloc(char const *symName);
+ struct Symbol *sym_AddReloc(char const *symName);
+ void sym_Export(char const *symName);
+diff --git a/src/asm/asmy.y b/src/asm/asmy.y
+index d51e683..bd17b9b 100644
+--- a/src/asm/asmy.y
++++ b/src/asm/asmy.y
+@@ -663,7 +663,7 @@ lines		: /* empty */
+ ;
+ 
+ line		: label
+-		| label cpu_command
++		| label { sym_AddSecret(); } cpu_command
+ 		| label macro
+ 		| label simple_pseudoop
+ 		| pseudoop
+@@ -1502,7 +1502,7 @@ sectattrs	: /* empty */ {
+ ;
+ 
+ 
+-cpu_command	: { nPCOffset = 1; } z80_adc
++cpu_command : { nPCOffset = 1; } z80_adc
+ 		| { nPCOffset = 1; } z80_add
+ 		| { nPCOffset = 1; } z80_and
+ 		| { nPCOffset = 1; } z80_bit
+diff --git a/src/asm/symbol.c b/src/asm/symbol.c
+index 4887b36..7e77f05 100644
+--- a/src/asm/symbol.c
++++ b/src/asm/symbol.c
+@@ -361,6 +361,18 @@ struct Symbol *sym_AddSet(char const *symName, int32_t value)
+ 	return sym;
+ }
+ 
++static uint32_t secret_counter = 0;
++struct Symbol *sym_AddSecret()
++{
++    char name[MAXSYMLEN + 1];
++    secret_counter += 1;
++    sprintf(name, ".__SECRET__%x__LINE__%x", secret_counter, fstk_GetLine());
++    if (symbolScope)
++        return sym_AddLocalReloc(name);
++    return sym_AddReloc(name + 1);
++}
++
++
+ /*
+  * Add a local (.name) relocatable symbol
+  */
