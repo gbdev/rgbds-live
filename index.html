@@ -157,6 +157,10 @@ function updateCpuState()
     document.getElementById("cpu_flags").innerHTML = flags;
 
     var line_nr = addr_to_line[gb.programCounter];
+    if (typeof(line_nr) == "undefined")
+        line_nr = addr_to_line[gb.programCounter - 1];
+    if (typeof(line_nr) == "undefined")
+        line_nr = addr_to_line[gb.programCounter - 2];
     if (typeof(line_nr) != "undefined")
         cpu_line_marker = editor.session.addMarker(new ace.Range(line_nr-1, 0, line_nr-1, 1), "cpuLineMarker", "fullLine");
 }
