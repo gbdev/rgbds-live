@@ -1,6 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 set -eu
+
+if [[ "$(which emmake)" == "" ]]; then
+    echo "I need emscripten sdk active, see https://emscripten.org/docs/getting_started/downloads.html"
+    exit 1
+fi
 
 rm -rf rgbds
 git clone https://github.com/rednex/rgbds.git
@@ -10,6 +15,7 @@ CFLAGS="-O3 -s MODULARIZE=1 -s EXTRA_EXPORTED_RUNTIME_METHODS=['FS'] -s USE_LIBP
 emmake make ${MAKE_ARGS} CFLAGS="${CFLAGS} -s 'EXPORT_NAME=createRgbAsm'" rgbasm
 emmake make ${MAKE_ARGS} CFLAGS="${CFLAGS} -s 'EXPORT_NAME=createRgbLink'" rgblink
 emmake make ${MAKE_ARGS} CFLAGS="${CFLAGS} -s 'EXPORT_NAME=createRgbFix'" rgbfix
-cp rgbasm* ../www
-cp rgblink* ../www
-cp rgbfix* ../www
+mkdir -p ../www/wasm/
+cp rgbasm* ../www/wasm/
+cp rgblink* ../www/wasm/
+cp rgbfix* ../www/wasm/
