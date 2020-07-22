@@ -1,5 +1,12 @@
 <html>
 <head>
+<style>
+.cpuLineMarker {
+  position:absolute;
+  background:rgba(100,200,100,0.5);
+  z-index:20
+}
+</style>
 
 <script src="wasm/rgbasm"></script>
 <script src="wasm/rgblink"></script>
@@ -20,12 +27,17 @@ function logFunction(str) {
     output.value += str + "\n";
     output.scrollTop = output.clientHeight;
 }
+
+//Global functions GameBoyCore needs.
 function cout(str) { logFunction(str); }
+function pause() {}
+function initNewCanvas() {}
+
 var build_busy = false;
 var editor;
+var cpu_line_marker = undefined;
 var gb;
-
-function initNewCanvas() {}
+var addr_to_line = {}
 
 function compileCode()
 {
@@ -39,7 +51,7 @@ function compileCode()
 
     logFunction("Running rgbasm");
     createRgbAsm({
-        'arguments': ['input.asm', '-o', 'output.o'],
+        'arguments': ['input.asm', '-o', 'output.o', '-e'],
         'preRun': function(m) {
             var FS = m['FS'];
             FS.writeFile("input.asm", code);
@@ -51,7 +63,7 @@ function compileCode()
         try { var obj_file = FS.readFile("output.o"); } catch { build_busy = false; return; }
         logFunction("Running rgblink");
         createRgbLink({
-            'arguments': ['input.o', '-o', 'output.gb', '-x'],
+            'arguments': ['input.o', '-o', 'output.gb', '-x', '--sym', 'output.sym'],
             'preRun': function(m) {
                 var FS = m['FS'];
                 FS.writeFile("input.o", obj_file);
@@ -61,10 +73,21 @@ function compileCode()
         }).then(function(m) {
             var FS = m['FS'];
             try { var gb_file = FS.readFile("output.gb"); } catch { build_busy = false; return; }
+            try { var sym_file = FS.readFile("output.sym", {'encoding': 'utf8'}); } catch { build_busy = false; return; }
             var hex = Array.prototype.map.call(gb_file, x => ('00' + x.toString(16)).slice(-2)).join(' ');
             for(var n=0; n<hex.length; n+=3*32)
                 logFunction(hex.slice(n, n + 3*32));
             build_busy = false;
+            for(var line of sym_file.split("\n"))
+            {
+                if (line.indexOf("__SECRET__") > -1 && line.indexOf("__LINE__") > -1)
+                {
+                    var line_nr = parseInt(line.split("__LINE__")[1], 16);
+                    var addr = line.split(" ")[0].split(":");
+                    addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
+                    addr_to_line[addr] = line_nr;
+                }
+            }
             initEmulator(gb_file);
         });
     });
@@ -72,6 +95,7 @@ function compileCode()
 
 function destroyEmulator()
 {
+    addr_to_line = {}
     gb = undefined;
 }
 
@@ -114,6 +138,12 @@ function toHex(num, digits)
 
 function updateCpuState()
 {
+    if (typeof(cpu_line_marker) != "undefined")
+    {
+        editor.session.removeMarker(cpu_line_marker);
+        cpu_line_marker = undefined;
+    }
+
     document.getElementById("cpu_pc").innerHTML = toHex(gb.programCounter, 4)
     document.getElementById("cpu_a").innerHTML = toHex(gb.registerA, 2);
     document.getElementById("cpu_bc").innerHTML = toHex((gb.registerB << 8) | gb.registerC, 4);
@@ -125,12 +155,17 @@ function updateCpuState()
     if (gb.FHalfCarry) flags += "H ";
     if (gb.FSubstract) flags += "N ";
     document.getElementById("cpu_flags").innerHTML = flags;
+
+    var line_nr = addr_to_line[gb.programCounter];
+    if (typeof(line_nr) != "undefined")
+        cpu_line_marker = editor.session.addMarker(new ace.Range(line_nr-1, 0, line_nr-1, 1), "cpuLineMarker", "fullLine");
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
     editor = ace.edit("input");
     editor.setTheme("ace/theme/tomorrow");
     editor.session.setMode("ace/mode/assembly_x86");
+    editor.session.setOptions({tabSize: 2, useSoftTabs: true});
 
     if (location.hash.length > 1)
     {
