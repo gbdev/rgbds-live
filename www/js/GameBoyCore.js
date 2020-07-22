@@ -5714,7 +5714,7 @@ GameBoyCore.prototype.channel4UpdateCache = function () {
 GameBoyCore.prototype.run = function () {
 	//The preprocessing before the actual iteration loop:
 	if ((this.stopEmulator & 2) == 0) {
-		if ((this.stopEmulator & 1) == 1 || this.singleStep) {
+		if ((this.stopEmulator & 1) == 1 || true) {
 			if (!this.CPUStopped) {
 				this.stopEmulator = 0;
 				this.audioUnderrunAdjustment();
