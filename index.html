@@ -124,9 +124,10 @@ function initEmulator(ROM)
     updateCpuState();
 }
 
-function stepEmulator()
+function stepEmulator(singleStep)
 {
     if (typeof(gb) == "undefined") return;
+    gb.singleStep = singleStep;
     gb.run();
     updateCpuState();
 }
@@ -148,7 +149,7 @@ function updateCpuState()
     document.getElementById("cpu_a").innerHTML = toHex(gb.registerA, 2);
     document.getElementById("cpu_bc").innerHTML = toHex((gb.registerB << 8) | gb.registerC, 4);
     document.getElementById("cpu_de").innerHTML = toHex((gb.registerD << 8) | gb.registerE, 4);
-    document.getElementById("cpu_hl").innerHTML = toHex((gb.registerH << 8) | gb.registerL, 4);
+    document.getElementById("cpu_hl").innerHTML = toHex(gb.registersHL, 4);
     var flags = "";
     if (gb.FZero) flags += "Z ";
     if (gb.FCarry) flags += "C ";
@@ -178,7 +179,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
     editor.session.on('change', function(delta) { compileCode() });
     compileCode();
 
-    document.getElementById("cpu_step").onclick = stepEmulator;
+    document.getElementById("cpu_step").onclick = function() { stepEmulator(true); };
+    document.getElementById("cpu_frame").onclick = function() { stepEmulator(false); };
 });
 
 </script>
@@ -196,7 +198,7 @@ SECTION "bank00", ROM0[$0000]
 <tr><td>DE:<td id="cpu_de">-
 <tr><td>HL:<td id="cpu_hl">-
 <tr><td>Flags:<td id="cpu_flags">-
-<tr><td><td><button id="cpu_step">step</button>
+<tr><td><button id="cpu_step">step</button><td><button id="cpu_frame">frame</button>
 <tr><td colspan="2"><canvas id="gbcanvas" width="160" height="144"></canvas>
 </table>
 </body>
