@@ -6,6 +6,13 @@
   background:rgba(100,200,100,0.5);
   z-index:20
 }
+table {
+  border-collapse: collapse;
+}
+table, th, td {
+  border: 1px solid black;
+  background: white;
+}
 </style>
 
 <script src="wasm/rgbasm"></script>
@@ -36,8 +43,11 @@ function initNewCanvas() {}
 var build_busy = false;
 var editor;
 var cpu_line_marker = undefined;
+var start_address;
+var rom;
 var gb;
 var addr_to_line = {}
+var cpu_step_interval_id;
 
 function compileCode()
 {
@@ -78,6 +88,7 @@ function compileCode()
             for(var n=0; n<hex.length; n+=3*32)
                 logFunction(hex.slice(n, n + 3*32));
             build_busy = false;
+            start_address = 0x100;
             for(var line of sym_file.split("\n"))
             {
                 if (line.indexOf("__SECRET__") > -1 && line.indexOf("__LINE__") > -1)
@@ -87,8 +98,14 @@ function compileCode()
                     addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
                     addr_to_line[addr] = line_nr;
                 }
+                if (line.endsWith(" emustart") || line.endsWith(" emuStart") || line.endsWith(" emu_start"))
+                {
+                    var addr = line.split(" ")[0].split(":");
+                    addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
+                    start_address = addr;
+                }
             }
-            initEmulator(gb_file);
+            rom = gb_file;
         });
     });
 }
@@ -97,37 +114,46 @@ function destroyEmulator()
 {
     addr_to_line = {}
     gb = undefined;
+    rom = undefined
 }
 
-function initEmulator(ROM)
+function initEmulator()
 {
-    gb = new GameBoyCore(document.getElementById("gbcanvas"), ROM, [
+    if (typeof(rom) == "undefined") return;
+    gb = new GameBoyCore(document.getElementById("gbcanvas"), rom, [
         false,                              //Turn on sound.
         false,                              //Boot with boot ROM first?
         false,                              //Give priority to GameBoy mode
         1,                                  //Volume level set.
         true,                               //Colorize GB mode?
         false,                              //Disallow typed arrays?
-        8,                                  //Interval for the emulator loop.
+        16,                                 //Interval for the emulator loop.
         10,                                 //Audio buffer minimum span amount over x interpreter iterations.
         20,                                 //Audio buffer maximum span amount over x interpreter iterations.
         false,                              //Override to allow for MBC1 instead of ROM only (compatibility for broken 3rd-party cartridges).
         false,                              //Override MBC RAM disabling and always allow reading and writing to the banks.
         false,                              //Use the GameBoy boot ROM instead of the GameBoy Color boot ROM.
         false,                              //Scale the canvas in JS, or let the browser scale the canvas?
-        true,                               //Use image smoothing based scaling?
+        false,                              //Use image smoothing based scaling?
         [true, true, true, true]            //User controlled channel enables.
     ]);
     gb.start();
-    gb.programCounter = 0;
-    gb.stopEmulator &= 1;
+    gb.updateGBBGPalette(gb.memory[0xFF47]);
+    gb.updateGBOBJPalette(0, gb.memory[0xFF48]);
+    gb.updateGBOBJPalette(1, gb.memory[0xFF49]);
+    gb.programCounter = start_address;
+    gb.stopEmulator &= 1; 
     updateCpuState();
 }
 
-function stepEmulator(singleStep)
+function stepEmulator(step_type)
 {
-    if (typeof(gb) == "undefined") return;
-    gb.singleStep = singleStep;
+    if (typeof(gb) == "undefined")
+    {
+        initEmulator();
+        return;
+    }
+    gb.singleStep = step_type == "single";
     gb.run();
     updateCpuState();
 }
@@ -163,7 +189,10 @@ function updateCpuState()
     if (typeof(line_nr) == "undefined")
         line_nr = addr_to_line[gb.programCounter - 2];
     if (typeof(line_nr) != "undefined")
+    {
         cpu_line_marker = editor.session.addMarker(new ace.Range(line_nr-1, 0, line_nr-1, 1), "cpuLineMarker", "fullLine");
+        editor.scrollToLine(line_nr-1, true, false, function() {});
+    }
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
@@ -179,8 +208,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
     editor.session.on('change', function(delta) { compileCode() });
     compileCode();
 
-    document.getElementById("cpu_step").onclick = function() { stepEmulator(true); };
-    document.getElementById("cpu_frame").onclick = function() { stepEmulator(false); };
+    document.getElementById("cpu_step").onclick = function() { stepEmulator(document.getElementById("cpu_step_type").value); };
+    document.getElementById("cpu_run_check").onclick = function() {
+        clearInterval(cpu_step_interval_id);
+        if (document.getElementById("cpu_run_check").checked)
+        {
+            cpu_step_interval_id = setInterval(function() {
+                stepEmulator(document.getElementById("cpu_step_type").value);
+            }, 16);
+        }
+    }
 });
 
 </script>
@@ -191,15 +228,15 @@ SECTION "bank00", ROM0[$0000]
   stop
 </div>
 <textarea style="height: 50%; width: 100%" id="output" readonly></textarea>
-<table style="position: absolute; top: 0; right: 0">
+<table style="position: absolute; top: 0; right: 20">
 <tr><td>PC:<td id="cpu_pc">-
 <tr><td>A:<td id="cpu_a">-
 <tr><td>BC:<td id="cpu_bc">-
 <tr><td>DE:<td id="cpu_de">-
 <tr><td>HL:<td id="cpu_hl">-
 <tr><td>Flags:<td id="cpu_flags">-
-<tr><td><button id="cpu_step">step</button><td><button id="cpu_frame">frame</button>
-<tr><td colspan="2"><canvas id="gbcanvas" width="160" height="144"></canvas>
+<tr><td><select id="cpu_step_type"><option value="single">Single<option value="frame">Frame</select><td><button id="cpu_step">step</button><input id="cpu_run_check" type="checkbox">run
+<tr><td colspan="2"><canvas id="gbcanvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
 </table>
 </body>
 </html>
