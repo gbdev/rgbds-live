@@ -6,6 +6,13 @@
   background:rgba(100,200,100,0.5);
   z-index:20
 }
+table {
+  border-collapse: collapse;
+}
+table, th, td {
+  border: 1px solid black;
+  background: white;
+}
 </style>
 
 <script src="wasm/rgbasm"></script>
@@ -40,6 +47,7 @@ var start_address;
 var rom;
 var gb;
 var addr_to_line = {}
+var cpu_step_interval_id;
 
 function compileCode()
 {
@@ -119,7 +127,7 @@ function initEmulator()
         1,                                  //Volume level set.
         true,                               //Colorize GB mode?
         false,                              //Disallow typed arrays?
-        16,                                  //Interval for the emulator loop.
+        16,                                 //Interval for the emulator loop.
         10,                                 //Audio buffer minimum span amount over x interpreter iterations.
         20,                                 //Audio buffer maximum span amount over x interpreter iterations.
         false,                              //Override to allow for MBC1 instead of ROM only (compatibility for broken 3rd-party cartridges).
@@ -135,14 +143,14 @@ function initEmulator()
     updateCpuState();
 }
 
-function stepEmulator(singleStep)
+function stepEmulator(step_type)
 {
     if (typeof(gb) == "undefined")
     {
         initEmulator();
         return;
     }
-    gb.singleStep = singleStep;
+    gb.singleStep = step_type == "single";
     gb.run();
     updateCpuState();
 }
@@ -197,8 +205,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
     editor.session.on('change', function(delta) { compileCode() });
     compileCode();
 
-    document.getElementById("cpu_step").onclick = function() { stepEmulator(true); };
-    document.getElementById("cpu_frame").onclick = function() { stepEmulator(false); };
+    document.getElementById("cpu_step").onclick = function() { stepEmulator(document.getElementById("cpu_step_type").value); };
+    document.getElementById("cpu_run_check").onclick = function() {
+        clearInterval(cpu_step_interval_id);
+        if (document.getElementById("cpu_run_check").checked)
+        {
+            cpu_step_interval_id = setInterval(function() {
+                stepEmulator(document.getElementById("cpu_step_type").value);
+            }, 16);
+        }
+    }
 });
 
 </script>
@@ -209,14 +225,14 @@ SECTION "bank00", ROM0[$0000]
   stop
 </div>
 <textarea style="height: 50%; width: 100%" id="output" readonly></textarea>
-<table style="position: absolute; top: 0; right: 0">
+<table style="position: absolute; top: 0; right: 20">
 <tr><td>PC:<td id="cpu_pc">-
 <tr><td>A:<td id="cpu_a">-
 <tr><td>BC:<td id="cpu_bc">-
 <tr><td>DE:<td id="cpu_de">-
 <tr><td>HL:<td id="cpu_hl">-
 <tr><td>Flags:<td id="cpu_flags">-
-<tr><td><button id="cpu_step">step</button><td><button id="cpu_frame">frame</button>
+<tr><td><select id="cpu_step_type"><option value="single">Single<option value="frame">Frame</select><td><button id="cpu_step">step</button><input id="cpu_run_check" type="checkbox">run
 <tr><td colspan="2"><canvas id="gbcanvas" width="160" height="144"></canvas>
 </table>
 </body>
