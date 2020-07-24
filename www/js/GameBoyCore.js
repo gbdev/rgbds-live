@@ -11,6 +11,8 @@
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 function GameBoyCore(canvas, ROMImage, settings) {
+    this.breakpointHit = false;
+    this.breakpoints = new Set()
 	//Params, etc...
 	this.canvas = canvas;						//Canvas DOM object for drawing out the graphics to.
 	this.drawContext = null;					// LCD Context
@@ -5811,7 +5813,11 @@ GameBoyCore.prototype.executeIteration = function () {
 		if (this.emulatorTicks >= this.CPUCyclesTotal) {
 			this.iterationEndRoutine();
 		}
-        if (this.singleStep) {
+        if (this.singleStep)
+            break;
+        if (this.breakpoints.has(this.programCounter))
+        {
+            this.breakpointHit = true;
             break;
         }
 	}
