@@ -36,6 +36,8 @@ function initNewCanvas() {}
 var build_busy = false;
 var editor;
 var cpu_line_marker = undefined;
+var start_address;
+var rom;
 var gb;
 var addr_to_line = {}
 
@@ -78,6 +80,7 @@ function compileCode()
             for(var n=0; n<hex.length; n+=3*32)
                 logFunction(hex.slice(n, n + 3*32));
             build_busy = false;
+            start_address = 0x100;
             for(var line of sym_file.split("\n"))
             {
                 if (line.indexOf("__SECRET__") > -1 && line.indexOf("__LINE__") > -1)
@@ -87,8 +90,14 @@ function compileCode()
                     addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
                     addr_to_line[addr] = line_nr;
                 }
+                if (line.endsWith(" emustart") || line.endsWith(" emuStart") || line.endsWith(" emu_start"))
+                {
+                    var addr = line.split(" ")[0].split(":");
+                    addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
+                    start_address = addr;
+                }
             }
-            initEmulator(gb_file);
+            rom = gb_file;
         });
     });
 }
@@ -97,18 +106,20 @@ function destroyEmulator()
 {
     addr_to_line = {}
     gb = undefined;
+    rom = undefined
 }
 
-function initEmulator(ROM)
+function initEmulator()
 {
-    gb = new GameBoyCore(document.getElementById("gbcanvas"), ROM, [
+    if (typeof(rom) == "undefined") return;
+    gb = new GameBoyCore(document.getElementById("gbcanvas"), rom, [
         false,                              //Turn on sound.
         false,                              //Boot with boot ROM first?
         false,                              //Give priority to GameBoy mode
         1,                                  //Volume level set.
         true,                               //Colorize GB mode?
         false,                              //Disallow typed arrays?
-        8,                                  //Interval for the emulator loop.
+        16,                                  //Interval for the emulator loop.
         10,                                 //Audio buffer minimum span amount over x interpreter iterations.
         20,                                 //Audio buffer maximum span amount over x interpreter iterations.
         false,                              //Override to allow for MBC1 instead of ROM only (compatibility for broken 3rd-party cartridges).
@@ -119,14 +130,18 @@ function initEmulator(ROM)
         [true, true, true, true]            //User controlled channel enables.
     ]);
     gb.start();
-    gb.programCounter = 0;
+    gb.programCounter = start_address;
     gb.stopEmulator &= 1;
     updateCpuState();
 }
 
 function stepEmulator(singleStep)
 {
-    if (typeof(gb) == "undefined") return;
+    if (typeof(gb) == "undefined")
+    {
+        initEmulator();
+        return;
+    }
     gb.singleStep = singleStep;
     gb.run();
     updateCpuState();
@@ -163,7 +178,10 @@ function updateCpuState()
     if (typeof(line_nr) == "undefined")
         line_nr = addr_to_line[gb.programCounter - 2];
     if (typeof(line_nr) != "undefined")
+    {
         cpu_line_marker = editor.session.addMarker(new ace.Range(line_nr-1, 0, line_nr-1, 1), "cpuLineMarker", "fullLine");
+        editor.scrollToLine(line_nr-1, true, false, function() {});
+    }
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
