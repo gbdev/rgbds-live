@@ -134,12 +134,15 @@ function initEmulator()
         false,                              //Override MBC RAM disabling and always allow reading and writing to the banks.
         false,                              //Use the GameBoy boot ROM instead of the GameBoy Color boot ROM.
         false,                              //Scale the canvas in JS, or let the browser scale the canvas?
-        true,                               //Use image smoothing based scaling?
+        false,                              //Use image smoothing based scaling?
         [true, true, true, true]            //User controlled channel enables.
     ]);
     gb.start();
+    gb.updateGBBGPalette(gb.memory[0xFF47]);
+    gb.updateGBOBJPalette(0, gb.memory[0xFF48]);
+    gb.updateGBOBJPalette(1, gb.memory[0xFF49]);
     gb.programCounter = start_address;
-    gb.stopEmulator &= 1;
+    gb.stopEmulator &= 1; 
     updateCpuState();
 }
 
@@ -233,7 +236,7 @@ SECTION "bank00", ROM0[$0000]
 <tr><td>HL:<td id="cpu_hl">-
 <tr><td>Flags:<td id="cpu_flags">-
 <tr><td><select id="cpu_step_type"><option value="single">Single<option value="frame">Frame</select><td><button id="cpu_step">step</button><input id="cpu_run_check" type="checkbox">run
-<tr><td colspan="2"><canvas id="gbcanvas" width="160" height="144"></canvas>
+<tr><td colspan="2"><canvas id="gbcanvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
 </table>
 </body>
 </html>

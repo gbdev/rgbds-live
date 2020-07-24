@@ -5011,14 +5011,6 @@ GameBoyCore.prototype.initLCD = function () {
 		this.canvasOffscreen.height = this.offscreenHeight;
 		this.drawContextOffscreen = this.canvasOffscreen.getContext("2d");
 		this.drawContextOnscreen = this.canvas.getContext("2d");
-		this.canvas.setAttribute("style", (this.canvas.getAttribute("style") || "") + "; image-rendering: " + ((this.settings[13]) ? "auto" : "-webkit-optimize-contrast") + ";" +
-		"image-rendering: " + ((this.settings[13]) ? "optimizeQuality" : "-o-crisp-edges") + ";" +
-		"image-rendering: " + ((this.settings[13]) ? "optimizeQuality" : "-moz-crisp-edges") + ";" +
-		"-ms-interpolation-mode: " + ((this.settings[13]) ? "bicubic" : "nearest-neighbor") + ";");
-		this.drawContextOffscreen.webkitImageSmoothingEnabled  = this.settings[13];
-		this.drawContextOffscreen.mozImageSmoothingEnabled = this.settings[13];
-		this.drawContextOnscreen.webkitImageSmoothingEnabled  = this.settings[13];
-		this.drawContextOnscreen.mozImageSmoothingEnabled = this.settings[13];
 		//Get a CanvasPixelArray buffer:
 		try {
 			this.canvasBuffer = this.drawContextOffscreen.createImageData(this.offscreenWidth, this.offscreenHeight);

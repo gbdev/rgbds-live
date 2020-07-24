@@ -11,7 +11,7 @@ index e1a420e..4df87e6 100644
  struct Symbol *sym_AddReloc(char const *symName);
  void sym_Export(char const *symName);
 diff --git a/src/asm/asmy.y b/src/asm/asmy.y
-index d51e683..bd17b9b 100644
+index d4f9d93..70ef955 100644
 --- a/src/asm/asmy.y
 +++ b/src/asm/asmy.y
 @@ -663,7 +663,7 @@ lines		: /* empty */
