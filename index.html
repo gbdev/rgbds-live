@@ -6,6 +6,10 @@
   background:rgba(100,200,100,0.5);
   z-index:20
 }
+.ace_gutter-cell.ace_breakpoint{ 
+    border-radius: 14px;
+    box-shadow: 10px 0px 1px 1px #ff2020 inset; 
+}
 table {
   border-collapse: collapse;
 }
@@ -18,6 +22,7 @@ table, th, td {
 <script src="wasm/rgbasm"></script>
 <script src="wasm/rgblink"></script>
 <script src="wasm/rgbfix"></script>
+<script src="js/hardware.inc.js"></script>
 <script src="js/lz-string.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.js"></script>
@@ -40,20 +45,24 @@ function cout(str) { logFunction(str); }
 function pause() {}
 function initNewCanvas() {}
 
-var build_busy = false;
+var build_state = 0;
 var editor;
 var cpu_line_marker = undefined;
 var start_address;
 var rom;
 var gb;
 var addr_to_line = {}
+var line_to_addr = {}
 var cpu_step_interval_id;
 
 function compileCode()
 {
-    if (build_busy)
+    if (build_state > 0)
+    {
+        build_state = 2;
         return;
-    build_busy = true;
+    }
+    build_state = 1;
     destroyEmulator();
     var code = editor.getValue();
     document.getElementById('output').value = "";
@@ -64,13 +73,14 @@ function compileCode()
         'arguments': ['input.asm', '-o', 'output.o', '-e'],
         'preRun': function(m) {
             var FS = m['FS'];
+            FS.writeFile("hardware.inc", hardware_inc);
             FS.writeFile("input.asm", code);
         },
         'print': logFunction,
         'printErr': logFunction,
     }).then(function(m) {
         var FS = m['FS'];
-        try { var obj_file = FS.readFile("output.o"); } catch { build_busy = false; return; }
+        try { var obj_file = FS.readFile("output.o"); } catch { buildDone(); return; }
         logFunction("Running rgblink");
         createRgbLink({
             'arguments': ['input.o', '-o', 'output.gb', '-x', '--sym', 'output.sym'],
@@ -82,12 +92,11 @@ function compileCode()
             'printErr': logFunction,
         }).then(function(m) {
             var FS = m['FS'];
-            try { var gb_file = FS.readFile("output.gb"); } catch { build_busy = false; return; }
-            try { var sym_file = FS.readFile("output.sym", {'encoding': 'utf8'}); } catch { build_busy = false; return; }
+            try { var gb_file = FS.readFile("output.gb"); } catch { buildDone(); return; }
+            try { var sym_file = FS.readFile("output.sym", {'encoding': 'utf8'}); } catch { buildDone(); return; }
             var hex = Array.prototype.map.call(gb_file, x => ('00' + x.toString(16)).slice(-2)).join(' ');
             for(var n=0; n<hex.length; n+=3*32)
                 logFunction(hex.slice(n, n + 3*32));
-            build_busy = false;
             start_address = 0x100;
             for(var line of sym_file.split("\n"))
             {
@@ -97,6 +106,7 @@ function compileCode()
                     var addr = line.split(" ")[0].split(":");
                     addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
                     addr_to_line[addr] = line_nr;
+                    line_to_addr[line_nr] = addr;
                 }
                 if (line.endsWith(" emustart") || line.endsWith(" emuStart") || line.endsWith(" emu_start"))
                 {
@@ -106,13 +116,25 @@ function compileCode()
                 }
             }
             rom = gb_file;
+            buildDone();
         });
     });
+}
+
+function buildDone()
+{
+    build_state -= 1;
+    if (build_state > 0)
+    {
+        build_state = 0;
+        compileCode();
+    }
 }
 
 function destroyEmulator()
 {
     addr_to_line = {}
+    line_to_addr = {}
     gb = undefined;
     rom = undefined
 }
@@ -144,6 +166,7 @@ function initEmulator()
     gb.programCounter = start_address;
     gb.stopEmulator &= 1; 
     updateCpuState();
+    updateBreakpoints();
 }
 
 function stepEmulator(step_type)
@@ -154,8 +177,25 @@ function stepEmulator(step_type)
         return;
     }
     gb.singleStep = step_type == "single";
+    gb.breakpointHit = false;
     gb.run();
     updateCpuState();
+}
+
+function updateBreakpoints()
+{
+    if (typeof(gb) == "undefined") return;
+
+    gb.breakpoints.clear();
+    var breakpoints = editor.session.getBreakpoints();
+    for(var line_nr in breakpoints)
+    {
+        if (typeof(breakpoints[line_nr]) == "undefined") continue;
+        line_nr = parseInt(line_nr) + 1;
+        if (typeof(line_to_addr[line_nr]) == "undefined") continue;
+        gb.breakpoints.add(line_to_addr[line_nr]);
+    }
+    console.log(gb.breakpoints);
 }
 
 function toHex(num, digits)
@@ -206,6 +246,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
         editor.setValue(LZString.decompressFromEncodedURIComponent(location.hash.slice(1)));
     }
     editor.session.on('change', function(delta) { compileCode() });
+    editor.on("guttermousedown", function(e) {
+        var target = e.domEvent.target;
+
+        if (target.className.indexOf("ace_gutter-cell") == -1)
+            return;
+        var row = e.getDocumentPosition().row;
+        var breakpoints = e.editor.session.getBreakpoints();
+        if (typeof(breakpoints[row]) == "undefined")
+            e.editor.session.setBreakpoint(row);
+        else
+            e.editor.session.clearBreakpoint(row);
+        updateBreakpoints();
+        e.stop();
+    });
     compileCode();
 
     document.getElementById("cpu_step").onclick = function() { stepEmulator(document.getElementById("cpu_step_type").value); };
@@ -215,6 +269,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
         {
             cpu_step_interval_id = setInterval(function() {
                 stepEmulator(document.getElementById("cpu_step_type").value);
+                if (gb.breakpointHit)
+                {
+                    clearInterval(cpu_step_interval_id);
+                    document.getElementById("cpu_run_check").checked = false;
+                }
             }, 16);
         }
     }
