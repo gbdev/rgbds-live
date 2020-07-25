@@ -187,9 +187,12 @@ function initEmulator()
         [true, true, true, true]            //User controlled channel enables.
     ]);
     gb.start();
-    gb.updateGBBGPalette(gb.memory[0xFF47]);
-    gb.updateGBOBJPalette(0, gb.memory[0xFF48]);
-    gb.updateGBOBJPalette(1, gb.memory[0xFF49]);
+    if (gb.gbBGPalette != null)
+    {
+        gb.updateGBBGPalette(gb.memory[0xFF47]);
+        gb.updateGBOBJPalette(0, gb.memory[0xFF48]);
+        gb.updateGBOBJPalette(1, gb.memory[0xFF49]);
+    }
     gb.programCounter = start_address;
     gb.stopEmulator &= 1; 
     updateCpuState();
