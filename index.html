@@ -35,6 +35,7 @@ table, th, td {
 "use strict";
 
 var err_regex = /ERROR: input.asm\(([0-9]+)\)/i;
+var warning_regex = /warning: input.asm\(([0-9]+)\)/i;
 
 function logFunction(str) {
     var output = document.getElementById('output');
@@ -45,7 +46,17 @@ function logFunction(str) {
     if (error_match)
     {
         var error_line = parseInt(error_match[1]);
-        editor.session.setAnnotations([{row: error_line-1, column: 0, type: "error"}]);
+        var annotations = editor.session.getAnnotations();
+        annotations.push({row: error_line-1, column: 0, type: "error", text: str});
+        editor.session.setAnnotations(annotations);
+    }
+    var warning_match = warning_regex.exec(str);
+    if (warning_match)
+    {
+        var line = parseInt(warning_match[1]);
+        var annotations = editor.session.getAnnotations();
+        annotations.push({row: line-1, column: 0, type: "warning", text: str});
+        editor.session.setAnnotations(annotations);
     }
 }
 
@@ -75,7 +86,7 @@ function compileCode()
     destroyEmulator();
     var code = editor.getValue();
     document.getElementById('output').value = "";
-    editor.session.setAnnotations([]);
+    editor.session.clearAnnotations();
     location.hash = LZString.compressToEncodedURIComponent(code);
 
     logFunction("Running rgbasm");
