@@ -25,9 +25,9 @@ table, th, td {
 <script src="js/hardware.inc.js"></script>
 <script src="js/lz-string.min.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-tomorrow.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-assembly_x86.min.js"></script>
+<script src="js/ace/ace.js"></script>
+<script src="js/ace/theme-tomorrow.js"></script>
+<script src="js/ace/mode-gbz80.js"></script>
 
 <script type="text/javascript" src="js/GameBoyCore.js"></script>
 
@@ -137,6 +137,12 @@ function destroyEmulator()
     line_to_addr = {}
     gb = undefined;
     rom = undefined
+
+    if (typeof(cpu_line_marker) != "undefined")
+    {
+        editor.session.removeMarker(cpu_line_marker);
+        cpu_line_marker = undefined;
+    }
 }
 
 function initEmulator()
@@ -252,7 +258,7 @@ function updateCpuState()
 window.addEventListener('DOMContentLoaded', (event) => {
     editor = ace.edit("input");
     editor.setTheme("ace/theme/tomorrow");
-    editor.session.setMode("ace/mode/assembly_x86");
+    editor.session.setMode("ace/mode/gbz80");
     editor.session.setOptions({tabSize: 2, useSoftTabs: true});
 
     if (location.hash.length > 1)
@@ -277,6 +283,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     compileCode();
 
     document.getElementById("cpu_step").onclick = function() { stepEmulator(document.getElementById("cpu_step_type").value); };
+    document.getElementById("cpu_reset").onclick = function() { initEmulator(); };
     document.getElementById("cpu_run_check").onclick = function() {
         clearInterval(cpu_step_interval_id);
         if (document.getElementById("cpu_run_check").checked)
@@ -307,11 +314,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
 </script>
 </head>
 <body style="margin: 0">
-<div id="input" style="height: 50%; width: 100%">
+<div id="input" style="height: 70%; width: 100%">
 SECTION "bank00", ROM0[$0000]
   stop
 </div>
-<textarea style="height: 50%; width: 100%" id="output" readonly></textarea>
+<textarea style="height: 30%; width: 100%" id="output" readonly></textarea>
 <table style="position: absolute; top: 0; right: 20">
 <tr><td>PC:<td id="cpu_pc">-
 <tr><td>A:<td id="cpu_a">-
@@ -320,6 +327,7 @@ SECTION "bank00", ROM0[$0000]
 <tr><td>HL:<td id="cpu_hl">-
 <tr><td>Flags:<td id="cpu_flags">-
 <tr><td><select id="cpu_step_type"><option value="single">Single<option value="frame">Frame</select><td><button id="cpu_step">step</button><input id="cpu_run_check" type="checkbox">run
+<tr><td><td><button id="cpu_reset">Reset</button>
 <tr><td colspan="2"><canvas id="gbcanvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
 </table>
 </body>
