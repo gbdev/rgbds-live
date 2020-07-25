@@ -195,7 +195,21 @@ function updateBreakpoints()
         if (typeof(line_to_addr[line_nr]) == "undefined") continue;
         gb.breakpoints.add(line_to_addr[line_nr]);
     }
-    console.log(gb.breakpoints);
+}
+
+function handleGBKey(keycode, down)
+{
+    if (typeof(gb) == "undefined") return;
+    
+    //Map the directional keys and A/S to B/A and shift/enter to select/start
+    if (keycode == 39) gb.JoyPadEvent(0, down); // right
+    if (keycode == 37) gb.JoyPadEvent(1, down); // left
+    if (keycode == 38) gb.JoyPadEvent(2, down); // up
+    if (keycode == 40) gb.JoyPadEvent(3, down); // down
+    if (keycode == 83) gb.JoyPadEvent(4, down); // a
+    if (keycode == 65) gb.JoyPadEvent(5, down); // b
+    if (keycode == 16) gb.JoyPadEvent(4, down); // select
+    if (keycode == 13) gb.JoyPadEvent(5, down); // start
 }
 
 function toHex(num, digits)
@@ -268,8 +282,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
         if (document.getElementById("cpu_run_check").checked)
         {
             cpu_step_interval_id = setInterval(function() {
-                stepEmulator(document.getElementById("cpu_step_type").value);
-                if (gb.breakpointHit)
+                if (!document.hidden)
+                    stepEmulator(document.getElementById("cpu_step_type").value);
+                if (typeof(gb) != "undefined" && gb.breakpointHit)
                 {
                     clearInterval(cpu_step_interval_id);
                     document.getElementById("cpu_run_check").checked = false;
@@ -277,6 +292,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }, 16);
         }
     }
+    var canvas = document.getElementById("gbcanvas");
+    canvas.tabIndex = -1;
+    canvas.onkeydown = function(e) {
+        handleGBKey(e.keyCode, true);
+        e.preventDefault();
+    };
+    canvas.onkeyup = function(e) {
+        handleGBKey(e.keyCode, false);
+        e.preventDefault();
+    };
 });
 
 </script>

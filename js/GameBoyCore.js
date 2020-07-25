@@ -4613,6 +4613,7 @@ GameBoyCore.prototype.ROMLoad = function () {
 	this.ROM = [];
 	this.usedBootROM = this.settings[1] && ((!this.settings[11] && this.GBCBOOTROM.length == 0x800) || (this.settings[11] && this.GBBOOTROM.length == 0x100));
 	var maxLength = ((this.ROMImage.length - 1) | 0x3FFF) + 1;
+    if (maxLength < 0x8000) maxLength = 0x8000;
 	this.ROM = this.getTypedArray(maxLength, 0, "uint8");
 	var romIndex = 0;
 	if (this.usedBootROM) {
