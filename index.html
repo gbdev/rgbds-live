@@ -34,10 +34,19 @@ table, th, td {
 <script>
 "use strict";
 
+var err_regex = /ERROR: input.asm\(([0-9]+)\)/i;
+
 function logFunction(str) {
     var output = document.getElementById('output');
     output.value += str + "\n";
     output.scrollTop = output.clientHeight;
+
+    var error_match = err_regex.exec(str);
+    if (error_match)
+    {
+        var error_line = parseInt(error_match[1]);
+        editor.session.setAnnotations([{row: error_line-1, column: 0, type: "error"}]);
+    }
 }
 
 //Global functions GameBoyCore needs.
@@ -66,6 +75,7 @@ function compileCode()
     destroyEmulator();
     var code = editor.getValue();
     document.getElementById('output').value = "";
+    editor.session.setAnnotations([]);
     location.hash = LZString.compressToEncodedURIComponent(code);
 
     logFunction("Running rgbasm");
