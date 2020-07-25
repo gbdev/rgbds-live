@@ -47,7 +47,7 @@ function logFunction(str) {
     {
         var error_line = parseInt(error_match[1]);
         var annotations = editor.session.getAnnotations();
-        annotations.push({row: error_line-1, column: 0, type: "error"});
+        annotations.push({row: error_line-1, column: 0, type: "error", text: str});
         editor.session.setAnnotations(annotations);
     }
     var warning_match = warning_regex.exec(str);
@@ -55,7 +55,7 @@ function logFunction(str) {
     {
         var line = parseInt(warning_match[1]);
         var annotations = editor.session.getAnnotations();
-        annotations.push({row: line-1, column: 0, type: "warning"});
+        annotations.push({row: line-1, column: 0, type: "warning", text: str});
         editor.session.setAnnotations(annotations);
     }
 }

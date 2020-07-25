@@ -55,3 +55,25 @@ index 4887b36..7e77f05 100644
  /*
   * Add a local (.name) relocatable symbol
   */
+diff --git a/src/asm/warning.c b/src/asm/warning.c
+index 83a8bda..cdc184e 100644
+--- a/src/asm/warning.c
++++ b/src/asm/warning.c
+@@ -199,7 +199,7 @@ void verror(const char *fmt, va_list args, char const *flag)
+ {
+ 	fputs("ERROR: ", stderr);
+ 	fstk_Dump();
+-	fprintf(stderr, flag ? ": [-Werror=%s]\n    " : ":\n    ", flag);
++	fprintf(stderr, flag ? ": [-Werror=%s]: " : ": ", flag);
+ 	vfprintf(stderr, fmt, args);
+ 	fputc('\n', stderr);
+ 	fstk_DumpStringExpansions();
+@@ -252,7 +252,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+ 
+ 	fputs("warning: ", stderr);
+ 	fstk_Dump();
+-	fprintf(stderr, ": [-W%s]\n    ", flag);
++	fprintf(stderr, ": [-W%s]: ", flag);
+ 	vfprintf(stderr, fmt, args);
+ 	fputc('\n', stderr);
+ 	fstk_DumpStringExpansions();
