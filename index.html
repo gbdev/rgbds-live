@@ -338,22 +338,22 @@ window.addEventListener('DOMContentLoaded', (event) => {
 </script>
 </head>
 <body style="margin: 0">
-<div id="input" style="height: 70%; width: 100%">
-SECTION "bank00", ROM0[$0000]
-emuStart:
-  stop
-</div>
-<textarea style="height: 30%; width: 100%" id="output" readonly></textarea>
-<table style="position: absolute; top: 0; right: 20; z-index: 10">
-<tr><td>PC:<td id="cpu_pc">-
-<tr><td>A:<td id="cpu_a">-
-<tr><td>BC:<td id="cpu_bc">-
-<tr><td>DE:<td id="cpu_de">-
-<tr><td>HL:<td id="cpu_hl">-
-<tr><td>Flags:<td id="cpu_flags">-
-<tr><td><select id="cpu_step_type"><option value="single">Single<option value="frame">Frame</select><td><button id="cpu_step">step</button><input id="cpu_run_check" type="checkbox">run
-<tr><td><td><button id="cpu_reset">Reset</button>
-<tr><td colspan="2"><canvas id="gbcanvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
+<table style="width: 100%; height: 100%">
+<tr>
+    <td><div id="input" style="height: 100%">EDIT</div>
+    <td rowspan="2" style="width: 1">
+        <table>
+        <tr><td colspan="2"><canvas id="gbcanvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
+        <tr><td><select id="cpu_step_type"><option value="single">Single<option value="frame">Frame</select><td><button id="cpu_step">step</button><input id="cpu_run_check" type="checkbox">run
+        <tr><td><td><button id="cpu_reset">Reset</button>
+        <tr><td>PC:<td id="cpu_pc">-
+        <tr><td>A:<td id="cpu_a">-
+        <tr><td>BC:<td id="cpu_bc">-
+        <tr><td>DE:<td id="cpu_de">-
+        <tr><td>HL:<td id="cpu_hl">-
+        <tr><td>Flags:<td id="cpu_flags">-
+        </table>
+<tr><td style="height: 20%"><textarea style="height: 100%; width: 100%" id="output" readonly></textarea>
 </table>
 </body>
 </html>
