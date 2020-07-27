@@ -24,6 +24,9 @@ table, th, td {
 body {
   margin: 0;
 }
+textarea {
+  resize: none;
+}
 </style>
 
 <script src="wasm/rgbasm"></script>
@@ -81,6 +84,7 @@ var gb;
 var addr_to_line = {}
 var line_to_addr = {}
 var cpu_step_interval_id;
+var vram_view = "";
 
 function compileCode()
 {
@@ -287,6 +291,86 @@ function updateCpuState()
         cpu_line_marker = editor.session.addMarker(new ace.Range(line_nr-1, 0, line_nr-1, 1), "cpuLineMarker", "fullLine");
         editor.scrollToLine(line_nr-1, true, false, function() {});
     }
+    updateVRamCanvas();
+}
+
+function updateVRamCanvas()
+{
+    var canvas = document.getElementById("vramcanvas");
+    if (canvas.style.display != "") return;
+    if (typeof(gb) == "undefined") return;
+
+    var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, 256, 256);
+    if (vram_view == "vram")
+    {
+        for(var ty=0; ty<24; ty++)
+        {
+            for(var tx=0; tx<16; tx++)
+            {
+                var n = ty * 16 * 16 + tx * 16;
+                for(var row=0; row<8; row+=1)
+                {
+                    var a = gb.memory[0x8000 + n];
+                    var b = gb.memory[0x8001 + n];
+                    n += 2;
+
+                    var x = 0;
+                    for(var bit=0x80; bit>0; bit >>= 1)
+                    {
+                        if ((a & bit) && (b & bit))
+                            ctx.fillStyle = '#000000';
+                        else if (a & bit)
+                            ctx.fillStyle = '#808080';
+                        else if (b & bit)
+                            ctx.fillStyle = '#C0C0C0';
+                        else if (x == 7 || row == 7)
+                            ctx.fillStyle = '#F0F0F0';
+                        else
+                            ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(tx * 8 + x, ty * 8 + row, 1, 1);
+                        x += 1;
+                    }
+                }
+            }
+        }
+    } else {
+        var offset = 0;
+        if (vram_view == "bg1")
+            offset += 0x400;
+        for(var ty=0; ty<32; ty++)
+        {
+            for(var tx=0; tx<32; tx++)
+            {
+                var n = gb.BGCHRBank1[tx + ty * 32 + offset] * 16;
+                for(var row=0; row<8; row+=1)
+                {
+                    var a = gb.memory[0x8000 + n];
+                    var b = gb.memory[0x8001 + n];
+                    n += 2;
+
+                    var x = 0;
+                    for(var bit=0x80; bit>0; bit >>= 1)
+                    {
+                        if ((a & bit) && (b & bit))
+                            ctx.fillStyle = '#000000';
+                        else if (a & bit)
+                            ctx.fillStyle = '#808080';
+                        else if (b & bit)
+                            ctx.fillStyle = '#C0C0C0';
+                        else if (x == 7 || row == 7)
+                            ctx.fillStyle = '#F0F0F0';
+                        else
+                            ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(tx * 8 + x, ty * 8 + row, 1, 1);
+                        x += 1;
+                    }
+                }
+            }
+        }
+        ctx.strokeStyle = '#80808080'
+        ctx.strokeRect(gb.backgroundX, gb.backgroundY, 160, 144);
+    }
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
@@ -316,7 +400,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
     });
     compileCode();
 
-    document.getElementById("cpu_step").onclick = function() { stepEmulator(document.getElementById("cpu_step_type").value); };
+    document.getElementById("cpu_single_step").onclick = function() { stepEmulator("single"); };
+    document.getElementById("cpu_frame_step").onclick = function() { stepEmulator("frame"); };
     document.getElementById("cpu_reset").onclick = function() { initEmulator(); };
     document.getElementById("cpu_run_check").onclick = function() {
         clearInterval(cpu_step_interval_id);
@@ -342,6 +427,29 @@ window.addEventListener('DOMContentLoaded', (event) => {
     canvas.onkeyup = function(e) {
         handleGBKey(e.keyCode, false);
         e.preventDefault();
+    };    
+
+    document.getElementById("display_screen").onclick = function() {
+        document.getElementById("gbcanvas").style.display = "";
+        document.getElementById("vramcanvas").style.display = "none";
+    };
+    document.getElementById("display_vram").onclick = function() {
+        document.getElementById("gbcanvas").style.display = "none";
+        document.getElementById("vramcanvas").style.display = "";
+        vram_view = "vram";
+        updateVRamCanvas();
+    };
+    document.getElementById("display_bg0").onclick = function() {
+        document.getElementById("gbcanvas").style.display = "none";
+        document.getElementById("vramcanvas").style.display = "";
+        vram_view = "bg0";
+        updateVRamCanvas();
+    };
+    document.getElementById("display_bg1").onclick = function() {
+        document.getElementById("gbcanvas").style.display = "none";
+        document.getElementById("vramcanvas").style.display = "";
+        vram_view = "bg1";
+        updateVRamCanvas();
     };
 });
 
@@ -353,8 +461,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
     <td><div id="input" style="height: 100%">EDIT</div>
     <td rowspan="2" style="width: 1">
         <table>
-        <tr><td colspan="4"><canvas id="gbcanvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
-        <tr><td class="right"><select id="cpu_step_type"><option value="single">Single<option value="frame">Frame</select><td><button id="cpu_step">step</button><input id="cpu_run_check" type="checkbox">run<td><button id="cpu_reset">Reset</button><td>
+        <tr><td colspan="4">
+            <button id="display_screen">screen</button>
+            <button id="display_vram">VRAM</button>
+            <button id="display_bg0">BG0</button>
+            <button id="display_bg1">BG1</button>
+            <canvas id="gbcanvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
+            <canvas id="vramcanvas" width="256" height="256" style="width: 512; image-rendering: pixelated; display: none"></canvas>
+        <tr><td class="right"><td><button id="cpu_single_step">step</button><button id="cpu_frame_step">frame</button><input id="cpu_run_check" type="checkbox">run<td><button id="cpu_reset">Reset</button><td>
         <tr><td class="right">PC:<td id="cpu_pc">-<td class="right">A:<td id="cpu_a">-
         <tr><td class="right">SP:<td id="cpu_sp">-<td class="right">BC:<td id="cpu_bc">-
         <tr><td class="right">Flags:<td id="cpu_flags">-<td class="right">DE:<td id="cpu_de">-
