@@ -20,28 +20,23 @@
 <script>
 "use strict";
 
-var err_regex = /ERROR: input.asm\(([0-9]+)\)/i;
-var warning_regex = /warning: input.asm\(([0-9]+)\)/i;
+var line_nr_regex = /.+\(([0-9]+)\)/i;
 
 function logFunction(str) {
     var output = document.getElementById('output');
     output.value += str + "\n";
     output.scrollTop = output.clientHeight;
 
-    var error_match = err_regex.exec(str);
-    if (error_match)
+    if (str.startsWith("error: ") || str.startsWith("ERROR: ") || str.startsWith("warning: "))
     {
-        var error_line = parseInt(error_match[1]);
+        var line_nr_match = line_nr_regex.exec(str);
+        var error_line = parseInt(line_nr_match[1]);
         var annotations = editor.session.getAnnotations();
-        annotations.push({row: error_line-1, column: 0, type: "error", text: str});
-        editor.session.setAnnotations(annotations);
-    }
-    var warning_match = warning_regex.exec(str);
-    if (warning_match)
-    {
-        var line = parseInt(warning_match[1]);
-        var annotations = editor.session.getAnnotations();
-        annotations.push({row: line-1, column: 0, type: "warning", text: str});
+        console.log(error_line)
+        var type = "error";
+        if (str.startsWith("warning: "))
+            type = "warning";
+        annotations.push({row: error_line-1, column: 0, type: type, text: str});
         editor.session.setAnnotations(annotations);
     }
 }
@@ -108,7 +103,9 @@ function compileCode()
                     var addr = line.split(" ")[0].split(":");
                     addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
                     addr_to_line[addr] = line_nr;
-                    line_to_addr[line_nr] = addr;
+                    if (typeof(line_to_addr[line_nr]) == "undefined")
+                        line_to_addr[line_nr] = []
+                    line_to_addr[line_nr].push(addr);
                 }
                 if (line.endsWith(" emustart") || line.endsWith(" emuStart") || line.endsWith(" emu_start"))
                 {
@@ -178,7 +175,8 @@ function updateBreakpoints()
         if (typeof(breakpoints[line_nr]) == "undefined") continue;
         line_nr = parseInt(line_nr) + 1;
         if (typeof(line_to_addr[line_nr]) == "undefined") continue;
-        emulatorSetBreakpoint(line_to_addr[line_nr]);
+        for(var addr of line_to_addr[line_nr])
+            emulatorSetBreakpoint(addr);
     }
 }
 
