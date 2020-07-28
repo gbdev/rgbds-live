@@ -74,6 +74,18 @@
         ctx.putImageData(image_data, 0, 0);
         Module._free(ptr);
     }
+
+    global.emulatorRenderBackground = function(canvas, type) {
+        if (!emulatorIsAvailable()) return;
+        var ctx = canvas.getContext("2d");
+        var image_data = canvas_ctx.createImageData(256, 256);
+        var ptr = Module._malloc(4 * 256 * 256);
+        Module._emulator_render_background(e, ptr, type);
+        var buffer = new Uint8Array(Module.HEAP8.buffer, ptr, 4 * 256 * 256);
+        image_data.data.set(buffer);
+        ctx.putImageData(image_data, 0, 0);
+        Module._free(ptr);
+    }
     
     global.emulatorGetPC = function() {
         return Module._emulator_get_PC(e);

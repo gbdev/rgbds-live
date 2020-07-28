@@ -46,11 +46,6 @@ function logFunction(str) {
     }
 }
 
-//Global functions GameBoyCore needs.
-function cout(str) { logFunction(str); }
-function pause() {}
-function initNewCanvas() {}
-
 var build_state = 0;
 var editor;
 var cpu_line_marker = undefined;
@@ -243,9 +238,11 @@ function updateVRamCanvas()
     if (canvas.style.display != "") return;
 
     if (vram_view == "vram")
-    {
         emulatorRenderVRam(canvas);
-    }
+    if (vram_view == "bg0")
+        emulatorRenderBackground(canvas, 0);
+    if (vram_view == "bg1")
+        emulatorRenderBackground(canvas, 1);
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
