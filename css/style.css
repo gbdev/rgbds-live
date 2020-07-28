@@ -1,0 +1,26 @@
+.cpuLineMarker {
+  position:absolute;
+  background:rgba(100,200,100,0.5);
+  z-index:20
+}
+.ace_gutter-cell.ace_breakpoint{ 
+    border-radius: 14px;
+    box-shadow: 10px 0px 1px 1px #ff2020 inset; 
+}
+.right {
+    text-align: right;
+}
+table {
+  border-collapse: collapse;
+}
+table, th, td {
+  border: 1px solid black;
+  background: white;
+  font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+}
+body {
+  margin: 0;
+}
+textarea {
+  resize: none;
+}

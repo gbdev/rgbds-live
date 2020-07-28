@@ -1,45 +1,19 @@
 <html>
 <head>
-<style>
-.cpuLineMarker {
-  position:absolute;
-  background:rgba(100,200,100,0.5);
-  z-index:20
-}
-.ace_gutter-cell.ace_breakpoint{ 
-    border-radius: 14px;
-    box-shadow: 10px 0px 1px 1px #ff2020 inset; 
-}
-.right {
-    text-align: right;
-}
-table {
-  border-collapse: collapse;
-}
-table, th, td {
-  border: 1px solid black;
-  background: white;
-  font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
-}
-body {
-  margin: 0;
-}
-textarea {
-  resize: none;
-}
-</style>
+<link rel="stylesheet" href="css/style.css">
 
 <script src="wasm/rgbasm"></script>
 <script src="wasm/rgblink"></script>
 <script src="wasm/rgbfix"></script>
 <script src="js/hardware.inc.js"></script>
 <script src="js/lz-string.min.js"></script>
+<script src="js/compiler.js"></script>
+<script src="js/emulator.js"></script>
 
 <script src="js/ace/ace.js"></script>
 <script src="js/ace/theme-tomorrow.js"></script>
 <script src="js/ace/mode-gbz80.js"></script>
-
-<script type="text/javascript" src="js/GameBoyCore.js"></script>
+<script src="wasm/binjgb.js"></script>
 
 <script>
 "use strict";
@@ -80,7 +54,6 @@ var editor;
 var cpu_line_marker = undefined;
 var start_address;
 var rom;
-var gb;
 var addr_to_line = {}
 var line_to_addr = {}
 var cpu_step_interval_id;
@@ -165,10 +138,11 @@ function buildDone()
 
 function destroyEmulator()
 {
+    emulatorDestroy();
+
     addr_to_line = {}
     line_to_addr = {}
-    gb = undefined;
-    rom = undefined
+    rom = undefined;
 
     if (typeof(cpu_line_marker) != "undefined")
     {
@@ -180,79 +154,48 @@ function destroyEmulator()
 function initEmulator()
 {
     if (typeof(rom) == "undefined") return;
-    gb = new GameBoyCore(document.getElementById("gbcanvas"), rom, [
-        false,                              //Turn on sound.
-        false,                              //Boot with boot ROM first?
-        false,                              //Give priority to GameBoy mode
-        1,                                  //Volume level set.
-        true,                               //Colorize GB mode?
-        false,                              //Disallow typed arrays?
-        16,                                 //Interval for the emulator loop.
-        10,                                 //Audio buffer minimum span amount over x interpreter iterations.
-        20,                                 //Audio buffer maximum span amount over x interpreter iterations.
-        false,                              //Override to allow for MBC1 instead of ROM only (compatibility for broken 3rd-party cartridges).
-        false,                              //Override MBC RAM disabling and always allow reading and writing to the banks.
-        false,                              //Use the GameBoy boot ROM instead of the GameBoy Color boot ROM.
-        false,                              //Scale the canvas in JS, or let the browser scale the canvas?
-        false,                              //Use image smoothing based scaling?
-        [true, true, true, true]            //User controlled channel enables.
-    ]);
-    gb.start();
-    if (gb.gbBGPalette != null)
-    {
-        gb.updateGBBGPalette(gb.memory[0xFF47]);
-        gb.updateGBOBJPalette(0, gb.memory[0xFF48]);
-        gb.updateGBOBJPalette(1, gb.memory[0xFF49]);
-    }
-    gb.clearFrameBuffer();
-    gb.dispatchDraw();
-    gb.programCounter = start_address;
-    gb.stopEmulator &= 1; 
+    
+    emulatorInit(document.getElementById("gbcanvas"), rom, start_address);
     updateCpuState();
     updateBreakpoints();
 }
 
 function stepEmulator(step_type)
 {
-    if (typeof(gb) == "undefined")
+    if (!emulatorIsAvailable())
     {
         initEmulator();
         return;
     }
-    gb.singleStep = step_type == "single";
-    gb.breakpointHit = false;
-    gb.run();
+    var result = emulatorStep(step_type);
     updateCpuState();
+    return result
 }
 
 function updateBreakpoints()
 {
-    if (typeof(gb) == "undefined") return;
-
-    gb.breakpoints.clear();
+    emulatorClearBreakpoints();
     var breakpoints = editor.session.getBreakpoints();
     for(var line_nr in breakpoints)
     {
         if (typeof(breakpoints[line_nr]) == "undefined") continue;
         line_nr = parseInt(line_nr) + 1;
         if (typeof(line_to_addr[line_nr]) == "undefined") continue;
-        gb.breakpoints.add(line_to_addr[line_nr]);
+        emulatorSetBreakpoint(line_to_addr[line_nr]);
     }
 }
 
 function handleGBKey(keycode, down)
 {
-    if (typeof(gb) == "undefined") return;
-    
     //Map the directional keys and A/S to B/A and shift/enter to select/start
-    if (keycode == 39) gb.JoyPadEvent(0, down); // right
-    if (keycode == 37) gb.JoyPadEvent(1, down); // left
-    if (keycode == 38) gb.JoyPadEvent(2, down); // up
-    if (keycode == 40) gb.JoyPadEvent(3, down); // down
-    if (keycode == 83) gb.JoyPadEvent(4, down); // a
-    if (keycode == 65) gb.JoyPadEvent(5, down); // b
-    if (keycode == 16) gb.JoyPadEvent(4, down); // select
-    if (keycode == 13) gb.JoyPadEvent(5, down); // start
+    if (keycode == 39) emulatorSetKeyPad("right", down);
+    if (keycode == 37) emulatorSetKeyPad("left", down);
+    if (keycode == 38) emulatorSetKeyPad("up", down);
+    if (keycode == 40) emulatorSetKeyPad("down", down);
+    if (keycode == 83) emulatorSetKeyPad("a", down);
+    if (keycode == 65) emulatorSetKeyPad("b", down);
+    if (keycode == 16) emulatorSetKeyPad("select", down);
+    if (keycode == 13) emulatorSetKeyPad("start", down);
 }
 
 function toHex(num, digits)
@@ -268,24 +211,22 @@ function updateCpuState()
         cpu_line_marker = undefined;
     }
 
-    document.getElementById("cpu_pc").innerHTML = toHex(gb.programCounter, 4)
-    document.getElementById("cpu_sp").innerHTML = toHex(gb.stackPointer, 4)
-    document.getElementById("cpu_a").innerHTML = toHex(gb.registerA, 2);
-    document.getElementById("cpu_bc").innerHTML = toHex((gb.registerB << 8) | gb.registerC, 4);
-    document.getElementById("cpu_de").innerHTML = toHex((gb.registerD << 8) | gb.registerE, 4);
-    document.getElementById("cpu_hl").innerHTML = toHex(gb.registersHL, 4);
-    var flags = "";
-    if (gb.FZero) flags += "Z ";
-    if (gb.FCarry) flags += "C ";
-    if (gb.FHalfCarry) flags += "H ";
-    if (gb.FSubstract) flags += "N ";
-    document.getElementById("cpu_flags").innerHTML = flags;
+    emulatorRenderScreen()
 
-    var line_nr = addr_to_line[gb.programCounter];
+    var pc = emulatorGetPC();
+    document.getElementById("cpu_pc").innerHTML = toHex(pc, 4)
+    document.getElementById("cpu_sp").innerHTML = toHex(emulatorGetSP(), 4)
+    document.getElementById("cpu_a").innerHTML = toHex(emulatorGetA(), 2);
+    document.getElementById("cpu_bc").innerHTML = toHex(emulatorGetBC(), 4);
+    document.getElementById("cpu_de").innerHTML = toHex(emulatorGetDE(), 4);
+    document.getElementById("cpu_hl").innerHTML = toHex(emulatorGetHL(), 4);
+    document.getElementById("cpu_flags").innerHTML = emulatorGetFlags();
+
+    var line_nr = addr_to_line[pc];
     if (typeof(line_nr) == "undefined")
-        line_nr = addr_to_line[gb.programCounter - 1];
+        line_nr = addr_to_line[pc - 1];
     if (typeof(line_nr) == "undefined")
-        line_nr = addr_to_line[gb.programCounter - 2];
+        line_nr = addr_to_line[pc - 2];
     if (typeof(line_nr) != "undefined")
     {
         cpu_line_marker = editor.session.addMarker(new ace.Range(line_nr-1, 0, line_nr-1, 1), "cpuLineMarker", "fullLine");
@@ -298,78 +239,10 @@ function updateVRamCanvas()
 {
     var canvas = document.getElementById("vramcanvas");
     if (canvas.style.display != "") return;
-    if (typeof(gb) == "undefined") return;
 
-    var ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, 256, 256);
     if (vram_view == "vram")
     {
-        for(var ty=0; ty<24; ty++)
-        {
-            for(var tx=0; tx<16; tx++)
-            {
-                var n = ty * 16 * 16 + tx * 16;
-                for(var row=0; row<8; row+=1)
-                {
-                    var a = gb.memory[0x8000 + n];
-                    var b = gb.memory[0x8001 + n];
-                    n += 2;
-
-                    var x = 0;
-                    for(var bit=0x80; bit>0; bit >>= 1)
-                    {
-                        if ((a & bit) && (b & bit))
-                            ctx.fillStyle = '#000000';
-                        else if (a & bit)
-                            ctx.fillStyle = '#808080';
-                        else if (b & bit)
-                            ctx.fillStyle = '#C0C0C0';
-                        else if (x == 7 || row == 7)
-                            ctx.fillStyle = '#F0F0F0';
-                        else
-                            ctx.fillStyle = '#FFFFFF';
-                        ctx.fillRect(tx * 8 + x, ty * 8 + row, 1, 1);
-                        x += 1;
-                    }
-                }
-            }
-        }
-    } else {
-        var offset = 0;
-        if (vram_view == "bg1")
-            offset += 0x400;
-        for(var ty=0; ty<32; ty++)
-        {
-            for(var tx=0; tx<32; tx++)
-            {
-                var n = gb.BGCHRBank1[tx + ty * 32 + offset] * 16;
-                for(var row=0; row<8; row+=1)
-                {
-                    var a = gb.memory[0x8000 + n];
-                    var b = gb.memory[0x8001 + n];
-                    n += 2;
-
-                    var x = 0;
-                    for(var bit=0x80; bit>0; bit >>= 1)
-                    {
-                        if ((a & bit) && (b & bit))
-                            ctx.fillStyle = '#000000';
-                        else if (a & bit)
-                            ctx.fillStyle = '#808080';
-                        else if (b & bit)
-                            ctx.fillStyle = '#C0C0C0';
-                        else if (x == 7 || row == 7)
-                            ctx.fillStyle = '#F0F0F0';
-                        else
-                            ctx.fillStyle = '#FFFFFF';
-                        ctx.fillRect(tx * 8 + x, ty * 8 + row, 1, 1);
-                        x += 1;
-                    }
-                }
-            }
-        }
-        ctx.strokeStyle = '#80808080'
-        ctx.strokeRect(gb.backgroundX, gb.backgroundY, 160, 144);
+        emulatorRenderVRam(canvas);
     }
 }
 
@@ -409,11 +282,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
         {
             cpu_step_interval_id = setInterval(function() {
                 if (!document.hidden)
-                    stepEmulator("frame");
-                if (typeof(gb) != "undefined" && gb.breakpointHit)
                 {
-                    clearInterval(cpu_step_interval_id);
-                    document.getElementById("cpu_run_check").checked = false;
+                    if (stepEmulator("frame"))
+                    {
+                        clearInterval(cpu_step_interval_id);
+                        document.getElementById("cpu_run_check").checked = false;
+                    }
                 }
             }, 16);
         }
