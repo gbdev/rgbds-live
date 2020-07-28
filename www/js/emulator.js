@@ -47,7 +47,7 @@
         if (!emulatorIsAvailable()) return;
         var ticks = Module._emulator_get_ticks_f64(e);
         if (step_type == "frame")
-            ticks += 100000000000000;
+            ticks += 70224;
         else
             ticks += 1;
         var result = Module._emulator_run_until_f64(e, ticks);
