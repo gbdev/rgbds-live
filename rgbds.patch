@@ -33,7 +33,7 @@ index d4f9d93..70ef955 100644
  		| { nPCOffset = 1; } z80_and
  		| { nPCOffset = 1; } z80_bit
 diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index 4887b36..7e77f05 100644
+index 4887b36..861d4b9 100644
 --- a/src/asm/symbol.c
 +++ b/src/asm/symbol.c
 @@ -361,6 +361,18 @@ struct Symbol *sym_AddSet(char const *symName, int32_t value)
@@ -45,7 +45,7 @@ index 4887b36..7e77f05 100644
 +{
 +    char name[MAXSYMLEN + 1];
 +    secret_counter += 1;
-+    sprintf(name, ".__SECRET__%x__LINE__%x", secret_counter, fstk_GetLine());
++    sprintf(name, ".__SECRET__%x__LINE__%x", secret_counter, nLineNo);
 +    if (symbolScope)
 +        return sym_AddLocalReloc(name);
 +    return sym_AddReloc(name + 1);
