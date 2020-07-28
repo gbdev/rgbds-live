@@ -32,7 +32,6 @@ function logFunction(str) {
         var line_nr_match = line_nr_regex.exec(str);
         var error_line = parseInt(line_nr_match[1]);
         var annotations = editor.session.getAnnotations();
-        console.log(error_line)
         var type = "error";
         if (str.startsWith("warning: "))
             type = "warning";
