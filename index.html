@@ -12,7 +12,9 @@
 
 <script src="js/ace/ace.js"></script>
 <script src="js/ace/theme-tomorrow.js"></script>
+<script src="js/ace/ext-language_tools.js"></script>
 <script src="js/ace/mode-gbz80.js"></script>
+<script src="js/ace/complete-gbz80.js"></script>
 <script src="wasm/binjgb.js"></script>
 
 <script>
@@ -250,7 +252,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
     editor = ace.edit("input");
     editor.setTheme("ace/theme/tomorrow");
     editor.session.setMode("ace/mode/gbz80");
-    editor.session.setOptions({tabSize: 2, useSoftTabs: true});
+    editor.setOptions({
+        tabSize: 2,
+        useSoftTabs: true,
+        enableLiveAutocompletion: true,
+        enableSnippets: true,
+    });
+    editor.completers = [gbz80Completer]
 
     if (location.hash.length > 1)
     {
