@@ -108,7 +108,9 @@ function compileCode()
                     var addr = line.split(" ")[0].split(":");
                     addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
                     addr_to_line[addr] = line_nr;
-                    line_to_addr[line_nr] = addr;
+                    if (typeof(line_to_addr[line_nr]) == "undefined")
+                        line_to_addr[line_nr] = []
+                    line_to_addr[line_nr].push(addr);
                 }
                 if (line.endsWith(" emustart") || line.endsWith(" emuStart") || line.endsWith(" emu_start"))
                 {
@@ -178,7 +180,8 @@ function updateBreakpoints()
         if (typeof(breakpoints[line_nr]) == "undefined") continue;
         line_nr = parseInt(line_nr) + 1;
         if (typeof(line_to_addr[line_nr]) == "undefined") continue;
-        emulatorSetBreakpoint(line_to_addr[line_nr]);
+        for(var addr of line_to_addr[line_nr])
+            emulatorSetBreakpoint(addr);
     }
 }
 
