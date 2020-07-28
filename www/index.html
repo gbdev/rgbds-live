@@ -1,46 +1,19 @@
 <html>
 <head>
-<style>
-.cpuLineMarker {
-  position:absolute;
-  background:rgba(100,200,100,0.5);
-  z-index:20
-}
-.ace_gutter-cell.ace_breakpoint{ 
-    border-radius: 14px;
-    box-shadow: 10px 0px 1px 1px #ff2020 inset; 
-}
-.right {
-    text-align: right;
-}
-table {
-  border-collapse: collapse;
-}
-table, th, td {
-  border: 1px solid black;
-  background: white;
-  font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
-}
-body {
-  margin: 0;
-}
-textarea {
-  resize: none;
-}
-</style>
+<link rel="stylesheet" href="css/style.css">
 
 <script src="wasm/rgbasm"></script>
 <script src="wasm/rgblink"></script>
 <script src="wasm/rgbfix"></script>
 <script src="js/hardware.inc.js"></script>
 <script src="js/lz-string.min.js"></script>
+<script src="js/compiler.js"></script>
+<script src="js/emulator.js"></script>
 
 <script src="js/ace/ace.js"></script>
 <script src="js/ace/theme-tomorrow.js"></script>
 <script src="js/ace/mode-gbz80.js"></script>
 <script src="wasm/binjgb.js"></script>
-
-<script type="text/javascript" src="js/GameBoyCore.js"></script>
 
 <script>
 "use strict";
@@ -81,7 +54,6 @@ var editor;
 var cpu_line_marker = undefined;
 var start_address;
 var rom;
-var gb;
 var addr_to_line = {}
 var line_to_addr = {}
 var cpu_step_interval_id;
@@ -166,12 +138,10 @@ function buildDone()
 
 function destroyEmulator()
 {
-    if (typeof(gb) != "undefined")
-        Module._emulator_delete(gb);
+    emulatorDestroy();
 
     addr_to_line = {}
     line_to_addr = {}
-    gb = undefined;
     rom = undefined;
 
     if (typeof(cpu_line_marker) != "undefined")
@@ -185,67 +155,47 @@ function initEmulator()
 {
     if (typeof(rom) == "undefined") return;
     
-    var rom_ptr = Module._malloc(0x8000);
-    for(var n=0; n<0x8000; n++)
-        Module.HEAP8[rom_ptr + n] = 0
-    for(var n=0; n<rom.length; n++)
-        Module.HEAP8[rom_ptr + n] = rom[n];
-    gb = Module._emulator_new_simple(rom_ptr, 0x8000, 44100, 2);
-    Module._emulator_set_bw_palette_simple(gb, 0, 0xFFA5FFFF, 0xFF9494FF, 0xFFFF9494, 0xFF000000);
-    Module._emulator_set_bw_palette_simple(gb, 1, 0xFFA5FFFF, 0xFF9494FF, 0xFFFF9494, 0xFF000000);
-    Module._emulator_set_bw_palette_simple(gb, 2, 0xFFA5FFFF, 0xFF9494FF, 0xFFFF9494, 0xFF000000);
-    Module._emulator_set_PC(gb, start_address);
-    Module._emulator_set_default_joypad_callback(gb, 0);
+    emulatorInit(document.getElementById("gbcanvas"), rom, start_address);
     updateCpuState();
     updateBreakpoints();
 }
 
 function stepEmulator(step_type)
 {
-    if (typeof(gb) == "undefined")
+    if (!emulatorIsAvailable())
     {
         initEmulator();
         return;
     }
-    var ticks = Module._emulator_get_ticks_f64(gb);
-    if (step_type == "frame")
-        ticks += 100000000000000;
-    else
-        ticks += 1;
-    var result = Module._emulator_run_until_f64(gb, ticks);
-    while(result == 2)
-        result = Module._emulator_run_until_f64(gb, ticks);
+    var result = emulatorStep(step_type);
     updateCpuState();
+    return result
 }
 
 function updateBreakpoints()
 {
-    if (typeof(gb) == "undefined") return;
-
-    //gb.breakpoints.clear();
+    emulatorClearBreakpoints();
     var breakpoints = editor.session.getBreakpoints();
     for(var line_nr in breakpoints)
     {
         if (typeof(breakpoints[line_nr]) == "undefined") continue;
         line_nr = parseInt(line_nr) + 1;
         if (typeof(line_to_addr[line_nr]) == "undefined") continue;
-        //gb.breakpoints.add(line_to_addr[line_nr]);
+        emulatorSetBreakpoint(line_to_addr[line_nr]);
     }
 }
 
 function handleGBKey(keycode, down)
 {
-    if (typeof(gb) == "undefined") return;
-    
     //Map the directional keys and A/S to B/A and shift/enter to select/start
-    if (keycode == 39) Module._set_joyp_right(gb, down); // right
-    if (keycode == 37) Module._set_joyp_left(gb, down); // left
-    if (keycode == 38) Module._set_joyp_up(gb, down); // up
-    if (keycode == 40) Module._set_joyp_down(gb, down); // down
-    if (keycode == 83) Module._set_joyp_A(gb, down); // a
-    if (keycode == 65) Module._set_joyp_B(gb, down); // b
-    if (keycode == 16) Module._set_joyp_select(gb, down); // select
-    if (keycode == 13) Module._set_joyp_start(gb, down); // start
+    if (keycode == 39) emulatorSetKeyPad("right", down);
+    if (keycode == 37) emulatorSetKeyPad("left", down);
+    if (keycode == 38) emulatorSetKeyPad("up", down);
+    if (keycode == 40) emulatorSetKeyPad("down", down);
+    if (keycode == 83) emulatorSetKeyPad("a", down);
+    if (keycode == 65) emulatorSetKeyPad("b", down);
+    if (keycode == 16) emulatorSetKeyPad("select", down);
+    if (keycode == 13) emulatorSetKeyPad("start", down);
 }
 
 function toHex(num, digits)
@@ -261,26 +211,16 @@ function updateCpuState()
         cpu_line_marker = undefined;
     }
 
-    var canvas = document.getElementById("gbcanvas");
-    var ctx = canvas.getContext("2d");
-    var imageData = ctx.createImageData(canvas.width, canvas.height);
-    var buffer = new Uint8Array(Module.HEAP8.buffer, Module._get_frame_buffer_ptr(gb), Module._get_frame_buffer_size(gb));
-    imageData.data.set(buffer);
-    ctx.putImageData(imageData, 0, 0);
+    emulatorRenderScreen()
 
-    var pc = Module._emulator_get_PC(gb);
+    var pc = emulatorGetPC();
     document.getElementById("cpu_pc").innerHTML = toHex(pc, 4)
-    document.getElementById("cpu_sp").innerHTML = toHex(Module._emulator_get_SP(gb), 4)
-    document.getElementById("cpu_a").innerHTML = toHex(Module._emulator_get_A(gb), 2);
-    document.getElementById("cpu_bc").innerHTML = toHex(Module._emulator_get_BC(gb), 4);
-    document.getElementById("cpu_de").innerHTML = toHex(Module._emulator_get_DE(gb), 4);
-    document.getElementById("cpu_hl").innerHTML = toHex(Module._emulator_get_HL(gb), 4);
-    var flags = "";
-    if (Module._emulator_get_F(gb) & 0x80) flags += "Z ";
-    if (Module._emulator_get_F(gb) & 0x10) flags += "C ";
-    if (Module._emulator_get_F(gb) & 0x20) flags += "H ";
-    if (Module._emulator_get_F(gb) & 0x40) flags += "N ";
-    document.getElementById("cpu_flags").innerHTML = flags;
+    document.getElementById("cpu_sp").innerHTML = toHex(emulatorGetSP(), 4)
+    document.getElementById("cpu_a").innerHTML = toHex(emulatorGetA(), 2);
+    document.getElementById("cpu_bc").innerHTML = toHex(emulatorGetBC(), 4);
+    document.getElementById("cpu_de").innerHTML = toHex(emulatorGetDE(), 4);
+    document.getElementById("cpu_hl").innerHTML = toHex(emulatorGetHL(), 4);
+    document.getElementById("cpu_flags").innerHTML = emulatorGetFlags();
 
     var line_nr = addr_to_line[pc];
     if (typeof(line_nr) == "undefined")
@@ -292,85 +232,17 @@ function updateCpuState()
         cpu_line_marker = editor.session.addMarker(new ace.Range(line_nr-1, 0, line_nr-1, 1), "cpuLineMarker", "fullLine");
         editor.scrollToLine(line_nr-1, true, false, function() {});
     }
-    //updateVRamCanvas();
+    updateVRamCanvas();
 }
 
 function updateVRamCanvas()
 {
     var canvas = document.getElementById("vramcanvas");
     if (canvas.style.display != "") return;
-    if (typeof(gb) == "undefined") return;
 
-    var ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, 256, 256);
     if (vram_view == "vram")
     {
-        for(var ty=0; ty<24; ty++)
-        {
-            for(var tx=0; tx<16; tx++)
-            {
-                var n = ty * 16 * 16 + tx * 16;
-                for(var row=0; row<8; row+=1)
-                {
-                    var a = gb.memory[0x8000 + n];
-                    var b = gb.memory[0x8001 + n];
-                    n += 2;
-
-                    var x = 0;
-                    for(var bit=0x80; bit>0; bit >>= 1)
-                    {
-                        if ((a & bit) && (b & bit))
-                            ctx.fillStyle = '#000000';
-                        else if (a & bit)
-                            ctx.fillStyle = '#808080';
-                        else if (b & bit)
-                            ctx.fillStyle = '#C0C0C0';
-                        else if (x == 7 || row == 7)
-                            ctx.fillStyle = '#F0F0F0';
-                        else
-                            ctx.fillStyle = '#FFFFFF';
-                        ctx.fillRect(tx * 8 + x, ty * 8 + row, 1, 1);
-                        x += 1;
-                    }
-                }
-            }
-        }
-    } else {
-        var offset = 0;
-        if (vram_view == "bg1")
-            offset += 0x400;
-        for(var ty=0; ty<32; ty++)
-        {
-            for(var tx=0; tx<32; tx++)
-            {
-                var n = gb.BGCHRBank1[tx + ty * 32 + offset] * 16;
-                for(var row=0; row<8; row+=1)
-                {
-                    var a = gb.memory[0x8000 + n];
-                    var b = gb.memory[0x8001 + n];
-                    n += 2;
-
-                    var x = 0;
-                    for(var bit=0x80; bit>0; bit >>= 1)
-                    {
-                        if ((a & bit) && (b & bit))
-                            ctx.fillStyle = '#000000';
-                        else if (a & bit)
-                            ctx.fillStyle = '#808080';
-                        else if (b & bit)
-                            ctx.fillStyle = '#C0C0C0';
-                        else if (x == 7 || row == 7)
-                            ctx.fillStyle = '#F0F0F0';
-                        else
-                            ctx.fillStyle = '#FFFFFF';
-                        ctx.fillRect(tx * 8 + x, ty * 8 + row, 1, 1);
-                        x += 1;
-                    }
-                }
-            }
-        }
-        ctx.strokeStyle = '#80808080'
-        ctx.strokeRect(gb.backgroundX, gb.backgroundY, 160, 144);
+        emulatorRenderVRam(canvas);
     }
 }
 
@@ -410,11 +282,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
         {
             cpu_step_interval_id = setInterval(function() {
                 if (!document.hidden)
-                    stepEmulator("frame");
-                if (typeof(gb) != "undefined" && gb.breakpointHit)
                 {
-                    clearInterval(cpu_step_interval_id);
-                    document.getElementById("cpu_run_check").checked = false;
+                    if (stepEmulator("frame"))
+                    {
+                        clearInterval(cpu_step_interval_id);
+                        document.getElementById("cpu_run_check").checked = false;
+                    }
                 }
             }, 16);
         }
