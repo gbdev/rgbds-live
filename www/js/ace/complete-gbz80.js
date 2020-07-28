@@ -1071,7 +1071,7 @@ gbz80Instructions.forEach(function(instr) {
         docHTML: doc,
     };
     i.completer = { insertMatch: function(editor, data) {
-        editor.completer.insertMatch({value: data.value.split(" ")[0]});
+        //editor.completer.insertMatch({value: data.value.split(" ")[0]});
         //editor.selection.selectTo(editor.selection.cursor.row, editor.selection.cursor.column - offset);
     }}
     gbz80CompleterInstructions.push(i);
