@@ -1079,8 +1079,15 @@ gbz80Instructions.forEach(function(instr) {
 
 var gbz80Completer = {
     getCompletions: function(editor, session, pos, prefix, callback) {
-        callback(null, gbz80CompleterInstructions.filter(function(c) {
-            return c.value.startsWith(prefix.toLowerCase());
-        }));
+        var line = session.getLine(pos.row);
+        // Check if we are possibly typing an instruction.
+        var before = line.substr(0, pos.column - 1).trim();
+        console.log(before);
+        if (before.trim() == "" || before.trim().endsWith(":"))
+        {
+            callback(null, gbz80CompleterInstructions.filter(function(c) {
+                return c.value.startsWith(prefix.toLowerCase());
+            }));
+        }
     }
 }
