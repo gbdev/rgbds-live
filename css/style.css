@@ -24,3 +24,24 @@ body {
 textarea {
   resize: none;
 }
+
+
+.container {
+    display: grid;
+    grid-template-columns: auto 520px;
+    grid-template-rows: auto 20%;
+    grid-gap: 0;
+    height: 100%;
+}
+.editor {
+    grid-column: 1;
+    grid-row: 1;
+}
+.emulator {
+    grid-column: 2;
+    grid-row: 1 / 3;
+}
+.console {
+    grid-column: 1;
+    grid-row: 2;
+}
