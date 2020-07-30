@@ -6,9 +6,15 @@
     var rom_size = 0;
     var canvas_ctx;
     var canvas_image_data;
+    var audio_ctx;
+    var audio_time;
     
     global.emulatorInit = function(canvas, rom_data, start_address) {
         if (emulatorIsAvailable()) emulatorDestroy();
+
+        if (typeof(audio_ctx) == "undefined")
+            audio_ctx = new AudioContext();
+
         var required_size = ((rom_data.length - 1) | 0x3FFF) + 1;
         if (required_size < 0x8000) required_size = 0x8000;
         if (rom_size < required_size)
@@ -22,7 +28,7 @@
         for(var n=0; n<rom.length; n++)
             Module.HEAP8[rom_ptr + n] = rom_data[n];
         
-        e = Module._emulator_new_simple(rom_ptr, rom_size, 44100, 2);
+        e = Module._emulator_new_simple(rom_ptr, rom_size, audio_ctx.sampleRate, 4096);
         Module._emulator_set_bw_palette_simple(e, 0, 0xFFC2F0C4, 0xFFA8B95A, 0xFF6E601E, 0xFF001B2D);
         Module._emulator_set_bw_palette_simple(e, 1, 0xFFC2F0C4, 0xFFA8B95A, 0xFF6E601E, 0xFF001B2D);
         Module._emulator_set_bw_palette_simple(e, 2, 0xFFC2F0C4, 0xFFA8B95A, 0xFF6E601E, 0xFF001B2D);
@@ -31,6 +37,9 @@
         
         canvas_ctx = canvas.getContext("2d");
         canvas_image_data = canvas_ctx.createImageData(canvas.width, canvas.height);
+        
+        audio_ctx.resume()
+        audio_time = audio_ctx.currentTime;
     }
     
     global.emulatorDestroy = function() {
@@ -51,8 +60,12 @@
         else
             ticks += 1;
         var result = Module._emulator_run_until_f64(e, ticks);
+        if (result & 2)
+            processAudioBuffer()
         while(result == 2) // Keep running on audio buffers filled
             result = Module._emulator_run_until_f64(e, ticks);
+            if (result & 2)
+                processAudioBuffer()
         return (result & 8) == 8 // return True if we hit a breakpoint.
     }
     
@@ -134,5 +147,29 @@
         if (key == "b") Module._set_joyp_B(e, down);
         if (key == "select") Module._set_joyp_select(e, down);
         if (key == "start") Module._set_joyp_start(e, down);
+    }
+    
+    function processAudioBuffer()
+    {
+        console.log(audio_time, audio_ctx.currentTime);
+        if (audio_time < audio_ctx.currentTime)
+            audio_time = audio_ctx.currentTime;
+
+        var input_buffer = new Uint8Array(Module.HEAP8.buffer, Module._get_audio_buffer_ptr(e), Module._get_audio_buffer_capacity(e));
+        const volume = 0.5;
+        const buffer = audio_ctx.createBuffer(2, 4096, audio_ctx.sampleRate);
+        const channel0 = buffer.getChannelData(0);
+        const channel1 = buffer.getChannelData(1);
+        
+        for (let i = 0; i < 4096; i++) {
+            channel0[i] = input_buffer[2 * i] * volume / 255;
+            channel1[i] = input_buffer[2 * i + 1] * volume / 255;
+        }
+        const bufferSource = audio_ctx.createBufferSource();
+        bufferSource.buffer = buffer;
+        bufferSource.connect(audio_ctx.destination);
+        bufferSource.start(audio_time);
+        const buffer_sec = 4096 / audio_ctx.sampleRate;
+        audio_time += buffer_sec;
     }
 })(this);

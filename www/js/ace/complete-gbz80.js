@@ -1188,9 +1188,9 @@ var gbz80HardwareInc = [
     //BGP ($FF47)
     {name: "rBGP", description: "BG Palette Data (W)<br>Bit 7-6 - Intensity for %11<br>Bit 5-4 - Intensity for %10<br>Bit 3-2 - Intensity for %01<br>Bit 1-0 - Intensity for %00<br>Value: $FF47"},
     //OBP0 ($FF48)
-    {name: "rOBP0", description: "Object Palette 0 Data (W)<br>Bit 7-6 - Intensity for %11<br>Bit 5-4 - Intensity for %10<br>Bit 3-2 - Intensity for %01<br>Bit 1-0 - Intensity for %00<br>Value: $FF48"},
+    {name: "rOBP0", description: "Object Palette 0 Data (W)<br>Bit 7-6 - Intensity for %11<br>Bit 5-4 - Intensity for %10<br>Bit 3-2 - Intensity for %01<br>Bit 1-0 - Ignored, %00 is transparent<br>Value: $FF48"},
     //OBP1 ($FF49)
-    {name: "rOBP1", description: "Object Palette 1 Data (W)<br>Bit 7-6 - Intensity for %11<br>Bit 5-4 - Intensity for %10<br>Bit 3-2 - Intensity for %01<br>Bit 1-0 - Intensity for %00<br>Value: $FF49"},
+    {name: "rOBP1", description: "Object Palette 1 Data (W)<br>Bit 7-6 - Intensity for %11<br>Bit 5-4 - Intensity for %10<br>Bit 3-2 - Intensity for %01<br>Bit 1-0 - Ignored, %00 is transparent<br>Value: $FF49"},
 
     //WY ($FF4A)
     {name: "rWY", description: "Window Y Position (R/W)<br>0 <= WY <= 143<br>Value: $FF4A"},
