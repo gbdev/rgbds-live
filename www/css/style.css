@@ -45,3 +45,24 @@ textarea {
     grid-column: 1;
     grid-row: 2;
 }
+
+@media only screen and (max-width: 600px) {
+    .container {
+        display: grid;
+        grid-template-columns: auto;
+        grid-template-rows: 600px auto 300px;
+        grid-gap: 0;
+    }
+    .editor {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .emulator {
+        grid-column: 1;
+        grid-row: 2;
+    }
+    .console {
+        grid-column: 1;
+        grid-row: 3;
+    }
+}
