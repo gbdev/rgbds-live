@@ -285,7 +285,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             cpu_step_interval_id = setInterval(function() {
                 if (!document.hidden)
                 {
-                    if (stepEmulator("frame"))
+                    if (stepEmulator("run"))
                     {
                         clearInterval(cpu_step_interval_id);
                         document.getElementById("cpu_run_check").checked = false;
