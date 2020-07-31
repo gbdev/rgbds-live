@@ -55,6 +55,12 @@ function compileCode()
         rom = _rom_file
         start_address = _start_address
         addr_to_line = _addr_to_line
+        for(var addr in addr_to_line) {
+            var line = addr_to_line[addr];
+            if (typeof(line_to_addr[line]) == "undefined")
+                line_to_addr[line] = [];
+            line_to_addr[line].push(addr);
+        }
     })
 }
 
