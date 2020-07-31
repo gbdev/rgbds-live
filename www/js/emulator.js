@@ -1,6 +1,7 @@
 "use strict";
 
-(function(global) {
+this.emulator = new Object();
+(function(emulator) {
     var e;
     var rom_ptr;
     var rom_size = 0;
@@ -9,8 +10,8 @@
     var audio_ctx;
     var audio_time;
     
-    global.emulatorInit = function(canvas, rom_data, start_address) {
-        if (emulatorIsAvailable()) emulatorDestroy();
+    emulator.init = function(canvas, rom_data, start_address) {
+        if (emulator.isAvailable()) emulator.destroy();
 
         if (typeof(audio_ctx) == "undefined")
             audio_ctx = new AudioContext();
@@ -42,18 +43,18 @@
         audio_time = audio_ctx.currentTime;
     }
     
-    global.emulatorDestroy = function() {
-        if (!emulatorIsAvailable()) return;
+    emulator.destroy = function() {
+        if (!emulator.isAvailable()) return;
         Module._emulator_delete(e);
         e = undefined;
     }
     
-    global.emulatorIsAvailable = function() {
+    emulator.isAvailable = function() {
         return (typeof(e) != "undefined");
     }
     
-    global.emulatorStep = function(step_type) {
-        if (!emulatorIsAvailable()) return;
+    emulator.step = function(step_type) {
+        if (!emulator.isAvailable()) return;
         var ticks = Module._emulator_get_ticks_f64(e);
         if (step_type == "single")
             ticks += 1;
@@ -83,16 +84,16 @@
             }
         }
     }
-    
-    global.emulatorRenderScreen = function() {
-        if (!emulatorIsAvailable()) return;
+
+    emulator.renderScreen = function() {
+        if (!emulator.isAvailable()) return;
         var buffer = new Uint8Array(Module.HEAP8.buffer, Module._get_frame_buffer_ptr(e), Module._get_frame_buffer_size(e));
         canvas_image_data.data.set(buffer);
         canvas_ctx.putImageData(canvas_image_data, 0, 0);
     }
     
-    global.emulatorRenderVRam = function(canvas) {
-        if (!emulatorIsAvailable()) return;
+    emulator.renderVRam = function(canvas) {
+        if (!emulator.isAvailable()) return;
         var ctx = canvas.getContext("2d");
         var image_data = canvas_ctx.createImageData(256, 256);
         var ptr = Module._malloc(4 * 256 * 256);
@@ -103,8 +104,8 @@
         Module._free(ptr);
     }
 
-    global.emulatorRenderBackground = function(canvas, type) {
-        if (!emulatorIsAvailable()) return;
+    emulator.renderBackground = function(canvas, type) {
+        if (!emulator.isAvailable()) return;
         var ctx = canvas.getContext("2d");
         var image_data = canvas_ctx.createImageData(256, 256);
         var ptr = Module._malloc(4 * 256 * 256);
@@ -115,25 +116,25 @@
         Module._free(ptr);
     }
     
-    global.emulatorGetPC = function() {
+    emulator.getPC = function() {
         return Module._emulator_get_PC(e);
     }
-    global.emulatorGetSP = function() {
+    emulator.getSP = function() {
         return Module._emulator_get_SP(e);
     }
-    global.emulatorGetA = function() {
+    emulator.getA = function() {
         return Module._emulator_get_A(e);
     }
-    global.emulatorGetBC = function() {
+    emulator.getBC = function() {
         return Module._emulator_get_BC(e);
     }
-    global.emulatorGetDE = function() {
+    emulator.getDE = function() {
         return Module._emulator_get_DE(e);
     }
-    global.emulatorGetHL = function() {
+    emulator.getHL = function() {
         return Module._emulator_get_HL(e);
     }
-    global.emulatorGetFlags = function() {
+    emulator.getFlags = function() {
         var flags = Module._emulator_get_F(e);
         var result = "";
         if (flags & 0x80) result += "Z ";
@@ -143,17 +144,17 @@
         return result;
     }
 
-    global.emulatorSetBreakpoint = function(pc) {
-        if (!emulatorIsAvailable()) return;
+    emulator.setBreakpoint = function(pc) {
+        if (!emulator.isAvailable()) return;
         Module._emulator_set_breakpoint(e, pc);
     }
-    global.emulatorClearBreakpoints = function() {
-        if (!emulatorIsAvailable()) return;
+    emulator.clearBreakpoints = function() {
+        if (!emulator.isAvailable()) return;
         Module._emulator_clear_breakpoints(e);
     }
     
-    global.emulatorSetKeyPad = function(key, down) {
-        if (!emulatorIsAvailable()) return;
+    emulator.setKeyPad = function(key, down) {
+        if (!emulator.isAvailable()) return;
         if (key == "right") Module._set_joyp_right(e, down);
         if (key == "left") Module._set_joyp_left(e, down);
         if (key == "up") Module._set_joyp_up(e, down);
@@ -186,4 +187,4 @@
         const buffer_sec = 4096 / audio_ctx.sampleRate;
         audio_time += buffer_sec;
     }
-})(this);
+})(this.emulator);
