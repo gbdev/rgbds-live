@@ -55,18 +55,33 @@
     global.emulatorStep = function(step_type) {
         if (!emulatorIsAvailable()) return;
         var ticks = Module._emulator_get_ticks_f64(e);
-        if (step_type == "frame")
-            ticks += 70224;
-        else
+        if (step_type == "single")
             ticks += 1;
-        var result = Module._emulator_run_until_f64(e, ticks);
-        if (result & 2)
-            processAudioBuffer()
-        while(result == 2) // Keep running on audio buffers filled
-            result = Module._emulator_run_until_f64(e, ticks);
+        else if (step_type == "frame")
+            ticks += 70224;
+        while(true) {
+            var result = Module._emulator_run_until_f64(e, ticks);
             if (result & 2)
                 processAudioBuffer()
-        return (result & 8) == 8 // return True if we hit a breakpoint.
+            if (result & 8) // Breakpoint hit
+                return true;
+            if (result & 16) // Illegal instruction
+                return true;
+            if ((result != 2) && (step_type != "run"))
+                return false;
+            if (step_type == "run")
+            {
+                console.log(audio_time - audio_ctx.currentTime);
+                if (result & 4)
+                {
+                    // Sync to the audio buffer, make sure we have 100ms of audio data buffered.
+                    if (audio_time < audio_ctx.currentTime + 0.1)
+                        ticks += 70224;
+                    else
+                        return false;
+                }
+            }
+        }
     }
     
     global.emulatorRenderScreen = function() {
@@ -151,7 +166,6 @@
     
     function processAudioBuffer()
     {
-        console.log(audio_time, audio_ctx.currentTime);
         if (audio_time < audio_ctx.currentTime)
             audio_time = audio_ctx.currentTime;
 
