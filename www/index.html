@@ -35,9 +35,9 @@ compiler.setLogCallback(function(str) {
     output.value += str + "\n";
     output.scrollTop = output.clientHeight;
 });
-compiler.setErrorCallback(function(line_nr, str) {
+compiler.setErrorCallback(function(type, line_nr, str) {
     var annotations = editor.session.getAnnotations();
-    annotations.push({row: error_line-1, column: 0, type: type, text: str});
+    annotations.push({row: line_nr-1, column: 0, type: type, text: str});
     editor.session.setAnnotations(annotations);
 });
 
@@ -192,7 +192,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     if (location.hash.length > 1)
     {
-        editor.setValue(LZString.decompressFromEncodedURIComponent(location.hash.slice(1)));
+        var code = LZString.decompressFromEncodedURIComponent(location.hash.slice(1));
+        if (code != null)
+            editor.setValue(code);
     }
     editor.session.on('change', function(delta) { compileCode() });
     editor.on("guttermousedown", function(e) {
