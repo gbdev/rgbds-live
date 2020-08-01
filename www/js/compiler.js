@@ -7,7 +7,7 @@ this.compiler = new Object();
     var done_callback;
     var log_callback;
     var error_callback;
-    var input_file;
+    var input_files = {"hardware.inc": hardware_inc};
 
     var line_nr_regex = /.+\(([0-9]+)\)/i;
 
@@ -35,7 +35,7 @@ this.compiler = new Object();
     }
 
     compiler.compile = function(code, callback) {
-        input_file = code;
+        input_files["input.asm"] = code;
         done_callback = callback;
         if (busy) {
             repeat = true;
@@ -51,8 +51,9 @@ this.compiler = new Object();
             'arguments': ['input.asm', '-o', 'output.o', '-e'],
             'preRun': function(m) {
                 var FS = m.FS;
-                FS.writeFile("hardware.inc", hardware_inc);
-                FS.writeFile("input.asm", input_file);
+                for (const [key, value] of Object.entries(input_files)) {
+                    FS.writeFile(key, value);
+                }
             },
             'print': logFunction, 'printErr': logFunction,
         }).then(function(m) {
@@ -61,7 +62,7 @@ this.compiler = new Object();
             runRgbLink(obj_file);
         });
     }
-    
+
     function runRgbLink(obj_file) {
         logFunction("Running rgblink");
         createRgbLink({
@@ -79,7 +80,7 @@ this.compiler = new Object();
             buildDone(rom_file, sym_file);
         });
     }
-    
+
     function buildFailed() {
         if (repeat) {
             repeat = false;
@@ -89,7 +90,7 @@ this.compiler = new Object();
             done_callback();
         }
     }
-    
+
     function buildDone(rom_file, sym_file) {
         if (repeat) {
             repeat = false;
