@@ -243,23 +243,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
         e.preventDefault();
     };    
 
-    document.getElementById("display_screen").onclick = function() {
+    document.getElementById("emulator_display_screen").onclick = function() {
         document.getElementById("gbcanvas").style.display = "";
         document.getElementById("vramcanvas").style.display = "none";
     };
-    document.getElementById("display_vram").onclick = function() {
+    document.getElementById("emulator_display_vram").onclick = function() {
         document.getElementById("gbcanvas").style.display = "none";
         document.getElementById("vramcanvas").style.display = "";
         vram_view = "vram";
         updateVRamCanvas();
     };
-    document.getElementById("display_bg0").onclick = function() {
+    document.getElementById("emulator_display_bg0").onclick = function() {
         document.getElementById("gbcanvas").style.display = "none";
         document.getElementById("vramcanvas").style.display = "";
         vram_view = "bg0";
         updateVRamCanvas();
     };
-    document.getElementById("display_bg1").onclick = function() {
+    document.getElementById("emulator_display_bg1").onclick = function() {
         document.getElementById("gbcanvas").style.display = "none";
         document.getElementById("vramcanvas").style.display = "";
         vram_view = "bg1";
@@ -274,10 +274,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
     <div class="editor" id="input"></div>
     <div class="emulator">
         <table><tr><td colspan="4">
-            <button id="display_screen">screen</button>
-            <button id="display_vram">VRAM</button>
-            <button id="display_bg0">BG0</button>
-            <button id="display_bg1">BG1</button>
+            <div class="tabs">
+                <input type="radio" name="emulator_display_mode" id="emulator_display_screen" checked /><label for="emulator_display_screen">Screen</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_vram" /><label for="emulator_display_vram">VRAM</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_bg0" /><label for="emulator_display_bg0">BG0</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_bg1" /><label for="emulator_display_bg1">BG1</label>
+            </div>
             <div style="width: 512; height: 512">
                 <canvas id="gbcanvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
                 <canvas id="vramcanvas" width="256" height="256" style="width: 512; image-rendering: pixelated; display: none"></canvas>

@@ -10,6 +10,27 @@
 .right {
     text-align: right;
 }
+
+.tabs {
+    border-bottom: 1px solid #999;
+}
+.tabs input {
+    display: none;
+}
+.tabs label, .tabs button {
+    display: inline-block;
+    border: 1px solid #999;
+    background: #EEE;
+    padding: 4px 12px;
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    top: 1px;
+}
+.tabs input:checked + label {
+  background: #FFF;
+  border-bottom: 1px solid transparent;
+}
+
 table {
   border-collapse: collapse;
 }
