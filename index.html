@@ -1,5 +1,6 @@
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="css/style.css">
 
 <script src="wasm/rgbasm"></script>
@@ -20,27 +21,6 @@
 <script>
 "use strict";
 
-var line_nr_regex = /.+\(([0-9]+)\)/i;
-
-function logFunction(str) {
-    var output = document.getElementById('output');
-    output.value += str + "\n";
-    output.scrollTop = output.clientHeight;
-
-    if (str.startsWith("error: ") || str.startsWith("ERROR: ") || str.startsWith("warning: "))
-    {
-        var line_nr_match = line_nr_regex.exec(str);
-        var error_line = parseInt(line_nr_match[1]);
-        var annotations = editor.session.getAnnotations();
-        var type = "error";
-        if (str.startsWith("warning: "))
-            type = "warning";
-        annotations.push({row: error_line-1, column: 0, type: type, text: str});
-        editor.session.setAnnotations(annotations);
-    }
-}
-
-var build_state = 0;
 var editor;
 var cpu_line_marker = undefined;
 var start_address;
@@ -50,88 +30,44 @@ var line_to_addr = {}
 var cpu_step_interval_id;
 var vram_view = "";
 
+compiler.setLogCallback(function(str) {
+    var output = document.getElementById('output');
+    output.value += str + "\n";
+    output.scrollTop = output.clientHeight;
+});
+compiler.setErrorCallback(function(type, line_nr, str) {
+    var annotations = editor.session.getAnnotations();
+    annotations.push({row: line_nr-1, column: 0, type: type, text: str});
+    editor.session.setAnnotations(annotations);
+});
+
 function compileCode()
 {
-    if (build_state > 0)
-    {
-        build_state = 2;
-        return;
-    }
-    build_state = 1;
     destroyEmulator();
     var code = editor.getValue();
     document.getElementById('output').value = "";
     editor.session.clearAnnotations();
     location.hash = LZString.compressToEncodedURIComponent(code);
 
-    logFunction("Running rgbasm");
-    createRgbAsm({
-        'arguments': ['input.asm', '-o', 'output.o', '-e'],
-        'preRun': function(m) {
-            var FS = m['FS'];
-            FS.writeFile("hardware.inc", hardware_inc);
-            FS.writeFile("input.asm", code);
-        },
-        'print': logFunction,
-        'printErr': logFunction,
-    }).then(function(m) {
-        var FS = m['FS'];
-        try { var obj_file = FS.readFile("output.o"); } catch { buildDone(); return; }
-        logFunction("Running rgblink");
-        createRgbLink({
-            'arguments': ['input.o', '-o', 'output.gb', '-x', '--sym', 'output.sym'],
-            'preRun': function(m) {
-                var FS = m['FS'];
-                FS.writeFile("input.o", obj_file);
-            },
-            'print': logFunction,
-            'printErr': logFunction,
-        }).then(function(m) {
-            var FS = m['FS'];
-            try { var gb_file = FS.readFile("output.gb"); } catch { buildDone(); return; }
-            try { var sym_file = FS.readFile("output.sym", {'encoding': 'utf8'}); } catch { buildDone(); return; }
-            var hex = Array.prototype.map.call(gb_file, x => ('00' + x.toString(16)).slice(-2)).join(' ');
-            for(var n=0; n<hex.length; n+=3*32)
-                logFunction(hex.slice(n, n + 3*32));
-            start_address = 0x100;
-            for(var line of sym_file.split("\n"))
-            {
-                if (line.indexOf("__SECRET__") > -1 && line.indexOf("__LINE__") > -1)
-                {
-                    var line_nr = parseInt(line.split("__LINE__").pop(), 16);
-                    var addr = line.split(" ")[0].split(":");
-                    addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
-                    addr_to_line[addr] = line_nr;
-                    if (typeof(line_to_addr[line_nr]) == "undefined")
-                        line_to_addr[line_nr] = []
-                    line_to_addr[line_nr].push(addr);
-                }
-                if (line.endsWith(" emustart") || line.endsWith(" emuStart") || line.endsWith(" emu_start"))
-                {
-                    var addr = line.split(" ")[0].split(":");
-                    addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
-                    start_address = addr;
-                }
-            }
-            rom = gb_file;
-            buildDone();
-        });
-    });
-}
-
-function buildDone()
-{
-    build_state -= 1;
-    if (build_state > 0)
-    {
-        build_state = 0;
-        compileCode();
-    }
+    compiler.compile(code, function(_rom_file, _start_address, _addr_to_line) {
+        if (typeof(_rom_file) == 'undefined') {
+            return;
+        }
+        rom = _rom_file
+        start_address = _start_address
+        addr_to_line = _addr_to_line
+        for(var addr in addr_to_line) {
+            var line = addr_to_line[addr];
+            if (typeof(line_to_addr[line]) == "undefined")
+                line_to_addr[line] = [];
+            line_to_addr[line].push(addr);
+        }
+    })
 }
 
 function destroyEmulator()
 {
-    emulatorDestroy();
+    emulator.destroy();
 
     addr_to_line = {}
     line_to_addr = {}
@@ -148,26 +84,26 @@ function initEmulator()
 {
     if (typeof(rom) == "undefined") return;
     
-    emulatorInit(document.getElementById("gbcanvas"), rom, start_address);
+    emulator.init(document.getElementById("gbcanvas"), rom, start_address);
     updateCpuState();
     updateBreakpoints();
 }
 
 function stepEmulator(step_type)
 {
-    if (!emulatorIsAvailable())
+    if (!emulator.isAvailable())
     {
         initEmulator();
         return;
     }
-    var result = emulatorStep(step_type);
+    var result = emulator.step(step_type);
     updateCpuState();
     return result
 }
 
 function updateBreakpoints()
 {
-    emulatorClearBreakpoints();
+    emulator.clearBreakpoints();
     var breakpoints = editor.session.getBreakpoints();
     for(var line_nr in breakpoints)
     {
@@ -175,21 +111,21 @@ function updateBreakpoints()
         line_nr = parseInt(line_nr) + 1;
         if (typeof(line_to_addr[line_nr]) == "undefined") continue;
         for(var addr of line_to_addr[line_nr])
-            emulatorSetBreakpoint(addr);
+            emulator.setBreakpoint(addr);
     }
 }
 
 function handleGBKey(keycode, down)
 {
     //Map the directional keys and A/S to B/A and shift/enter to select/start
-    if (keycode == 39) emulatorSetKeyPad("right", down);
-    if (keycode == 37) emulatorSetKeyPad("left", down);
-    if (keycode == 38) emulatorSetKeyPad("up", down);
-    if (keycode == 40) emulatorSetKeyPad("down", down);
-    if (keycode == 83) emulatorSetKeyPad("a", down);
-    if (keycode == 65) emulatorSetKeyPad("b", down);
-    if (keycode == 16) emulatorSetKeyPad("select", down);
-    if (keycode == 13) emulatorSetKeyPad("start", down);
+    if (keycode == 39) emulator.setKeyPad("right", down);
+    if (keycode == 37) emulator.setKeyPad("left", down);
+    if (keycode == 38) emulator.setKeyPad("up", down);
+    if (keycode == 40) emulator.setKeyPad("down", down);
+    if (keycode == 83) emulator.setKeyPad("a", down);
+    if (keycode == 65) emulator.setKeyPad("b", down);
+    if (keycode == 16) emulator.setKeyPad("select", down);
+    if (keycode == 13) emulator.setKeyPad("start", down);
 }
 
 function toHex(num, digits)
@@ -205,16 +141,16 @@ function updateCpuState()
         cpu_line_marker = undefined;
     }
 
-    emulatorRenderScreen()
+    emulator.renderScreen()
 
-    var pc = emulatorGetPC();
+    var pc = emulator.getPC();
     document.getElementById("cpu_pc").innerHTML = toHex(pc, 4)
-    document.getElementById("cpu_sp").innerHTML = toHex(emulatorGetSP(), 4)
-    document.getElementById("cpu_a").innerHTML = toHex(emulatorGetA(), 2);
-    document.getElementById("cpu_bc").innerHTML = toHex(emulatorGetBC(), 4);
-    document.getElementById("cpu_de").innerHTML = toHex(emulatorGetDE(), 4);
-    document.getElementById("cpu_hl").innerHTML = toHex(emulatorGetHL(), 4);
-    document.getElementById("cpu_flags").innerHTML = emulatorGetFlags();
+    document.getElementById("cpu_sp").innerHTML = toHex(emulator.getSP(), 4)
+    document.getElementById("cpu_a").innerHTML = toHex(emulator.getA(), 2);
+    document.getElementById("cpu_bc").innerHTML = toHex(emulator.getBC(), 4);
+    document.getElementById("cpu_de").innerHTML = toHex(emulator.getDE(), 4);
+    document.getElementById("cpu_hl").innerHTML = toHex(emulator.getHL(), 4);
+    document.getElementById("cpu_flags").innerHTML = emulator.getFlags();
 
     var line_nr = addr_to_line[pc];
     if (typeof(line_nr) == "undefined")
@@ -235,11 +171,11 @@ function updateVRamCanvas()
     if (canvas.style.display != "") return;
 
     if (vram_view == "vram")
-        emulatorRenderVRam(canvas);
+        emulator.renderVRam(canvas);
     if (vram_view == "bg0")
-        emulatorRenderBackground(canvas, 0);
+        emulator.renderBackground(canvas, 0);
     if (vram_view == "bg1")
-        emulatorRenderBackground(canvas, 1);
+        emulator.renderBackground(canvas, 1);
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
@@ -256,7 +192,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     if (location.hash.length > 1)
     {
-        editor.setValue(LZString.decompressFromEncodedURIComponent(location.hash.slice(1)));
+        var code = LZString.decompressFromEncodedURIComponent(location.hash.slice(1));
+        if (code != null)
+            editor.setValue(code);
     }
     editor.session.on('change', function(delta) { compileCode() });
     editor.on("guttermousedown", function(e) {
@@ -305,23 +243,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
         e.preventDefault();
     };    
 
-    document.getElementById("display_screen").onclick = function() {
+    document.getElementById("emulator_display_screen").onclick = function() {
         document.getElementById("gbcanvas").style.display = "";
         document.getElementById("vramcanvas").style.display = "none";
     };
-    document.getElementById("display_vram").onclick = function() {
+    document.getElementById("emulator_display_vram").onclick = function() {
         document.getElementById("gbcanvas").style.display = "none";
         document.getElementById("vramcanvas").style.display = "";
         vram_view = "vram";
         updateVRamCanvas();
     };
-    document.getElementById("display_bg0").onclick = function() {
+    document.getElementById("emulator_display_bg0").onclick = function() {
         document.getElementById("gbcanvas").style.display = "none";
         document.getElementById("vramcanvas").style.display = "";
         vram_view = "bg0";
         updateVRamCanvas();
     };
-    document.getElementById("display_bg1").onclick = function() {
+    document.getElementById("emulator_display_bg1").onclick = function() {
         document.getElementById("gbcanvas").style.display = "none";
         document.getElementById("vramcanvas").style.display = "";
         vram_view = "bg1";
@@ -336,10 +274,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
     <div class="editor" id="input"></div>
     <div class="emulator">
         <table><tr><td colspan="4">
-            <button id="display_screen">screen</button>
-            <button id="display_vram">VRAM</button>
-            <button id="display_bg0">BG0</button>
-            <button id="display_bg1">BG1</button>
+            <div class="tabs">
+                <input type="radio" name="emulator_display_mode" id="emulator_display_screen" checked /><label for="emulator_display_screen">Screen</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_vram" /><label for="emulator_display_vram">VRAM</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_bg0" /><label for="emulator_display_bg0">BG0</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_bg1" /><label for="emulator_display_bg1">BG1</label>
+            </div>
             <div style="width: 512; height: 512">
                 <canvas id="gbcanvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
                 <canvas id="vramcanvas" width="256" height="256" style="width: 512; image-rendering: pixelated; display: none"></canvas>
