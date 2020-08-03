@@ -98,10 +98,6 @@ this.compiler = new Object();
         } else {
             busy = false;
 
-            var hex = Array.prototype.map.call(rom_file, x => ('00' + x.toString(16)).slice(-2)).join(' ');
-            for(var n=0; n<hex.length; n+=3*32)
-                logFunction(hex.slice(n, n + 3*32));
-            
             var start_address = 0x100;
             var addr_to_line = {}
             for(var line of sym_file.split("\n"))

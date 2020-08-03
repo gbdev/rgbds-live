@@ -72,7 +72,6 @@ this.emulator = new Object();
                 return false;
             if (step_type == "run")
             {
-                console.log(audio_time - audio_ctx.currentTime);
                 if (result & 4)
                 {
                     // Sync to the audio buffer, make sure we have 100ms of audio data buffered.
@@ -114,6 +113,20 @@ this.emulator = new Object();
         image_data.data.set(buffer);
         ctx.putImageData(image_data, 0, 0);
         Module._free(ptr);
+    }
+    
+    emulator.getWRam = function() {
+        if (!emulator.isAvailable()) return;
+        
+        var ptr = Module._emulator_get_wram_ptr(e);
+        return new Uint8Array(Module.HEAP8.buffer, ptr, 0x8000);
+    }
+
+    emulator.getHRam = function() {
+        if (!emulator.isAvailable()) return;
+        
+        var ptr = Module._emulator_get_hram_ptr(e);
+        return new Uint8Array(Module.HEAP8.buffer, ptr, 0x7F);
     }
     
     emulator.getPC = function() {
