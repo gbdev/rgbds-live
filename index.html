@@ -28,7 +28,7 @@ var rom;
 var addr_to_line = {}
 var line_to_addr = {}
 var cpu_step_interval_id;
-var vram_view = "";
+var emu_view = "";
 
 compiler.setLogCallback(function(str) {
     var output = document.getElementById('output');
@@ -62,6 +62,7 @@ function compileCode()
                 line_to_addr[line] = [];
             line_to_addr[line].push(addr);
         }
+        updateTextView();
     })
 }
 
@@ -84,7 +85,7 @@ function initEmulator()
 {
     if (typeof(rom) == "undefined") return;
     
-    emulator.init(document.getElementById("gbcanvas"), rom, start_address);
+    emulator.init(document.getElementById("emulator_screen_canvas"), rom, start_address);
     updateCpuState();
     updateBreakpoints();
 }
@@ -163,19 +164,54 @@ function updateCpuState()
         editor.scrollToLine(line_nr-1, true, false, function() {});
     }
     updateVRamCanvas();
+    updateTextView();
 }
 
 function updateVRamCanvas()
 {
-    var canvas = document.getElementById("vramcanvas");
+    var canvas = document.getElementById("emulator_vram_canvas");
     if (canvas.style.display != "") return;
 
-    if (vram_view == "vram")
+    if (emu_view == "vram")
         emulator.renderVRam(canvas);
-    if (vram_view == "bg0")
+    if (emu_view == "bg0")
         emulator.renderBackground(canvas, 0);
-    if (vram_view == "bg1")
+    if (emu_view == "bg1")
         emulator.renderBackground(canvas, 1);
+}
+
+function updateTextView()
+{
+    var display_text = document.getElementById("emulator_display_text");
+    if (display_text.style.display != "") return;
+    var data = rom;
+    var bank_size = 0x4000;
+    var offset = 0x0000;
+    if (emu_view == "wram")
+    {
+        data = emulator.getWRam();
+        bank_size = 0x1000;
+        offset = 0xC000;
+    }
+    if (emu_view == "hram")
+    {
+        data = emulator.getHRam();
+        bank_size = 0x1000;
+        offset = 0xFF80;
+    }
+    if (typeof(data) == "undefined") return;
+
+    var text = "         0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n";
+    for(var n=0; n<data.length; n+=16)
+    {
+        var hex = Array.prototype.map.call(data.slice(n, n + 16), x => ('00' + x.toString(16)).slice(-2)).join(' ');
+        var bank = ~~(n / bank_size);
+        var addr = (n & (bank_size - 1))
+        if (bank > 0)
+            addr += bank_size;
+        text += ("00" + bank.toString(16)).slice(-2) + ":" + ("0000" + (addr + offset).toString(16)).slice(-4) + " " + hex + "\n";
+    }
+    display_text.value = text;
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
@@ -232,7 +268,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }, 16);
         }
     }
-    var canvas = document.getElementById("gbcanvas");
+    var canvas = document.getElementById("emulator_screen_canvas");
     canvas.tabIndex = -1;
     canvas.onkeydown = function(e) {
         handleGBKey(e.keyCode, true);
@@ -244,26 +280,52 @@ window.addEventListener('DOMContentLoaded', (event) => {
     };    
 
     document.getElementById("emulator_display_screen").onclick = function() {
-        document.getElementById("gbcanvas").style.display = "";
-        document.getElementById("vramcanvas").style.display = "none";
+        document.getElementById("emulator_screen_canvas").style.display = "";
+        document.getElementById("emulator_vram_canvas").style.display = "none";
+        document.getElementById("emulator_display_text").style.display = "none";
+        emu_view = "display";
     };
     document.getElementById("emulator_display_vram").onclick = function() {
-        document.getElementById("gbcanvas").style.display = "none";
-        document.getElementById("vramcanvas").style.display = "";
-        vram_view = "vram";
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "";
+        document.getElementById("emulator_display_text").style.display = "none";
+        emu_view = "vram";
         updateVRamCanvas();
     };
     document.getElementById("emulator_display_bg0").onclick = function() {
-        document.getElementById("gbcanvas").style.display = "none";
-        document.getElementById("vramcanvas").style.display = "";
-        vram_view = "bg0";
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "";
+        document.getElementById("emulator_display_text").style.display = "none";
+        emu_view = "bg0";
         updateVRamCanvas();
     };
     document.getElementById("emulator_display_bg1").onclick = function() {
-        document.getElementById("gbcanvas").style.display = "none";
-        document.getElementById("vramcanvas").style.display = "";
-        vram_view = "bg1";
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "";
+        document.getElementById("emulator_display_text").style.display = "none";
+        emu_view = "bg1";
         updateVRamCanvas();
+    };
+    document.getElementById("emulator_display_rom").onclick = function() {
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "none";
+        document.getElementById("emulator_display_text").style.display = "";
+        emu_view = "rom";
+        updateTextView();
+    };
+    document.getElementById("emulator_display_wram").onclick = function() {
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "none";
+        document.getElementById("emulator_display_text").style.display = "";
+        emu_view = "wram";
+        updateTextView();
+    };
+    document.getElementById("emulator_display_hram").onclick = function() {
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "none";
+        document.getElementById("emulator_display_text").style.display = "";
+        emu_view = "hram";
+        updateTextView();
     };
 });
 
@@ -271,7 +333,19 @@ window.addEventListener('DOMContentLoaded', (event) => {
 </head>
 <body>
 <div class="container">
-    <div class="editor" id="input"></div>
+    <div class="editor" id="input">
+INCLUDE "hardware.inc"
+
+SECTION "entry", ROM0[$100]
+  jp start
+
+SECTION "main", ROM0[$150]
+start:
+  nop
+haltLoop:
+  halt
+  jr haltLoop
+    </div>
     <div class="emulator">
         <table><tr><td colspan="4">
             <div class="tabs">
@@ -279,10 +353,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <input type="radio" name="emulator_display_mode" id="emulator_display_vram" /><label for="emulator_display_vram">VRAM</label>
                 <input type="radio" name="emulator_display_mode" id="emulator_display_bg0" /><label for="emulator_display_bg0">BG0</label>
                 <input type="radio" name="emulator_display_mode" id="emulator_display_bg1" /><label for="emulator_display_bg1">BG1</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_rom" /><label for="emulator_display_rom">ROM</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_wram" /><label for="emulator_display_wram">WRam</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_hram" /><label for="emulator_display_hram">HRam</label>
             </div>
             <div style="width: 512; height: 512">
-                <canvas id="gbcanvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
-                <canvas id="vramcanvas" width="256" height="256" style="width: 512; image-rendering: pixelated; display: none"></canvas>
+                <canvas id="emulator_screen_canvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
+                <canvas id="emulator_vram_canvas" width="256" height="256" style="width: 512; image-rendering: pixelated; display: none"></canvas>
+                <textarea style="height: 100%; width: 100%; display: none" id="emulator_display_text" readonly></textarea>
             </div>
         <tr><td class="right"><td><button id="cpu_single_step">step</button><button id="cpu_frame_step">frame</button><input id="cpu_run_check" type="checkbox">run<td><button id="cpu_reset">Reset</button><td>
         <tr><td class="right">PC:<td id="cpu_pc">-<td class="right">A:<td id="cpu_a">-

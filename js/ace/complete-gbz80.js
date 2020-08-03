@@ -1220,28 +1220,22 @@ var gbz80HardwareInc = [
     {name: "rRP", description: "Infrared Communications Port (R/W) GBC Only!<br>Value: $FF56"},
 
     //BCPS ($FF68)
-    //Background Color Palette Specification (R/W)
-    {name: "rBCPS", description: "$FF68"},
+    {name: "rBCPS", description: "Background Color Palette Specification (R/W) GBC Only!<br>Value: $FF68"},
 
     //BCPD ($FF69)
-    //Background Color Palette Data (R/W)
-    {name: "rBCPD", description: "$FF69"},
+    {name: "rBCPD", description: "Background Color Palette Data (R/W) GBC Only!<br>Value: $FF69"},
 
     //BCPS ($FF6A)
-    //Object Color Palette Specification (R/W)
-    {name: "rOCPS", description: "$FF6A"},
+    {name: "rOCPS", description: "Object Color Palette Specification (R/W) GBC Only!<br>Value: $FF6A"},
 
     //BCPD ($FF6B)
-    //Object Color Palette Data (R/W)
-    {name: "rOCPD", description: "$FF6B"},
+    {name: "rOCPD", description: "Object Color Palette Data (R/W) GBC Only!<br>Value: $FF6B"},
 
     //SVBK ($FF4F)
-    //Select Main RAM Bank (R/W)
-    {name: "rSVBK", description: "$FF70"},
+    {name: "rSVBK", description: "Select Main RAM Bank (R/W) GBC Only!<br>Value: $FF70"},
 
     //IE ($FFFF)
-    //Interrupt Enable (R/W)
-    {name: "rIE", description: "$FFFF"},
+    {name: "rIE", description: "Interrupt Enable (R/W)<br>Value: $FFFF"},
 
     {name: "IEF_HILO",   description: "%00010000 ; Transition from High to Low of Pin number P10-P13"},
     {name: "IEF_SERIAL", description: "%00001000 ; Serial I/O transfer end"},
@@ -1252,34 +1246,14 @@ var gbz80HardwareInc = [
     ///Sound control registers
 
     //AUDVOL/NR50 ($FF24)
-    //Channel control / ON-OFF / Volume (R/W)
-    //Bit 7   - Vin->SO2 ON/OFF (Vin??)
-    //Bit 6-4 - SO2 output level (volume) (# 0-7)
-    //Bit 3   - Vin->SO1 ON/OFF (Vin??)
-    //Bit 2-0 - SO1 output level (volume) (# 0-7)
-    {name: "rNR50", description: "$FF24"},
-    {name: "rAUDVOL", description: "Alias of rNR50"},
-
+    {name: "rNR50", description: "Channel control / ON-OFF / Volume (R/W)<br>Bit 7   - Vin->SO2 ON/OFF (Vin??)<br>Bit 6-4 - SO2 output level (volume) (# 0-7)<br>Bit 3   - Vin->SO1 ON/OFF (Vin??)<br>Bit 2-0 - SO1 output level (volume) (# 0-7)<br>Value: $FF24<br>Aliased as rAUDVOL"},
+    {name: "rAUDVOL", description: "Channel control / ON-OFF / Volume (R/W)<br>Bit 7   - Vin->SO2 ON/OFF (Vin??)<br>Bit 6-4 - SO2 output level (volume) (# 0-7)<br>Bit 3   - Vin->SO1 ON/OFF (Vin??)<br>Bit 2-0 - SO1 output level (volume) (# 0-7)<br>Value: $FF24<br>Alias of rNR50"},
     {name: "AUDVOL_VIN_LEFT",  description: "%10000000 ; SO2"},
     {name: "AUDVOL_VIN_RIGHT", description: "%00001000 ; SO1"},
 
-
-    //
     //AUDTERM/NR51 ($FF25)
-    //Selection of Sound output terminal (R/W)
-    //
-    //Bit 7   - Output sound 4 to SO2 terminal
-    //Bit 6   - Output sound 3 to SO2 terminal
-    //Bit 5   - Output sound 2 to SO2 terminal
-    //Bit 4   - Output sound 1 to SO2 terminal
-    //Bit 3   - Output sound 4 to SO1 terminal
-    //Bit 2   - Output sound 3 to SO1 terminal
-    //Bit 1   - Output sound 2 to SO1 terminal
-    //Bit 0   - Output sound 0 to SO1 terminal
-    //
-    {name: "rNR51", description: "$FF25"},
-    {name: "rAUDTERM", description: "Alias of rNR51"},
-
+    {name: "rNR51", description: "Selection of Sound output terminal (R/W)<br>Bit 7   - Output sound 4 to SO2 terminal<br>Bit 6   - Output sound 3 to SO2 terminal<br>Bit 5   - Output sound 2 to SO2 terminal<br>Bit 4   - Output sound 1 to SO2 terminal<br>Bit 3   - Output sound 4 to SO1 terminal<br>Bit 2   - Output sound 3 to SO1 terminal<br>Bit 1   - Output sound 2 to SO1 terminal<br>Bit 0   - Output sound 0 to SO1 terminal<br>Value: $FF25<br>Aliased as rAUDTERM"},
+    {name: "rAUDTERM", description: "Selection of Sound output terminal (R/W)<br>Bit 7   - Output sound 4 to SO2 terminal<br>Bit 6   - Output sound 3 to SO2 terminal<br>Bit 5   - Output sound 2 to SO2 terminal<br>Bit 4   - Output sound 1 to SO2 terminal<br>Bit 3   - Output sound 4 to SO1 terminal<br>Bit 2   - Output sound 3 to SO1 terminal<br>Bit 1   - Output sound 2 to SO1 terminal<br>Bit 0   - Output sound 0 to SO1 terminal<br>Value: $FF25<br>Alias of rNR51"},
     //SO2
     {name: "AUDTERM_4_LEFT",  description: "%10000000"},
     {name: "AUDTERM_3_LEFT",  description: "%01000000"},
@@ -1292,55 +1266,24 @@ var gbz80HardwareInc = [
     {name: "AUDTERM_1_RIGHT", description: "%00000001"},
 
 
-    //
     //AUDENA/NR52 ($FF26)
-    //Sound on/off (R/W)
-    //
-    //Bit 7   - All sound on/off (sets all audio regs to 0!)
-    //Bit 3   - Sound 4 ON flag (doesn't work!)
-    //Bit 2   - Sound 3 ON flag (doesn't work!)
-    //Bit 1   - Sound 2 ON flag (doesn't work!)
-    //Bit 0   - Sound 1 ON flag (doesn't work!)
-    //
-    {name: "rNR52", description: "$FF26"},
-    {name: "rAUDENA", description: "Alias of rNR52"},
-
+    {name: "rNR52", description: "Sound on/off (R/W)<br>Bit 7   - All sound on/off (sets all audio regs to 0!)<br>Bit 3   - Sound 4 ON flag (read only)<br>Bit 2   - Sound 3 ON flag (read only)<br>Bit 1   - Sound 2 ON flag (read only)<br>Bit 0   - Sound 1 ON flag (read only)<br>Value: $FF26<br>Aliased as rAUDENA"},
+    {name: "rAUDENA", description: "Sound on/off (R/W)<br>Bit 7   - All sound on/off (sets all audio regs to 0!)<br>Bit 3   - Sound 4 ON flag (read only)<br>Bit 2   - Sound 3 ON flag (read only)<br>Bit 1   - Sound 2 ON flag (read only)<br>Bit 0   - Sound 1 ON flag (read only)<br>Value: $FF26<br>Alias of rNR52"},
     {name: "AUDENA_ON",    description: "%10000000"},
     {name: "AUDENA_OFF",   description: "%00000000  ; sets all audio regs to 0!"},
 
-
     ///SoundChannel #1 registers
 
-    //
     //AUD1SWEEP/NR10 ($FF10)
-    //Sweep register (R/W)
-    //
-    //Bit 6-4 - Sweep Time
-    //Bit 3   - Sweep Increase/Decrease
-    //          0: Addition    (frequency increases???)
-    //          1: Subtraction (frequency increases???)
-    //Bit 2-0 - Number of sweep shift (# 0-7)
-    //Sweep Time: (n*7.8ms)
-    //
-    {name: "rNR10", description: "$FF10"},
-    {name: "rAUD1SWEEP", description: "Alias of rNR10"},
-
+    {name: "rNR10", description: "Sweep register (R/W)<br>Bit 6-4 - Sweep Time<br>Bit 3   - Sweep Increase/Decrease<br>&nbsp; 0: Addition<br>&nbsp; 1: Subtraction<br>Bit 2-0 - Number of sweep shift (# 0-7)<br>Sweep Time: (n*7.8ms)<br>Value: $FF10<br>Aliased as rAUD1SWEEP"},
+    {name: "rAUD1SWEEP", description: "Sweep register (R/W)<br>Bit 6-4 - Sweep Time<br>Bit 3   - Sweep Increase/Decrease<br>&nbsp; 0: Addition<br>&nbsp; 1: Subtraction<br>Bit 2-0 - Number of sweep shift (# 0-7)<br>Sweep Time: (n*7.8ms)<br>Value: $FF10<br>Alias of rNR10"},
     {name: "AUD1SWEEP_UP",   description: "%00000000"},
     {name: "AUD1SWEEP_DOWN", description: "%00001000"},
 
-
-    //
     //AUD1LEN/NR11 ($FF11)
-    //Sound length/Wave pattern duty (R/W)
-    //
-    //Bit 7-6 - Wave Pattern Duty (00:12.5% 01:25% 10:50% 11:75%)
-    //Bit 5-0 - Sound length data (# 0-63)
-    //
-    {name: "rNR11", description: "$FF11"},
-    {name: "rAUD1LEN", description: "Alias of rNR11"},
+    {name: "rNR11", description: "Sound length/Wave pattern duty (R/W)<br>Bit 7-6 - Wave Pattern Duty (00:12.5% 01:25% 10:50% 11:75%)<br>Bit 5-0 - Sound length data (# 0-63)<br>Value: $FF11<br>Aliased as rAUD1LEN"},
+    {name: "rAUD1LEN", description: "Sound length/Wave pattern duty (R/W)<br>Bit 7-6 - Wave Pattern Duty (00:12.5% 01:25% 10:50% 11:75%)<br>Bit 5-0 - Sound length data (# 0-63)<br>Value: $FF11<br>Alias of rNR11"},
 
-
-    //
     //AUD1ENV/NR12 ($FF12)
     //Envelope (R/W)
     //
@@ -1678,7 +1621,6 @@ var gbz80Completer = {
         var line = session.getLine(pos.row);
         // Check if we are possibly typing an instruction.
         var before = line.substr(0, pos.column - 1).trim();
-        console.log(before);
         if (before.trim() == "" || before.trim().endsWith(":")) {
             callback(null, gbz80CompleterInstructions.filter(function(c) {
                 return c.value.startsWith(prefix.toLowerCase());

@@ -66,7 +66,7 @@ this.compiler = new Object();
     function runRgbLink(obj_file) {
         logFunction("Running rgblink");
         createRgbLink({
-            'arguments': ['input.o', '-o', 'output.gb', '-x', '--sym', 'output.sym'],
+            'arguments': ['input.o', '-o', 'output.gb', '--sym', 'output.sym'],
             'preRun': function(m) {
                 var FS = m.FS;
                 FS.writeFile("input.o", obj_file);
@@ -77,11 +77,30 @@ this.compiler = new Object();
             try { var rom_file = FS.readFile("output.gb"); } catch { buildFailed(); return; }
             try { var sym_file = FS.readFile("output.sym", {'encoding': 'utf8'}); } catch { buildFailed(); return; }
             
+            runRgbFix(rom_file, sym_file);
+            //buildDone(rom_file, sym_file);
+        });
+    }
+
+    function runRgbFix(input_rom_file, sym_file) {
+        logFunction("Running rgbfix");
+        createRgbFix({
+            'arguments': ['-v', 'output.gb'],
+            'preRun': function(m) {
+                var FS = m.FS;
+                FS.writeFile("output.gb", input_rom_file);
+            },
+            'print': logFunction, 'printErr': logFunction,
+        }).then(function(m) {
+            var FS = m.FS;
+            try { var rom_file = FS.readFile("output.gb"); } catch { buildFailed(); return; }
+            
             buildDone(rom_file, sym_file);
         });
     }
 
     function buildFailed() {
+        logFunction("Build failed");
         if (repeat) {
             repeat = false;
             runRgbAsm();
@@ -98,10 +117,6 @@ this.compiler = new Object();
         } else {
             busy = false;
 
-            var hex = Array.prototype.map.call(rom_file, x => ('00' + x.toString(16)).slice(-2)).join(' ');
-            for(var n=0; n<hex.length; n+=3*32)
-                logFunction(hex.slice(n, n + 3*32));
-            
             var start_address = 0x100;
             var addr_to_line = {}
             for(var line of sym_file.split("\n"))
@@ -120,6 +135,7 @@ this.compiler = new Object();
                     start_address = addr;
                 }
             }
+            logFunction("Build done");
             done_callback(rom_file, start_address, addr_to_line);
         }
     }
