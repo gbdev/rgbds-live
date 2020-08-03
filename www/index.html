@@ -333,7 +333,19 @@ window.addEventListener('DOMContentLoaded', (event) => {
 </head>
 <body>
 <div class="container">
-    <div class="editor" id="input"></div>
+    <div class="editor" id="input">
+INCLUDE "hardware.inc"
+
+SECTION "entry", ROM0[$100]
+    jp start
+
+SECTION "main", ROM0[$150]
+start:
+    nop
+haltLoop:
+    halt
+    jr haltLoop
+    </div>
     <div class="emulator">
         <table><tr><td colspan="4">
             <div class="tabs">
