@@ -337,14 +337,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
 INCLUDE "hardware.inc"
 
 SECTION "entry", ROM0[$100]
-    jp start
+  jp start
 
 SECTION "main", ROM0[$150]
 start:
-    nop
+  nop
 haltLoop:
-    halt
-    jr haltLoop
+  halt
+  jr haltLoop
     </div>
     <div class="emulator">
         <table><tr><td colspan="4">
