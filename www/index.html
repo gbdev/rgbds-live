@@ -11,6 +11,7 @@
 <script src="js/lz-string.min.js"></script>
 <script src="js/compiler.js"></script>
 <script src="js/emulator.js"></script>
+<script src="js/storage.js"></script>
 
 <script src="js/ace/ace.js"></script>
 <script src="js/ace/theme-tomorrow.js"></script>
@@ -30,13 +31,16 @@ var addr_to_line = {}
 var line_to_addr = {}
 var cpu_step_interval_id;
 var emu_view = "";
+var current_file = "main.asm";
 
 compiler.setLogCallback(function(str) {
     var output = document.getElementById('output');
     output.value += str + "\n";
     output.scrollTop = output.clientHeight;
 });
-compiler.setErrorCallback(function(type, line_nr, str) {
+compiler.setErrorCallback(function(type, filename, line_nr, str) {
+    if (filename != current_file)
+        return;
     var annotations = editor.session.getAnnotations();
     annotations.push({row: line_nr-1, column: 0, type: type, text: str});
     editor.session.setAnnotations(annotations);
@@ -45,12 +49,11 @@ compiler.setErrorCallback(function(type, line_nr, str) {
 function compileCode()
 {
     destroyEmulator();
-    var code = editor.getValue();
+    storage.update(current_file, editor.getValue());
     document.getElementById('output').value = "";
     editor.session.clearAnnotations();
-    location.hash = LZString.compressToEncodedURIComponent(code);
 
-    compiler.compile(code, function(_rom_file, _start_address, _addr_to_line) {
+    compiler.compile(function(_rom_file, _start_address, _addr_to_line) {
         if (typeof(_rom_file) == 'undefined') {
             return;
         }
@@ -58,7 +61,7 @@ function compileCode()
         start_address = _start_address
         addr_to_line = _addr_to_line
         for(var addr in addr_to_line) {
-            var line = addr_to_line[addr];
+            var [file, line] = addr_to_line[addr];
             if (typeof(line_to_addr[line]) == "undefined")
                 line_to_addr[line] = [];
             line_to_addr[line].push(addr);
@@ -154,15 +157,11 @@ function updateCpuState()
     document.getElementById("cpu_hl").innerHTML = toHex(emulator.getHL(), 4);
     document.getElementById("cpu_flags").innerHTML = emulator.getFlags();
 
-    var line_nr = addr_to_line[pc];
-    if (typeof(line_nr) == "undefined")
-        line_nr = addr_to_line[pc - 1];
-    if (typeof(line_nr) == "undefined")
-        line_nr = addr_to_line[pc - 2];
-    if (typeof(line_nr) != "undefined")
+    var file_line_nr = addr_to_line[pc];
+    if (typeof(file_line_nr) != "undefined" && file_line_nr[0] == current_file)
     {
-        cpu_line_marker = editor.session.addMarker(new ace.Range(line_nr-1, 0, line_nr-1, 1), "cpuLineMarker", "fullLine");
-        editor.scrollToLine(line_nr-1, true, false, function() {});
+        cpu_line_marker = editor.session.addMarker(new ace.Range(file_line_nr[1]-1, 0, file_line_nr[1]-1, 1), "cpuLineMarker", "fullLine");
+        editor.scrollToLine(file_line_nr[1]-1, true, false, function() {});
     }
     updateVRamCanvas();
     updateTextView();
@@ -215,6 +214,43 @@ function updateTextView()
     display_text.value = text;
 }
 
+function updateFileList()
+{
+    var filelist = document.getElementById("filelist");
+    filelist.textContent = "";
+    
+    for (const name of Object.keys(storage.getFiles()).sort()) {
+        var entry = document.createElement('li');
+        entry.textContent = name;
+        filelist.appendChild(entry);
+        
+        if (Object.keys(storage.getFiles()).length > 1)
+        {
+            var delbutton = document.createElement('button');
+            delbutton.textContent = "x";
+            entry.appendChild(delbutton);
+            delbutton.onclick = function(e) {
+                e.cancelBubble = true;
+                deleteFile(name);
+            }
+        }
+        
+        if (name == current_file)
+            entry.className = "active";
+    }
+}
+
+function deleteFile(name)
+{
+    storage.update(name, null);
+    if (current_file == name)
+    {
+        current_file = Object.keys(storage.getFiles()).sort()[0];
+        editor.setValue(storage.getFiles()[current_file]);
+    }
+    updateFileList();
+}
+
 window.addEventListener('DOMContentLoaded', (event) => {
     editor = ace.edit("input");
     editor.setTheme("ace/theme/tomorrow");
@@ -227,13 +263,29 @@ window.addEventListener('DOMContentLoaded', (event) => {
     });
     editor.completers = [gbz80Completer]
 
-    if (location.hash.length > 1)
+    storage.load();
+    updateFileList();
+    document.getElementById("filelist").onclick = function(e)
     {
-        var code = LZString.decompressFromEncodedURIComponent(location.hash.slice(1));
-        if (code != null)
-            editor.setValue(code);
+        current_file = e.target.childNodes[0].wholeText;
+        editor.setValue(storage.getFiles()[current_file]);
+        updateFileList();
+        updateCpuState();
     }
-    editor.session.on('change', function(delta) { compileCode() });
+    document.getElementById("newfile").onclick = function()
+    {
+        var result = prompt("Name of new file?");
+        if (!result) return;
+        if (result.indexOf(".") < 0) result += ".asm";
+        if (result in storage.getFiles()) return;
+        current_file = result;
+        storage.update(current_file, "");
+        editor.setValue("");
+        updateFileList();
+    }
+
+    editor.setValue(storage.getFiles()[current_file]);
+    editor.session.on('change', function(delta) { if (editor.curOp && editor.curOp.command.name) compileCode(); });
     editor.on("guttermousedown", function(e) {
         var target = e.domEvent.target;
 
@@ -334,19 +386,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
 </head>
 <body>
 <div class="container">
-    <div class="editor" id="input">
-INCLUDE "hardware.inc"
-
-SECTION "entry", ROM0[$100]
-  jp start
-
-SECTION "main", ROM0[$150]
-start:
-  nop
-haltLoop:
-  halt
-  jr haltLoop
+    <div class="filelist">
+        <ul id="filelist">
+        </ul>
+        <button id="newfile">+</button>
     </div>
+    <div class="editor" id="input"></div>
     <div class="emulator">
         <table><tr><td colspan="4">
             <div class="tabs">

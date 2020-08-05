@@ -7,22 +7,24 @@ this.compiler = new Object();
     var done_callback;
     var log_callback;
     var error_callback;
-    var input_files = {"hardware.inc": hardware_inc};
 
-    var line_nr_regex = /.+\(([0-9]+)\)/i;
+    var line_nr_regex = /([\w\.]+)[\w\.\:]*\(([0-9]+)\)/gi;
 
     function logFunction(str) {
         log_callback(str);
 
         if (str.startsWith("error: ") || str.startsWith("ERROR: ") || str.startsWith("warning: "))
         {
-            var line_nr_match = line_nr_regex.exec(str);
-            var error_line = parseInt(line_nr_match[1]);
             var type = "error";
             if (str.startsWith("warning: "))
                 type = "warning";
-            
-            error_callback(type, error_line, str);
+
+            var line_nr_match = str.matchAll(line_nr_regex);
+            for(var m of line_nr_match)
+            {
+                var error_line = parseInt(m[2]);
+                error_callback(type, m[1], error_line, str);
+            }
         }
     }
 
@@ -34,8 +36,7 @@ this.compiler = new Object();
         error_callback = callback;
     }
 
-    compiler.compile = function(code, callback) {
-        input_files["input.asm"] = code;
+    compiler.compile = function(callback) {
         done_callback = callback;
         if (busy) {
             repeat = true;
@@ -45,13 +46,22 @@ this.compiler = new Object();
         }
     }
     
-    function runRgbAsm() {
-        logFunction("Running rgbasm");
+    function runRgbAsm(targets, obj_files) {
+        if (typeof(targets) === "undefined")
+        {
+            targets = []
+            obj_files = []
+            for (const name of Object.keys(storage.getFiles()))
+                if (name.endsWith(".asm"))
+                    targets.push(name);
+        }
+        var target = targets.pop();
+        logFunction("Running rgbasm: " + target);
         createRgbAsm({
-            'arguments': ['input.asm', '-o', 'output.o', '-e', '-Wall'],
+            'arguments': [target, '-o', 'output.o', '-e', '-Wall'],
             'preRun': function(m) {
                 var FS = m.FS;
-                for (const [key, value] of Object.entries(input_files)) {
+                for (const [key, value] of Object.entries(storage.getFiles())) {
                     FS.writeFile(key, value);
                 }
             },
@@ -59,17 +69,25 @@ this.compiler = new Object();
         }).then(function(m) {
             var FS = m.FS;
             try { var obj_file = FS.readFile("output.o"); } catch { buildFailed(); return; }
-            runRgbLink(obj_file);
+            obj_files.push(obj_file);
+            if (targets.length > 0)
+                runRgbAsm(targets, obj_files);
+            else
+                runRgbLink(obj_files);
         });
     }
 
-    function runRgbLink(obj_file) {
+    function runRgbLink(obj_files) {
         logFunction("Running rgblink");
+        var args = ['-o', 'output.gb', '--sym', 'output.sym']
+        for(var idx=0; idx<obj_files.length; idx++)
+            args.push(idx.toString() + ".o");
         createRgbLink({
-            'arguments': ['input.o', '-o', 'output.gb', '--sym', 'output.sym'],
+            'arguments': args,
             'preRun': function(m) {
                 var FS = m.FS;
-                FS.writeFile("input.o", obj_file);
+                for(var idx=0; idx<obj_files.length; idx++)
+                    FS.writeFile(idx.toString() + ".o", obj_files[idx]);
             },
             'print': logFunction, 'printErr': logFunction,
         }).then(function(m) {
@@ -121,14 +139,17 @@ this.compiler = new Object();
             var addr_to_line = {}
             for(var line of sym_file.split("\n"))
             {
-                if (line.indexOf("__SECRET__") > -1 && line.indexOf("__LINE__") > -1)
+                if (line.indexOf("__SEC_") > -1)
                 {
-                    var line_nr = parseInt(line.split("__LINE__").pop(), 16);
+                    var sym = line.substr(line.indexOf("__SEC_") + 6);
+                    var file = sym.substr(sym.indexOf("_") + 1);
+                    file = file.substr(file.indexOf("_") + 1).replace("#", ".");
+                    var line_nr = parseInt(sym.split("_")[1], 16);
                     var addr = line.split(" ")[0].split(":");
                     addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
-                    addr_to_line[addr] = line_nr;
+                    addr_to_line[addr] = [file, line_nr];
                 }
-                if (line.endsWith(" emustart") || line.endsWith(" emuStart") || line.endsWith(" emu_start"))
+                else if (line.endsWith(" emustart") || line.endsWith(" emuStart") || line.endsWith(" emu_start"))
                 {
                     var addr = line.split(" ")[0].split(":");
                     addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)

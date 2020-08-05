@@ -11,7 +11,7 @@ index e1a420e..4df87e6 100644
  struct Symbol *sym_AddReloc(char const *symName);
  void sym_Export(char const *symName);
 diff --git a/src/asm/asmy.y b/src/asm/asmy.y
-index d4f9d93..70ef955 100644
+index c5f7082..4c67a21 100644
 --- a/src/asm/asmy.y
 +++ b/src/asm/asmy.y
 @@ -663,7 +663,7 @@ lines		: /* empty */
@@ -33,10 +33,10 @@ index d4f9d93..70ef955 100644
  		| { nPCOffset = 1; } z80_and
  		| { nPCOffset = 1; } z80_bit
 diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index 4887b36..861d4b9 100644
+index 4887b36..e374cdd 100644
 --- a/src/asm/symbol.c
 +++ b/src/asm/symbol.c
-@@ -361,6 +361,18 @@ struct Symbol *sym_AddSet(char const *symName, int32_t value)
+@@ -361,6 +361,24 @@ struct Symbol *sym_AddSet(char const *symName, int32_t value)
  	return sym;
  }
  
@@ -45,7 +45,13 @@ index 4887b36..861d4b9 100644
 +{
 +    char name[MAXSYMLEN + 1];
 +    secret_counter += 1;
-+    sprintf(name, ".__SECRET__%x__LINE__%x", secret_counter, nLineNo);
++    sprintf(name, ".__SEC_%x_%x_%s", secret_counter, nLineNo, tzCurrentFileName);
++    for(char* s = name + 1; *s; s++) {
++        if (*s == '.')
++            *s = '#';
++        if (*s == ':')
++            *s = 0;
++    }
 +    if (symbolScope)
 +        return sym_AddLocalReloc(name);
 +    return sym_AddReloc(name + 1);
@@ -56,7 +62,7 @@ index 4887b36..861d4b9 100644
   * Add a local (.name) relocatable symbol
   */
 diff --git a/src/asm/warning.c b/src/asm/warning.c
-index 83a8bda..cdc184e 100644
+index 8e3474b..9e92836 100644
 --- a/src/asm/warning.c
 +++ b/src/asm/warning.c
 @@ -199,7 +199,7 @@ void verror(const char *fmt, va_list args, char const *flag)
