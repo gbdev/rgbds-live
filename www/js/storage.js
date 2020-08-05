@@ -63,7 +63,11 @@ haltLoop:
         }
 
         load() {
-            
+            for(var [name, data] of Object.entries(localStorage))
+            {
+                if (name.startsWith("rgbds_storage_"))
+                    files[name.substr(14)] = data;
+            }
         }
     }
     

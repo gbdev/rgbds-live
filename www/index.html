@@ -158,6 +158,8 @@ function updateCpuState()
     document.getElementById("cpu_flags").innerHTML = emulator.getFlags();
 
     var file_line_nr = addr_to_line[pc];
+    if (typeof(file_line_nr) == "undefined")
+        file_line_nr = addr_to_line[pc - 1];
     if (typeof(file_line_nr) != "undefined" && file_line_nr[0] == current_file)
     {
         cpu_line_marker = editor.session.addMarker(new ace.Range(file_line_nr[1]-1, 0, file_line_nr[1]-1, 1), "cpuLineMarker", "fullLine");
