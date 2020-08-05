@@ -48,7 +48,7 @@ this.compiler = new Object();
     function runRgbAsm() {
         logFunction("Running rgbasm");
         createRgbAsm({
-            'arguments': ['input.asm', '-o', 'output.o', '-e'],
+            'arguments': ['input.asm', '-o', 'output.o', '-e', '-Wall'],
             'preRun': function(m) {
                 var FS = m.FS;
                 for (const [key, value] of Object.entries(input_files)) {
