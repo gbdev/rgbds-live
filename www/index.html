@@ -405,9 +405,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <input type="radio" name="emulator_display_mode" id="emulator_display_wram" /><label for="emulator_display_wram">WRam</label>
                 <input type="radio" name="emulator_display_mode" id="emulator_display_hram" /><label for="emulator_display_hram">HRam</label>
             </div>
-            <div style="width: 512; height: 512">
-                <canvas id="emulator_screen_canvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
-                <canvas id="emulator_vram_canvas" width="256" height="256" style="width: 512; image-rendering: pixelated; display: none"></canvas>
+            <div class="emulator_screen_container">
+                <canvas class="emulator_canvas_screen" id="emulator_screen_canvas" width="160" height="144"></canvas>
+                <canvas class="emulator_vram_screen" id="emulator_vram_canvas" width="256" height="256" style="display: none"></canvas>
                 <textarea style="height: 100%; width: 100%; display: none" id="emulator_display_text" readonly></textarea>
             </div>
         <tr><td class="right"><td><button id="cpu_single_step">step</button><button id="cpu_frame_step">frame</button><input id="cpu_run_check" type="checkbox">run<td><button id="cpu_reset">Reset</button><td>

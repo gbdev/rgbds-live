@@ -45,6 +45,9 @@ body {
 textarea {
   resize: none;
 }
+canvas {
+    image-rendering: pixelated;
+}
 
 .filelist ul {
   padding: 0;
@@ -88,6 +91,30 @@ textarea {
 .console {
     grid-column: 1 / 3;
     grid-row: 2;
+}
+
+.emulator_screen_container {
+    width: 512;
+    height: 512;
+}
+.emulator_canvas_screen {
+    width: 480;
+}
+.emulator_vram_screen {
+    width: 512;
+}
+
+@media only screen and (max-height: 600px) {
+    .emulator_screen_container {
+        width: 256;
+        height: 256;
+    }
+    .emulator_canvas_screen {
+        width: 240;
+    }
+    .emulator_vram_screen {
+        width: 256;
+    }
 }
 
 @media only screen and (max-width: 600px) {
