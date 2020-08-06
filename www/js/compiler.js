@@ -67,6 +67,7 @@ this.compiler = new Object();
             },
             'print': logFunction, 'printErr': logFunction,
         }).then(function(m) {
+            if (repeat) { buildFailed(); return; }
             var FS = m.FS;
             try { var obj_file = FS.readFile("output.o"); } catch { buildFailed(); return; }
             obj_files.push(obj_file);
@@ -91,6 +92,7 @@ this.compiler = new Object();
             },
             'print': logFunction, 'printErr': logFunction,
         }).then(function(m) {
+            if (repeat) { buildFailed(); return; }
             var FS = m.FS;
             try { var rom_file = FS.readFile("output.gb"); } catch { buildFailed(); return; }
             try { var sym_file = FS.readFile("output.sym", {'encoding': 'utf8'}); } catch { buildFailed(); return; }
