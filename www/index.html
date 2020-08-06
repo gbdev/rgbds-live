@@ -163,7 +163,9 @@ function updateCpuState()
     if (typeof(file_line_nr) != "undefined" && file_line_nr[0] == current_file)
     {
         cpu_line_marker = editor.session.addMarker(new ace.Range(file_line_nr[1]-1, 0, file_line_nr[1]-1, 1), "cpuLineMarker", "fullLine");
-        editor.scrollToLine(file_line_nr[1]-1, true, false, function() {});
+        
+        if (!document.getElementById("cpu_run_check").checked)
+            editor.scrollToLine(file_line_nr[1]-1, true, false, function() {});
     }
     updateVRamCanvas();
     updateTextView();

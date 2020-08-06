@@ -4,6 +4,7 @@ this.compiler = new Object();
 (function(compiler) {
     var busy = false;
     var repeat = false;
+    var start_delay_timer;
     var done_callback;
     var log_callback;
     var error_callback;
@@ -42,19 +43,27 @@ this.compiler = new Object();
             repeat = true;
         } else {
             busy = true;
-            runRgbAsm();
+            trigger();
         }
     }
     
+    function trigger()
+    {
+        if (typeof(start_delay_timer) != "undefined")
+            clearTimeout(start_delay_timer);
+        start_delay_timer = setTimeout(startCompile, 500);
+    }
+    
+    function startCompile()
+    {
+        var targets = [];
+        for (const name of Object.keys(storage.getFiles()))
+            if (name.endsWith(".asm"))
+                targets.push(name);
+        runRgbAsm(targets, []);
+    }
+    
     function runRgbAsm(targets, obj_files) {
-        if (typeof(targets) === "undefined")
-        {
-            targets = []
-            obj_files = []
-            for (const name of Object.keys(storage.getFiles()))
-                if (name.endsWith(".asm"))
-                    targets.push(name);
-        }
         var target = targets.pop();
         logFunction("Running rgbasm: " + target);
         createRgbAsm({
@@ -123,7 +132,7 @@ this.compiler = new Object();
         logFunction("Build failed");
         if (repeat) {
             repeat = false;
-            runRgbAsm();
+            trigger();
         } else {
             busy = false;
             done_callback();
@@ -133,7 +142,7 @@ this.compiler = new Object();
     function buildDone(rom_file, sym_file) {
         if (repeat) {
             repeat = false;
-            runRgbAsm();
+            trigger();
         } else {
             busy = false;
 
