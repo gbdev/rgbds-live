@@ -131,6 +131,10 @@ function handleGBKey(keycode, down)
     if (keycode == 65) emulator.setKeyPad("b", down);
     if (keycode == 16) emulator.setKeyPad("select", down);
     if (keycode == 13) emulator.setKeyPad("start", down);
+    if (keycode == 27) {
+        document.getElementById("cpu_run_check").checked = false;
+        document.getElementById("cpu_run_check").onclick();
+    }
 }
 
 function toHex(num, digits)
@@ -384,6 +388,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
         emu_view = "hram";
         updateTextView();
     };
+    
+    document.getElementById("download_rom").onclick = function() {
+        if (typeof(rom) == "undefined") return;
+        var element = document.createElement('a');
+        var url = window.URL.createObjectURL(new Blob([rom.buffer], {type: 'application/octet-stream'}));
+        element.setAttribute('href', url);
+        element.setAttribute('download', "rom.gb");
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+        window.URL.revokeObjectURL(url);
+    };
 });
 
 </script>
@@ -412,7 +430,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <canvas class="emulator_vram_screen" id="emulator_vram_canvas" width="256" height="256" style="display: none"></canvas>
                 <textarea style="height: 100%; width: 100%; display: none" id="emulator_display_text" readonly></textarea>
             </div>
-        <tr><td class="right"><td><button id="cpu_single_step">step</button><button id="cpu_frame_step">frame</button><input id="cpu_run_check" type="checkbox">run<td><button id="cpu_reset">Reset</button><td>
+        <tr><td class="right"><button id="download_rom">Download</button><td><button id="cpu_single_step">step</button><button id="cpu_frame_step">frame</button><input id="cpu_run_check" type="checkbox">run<td><button id="cpu_reset">Reset</button><td>
         <tr><td class="right">PC:<td id="cpu_pc">-<td class="right">A:<td id="cpu_a">-
         <tr><td class="right">SP:<td id="cpu_sp">-<td class="right">BC:<td id="cpu_bc">-
         <tr><td class="right">Flags:<td id="cpu_flags">-<td class="right">DE:<td id="cpu_de">-
