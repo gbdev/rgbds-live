@@ -89,7 +89,8 @@ function initEmulator()
 {
     if (typeof(rom) == "undefined") return;
     
-    emulator.init(document.getElementById("emulator_screen_canvas"), rom, start_address);
+    emulator.init(document.getElementById("emulator_screen_canvas"), rom);
+    emulator.setPC(start_address)
     updateCpuState();
     updateBreakpoints();
 }
@@ -206,6 +207,47 @@ function updateTextView()
         data = emulator.getHRam();
         bank_size = 0x1000;
         offset = 0xFF80;
+    }
+    if (emu_view == "io")
+    {
+        var text = "";
+        var registers = [
+            {name: "P1", value: 0xFF00},
+            {name: "SB", value: 0xFF01},
+            {name: "SC", value: 0xFF02},
+            {name: "DIV", value: 0xFF04},
+            {name: "TIMA", value: 0xFF05},
+            {name: "TMA", value: 0xFF06},
+            {name: "TAC", value: 0xFF07},
+            {name: "IF", value: 0xFF0F},
+            {name: "LCDC", value: 0xFF40},
+            {name: "STAT", value: 0xFF41},
+            {name: "SCY", value: 0xFF42},
+            {name: "SCX", value: 0xFF43},
+            {name: "LY", value: 0xFF44},
+            {name: "LYC", value: 0xFF45},
+            {name: "DMA", value: 0xFF46},
+            {name: "BGP", value: 0xFF47},
+            {name: "OBP0", value: 0xFF48},
+            {name: "OBP1", value: 0xFF49},
+            {name: "WY", value: 0xFF4A},
+            {name: "WX", value: 0xFF4B},
+            {name: "KEY1", value: 0xFF4D},
+            {name: "VBK", value: 0xFF4F},
+            {name: "RP", value: 0xFF56},
+            {name: "BCPS", value: 0xFF68},
+            {name: "BCPD", value: 0xFF69},
+            {name: "OCPS", value: 0xFF6A},
+            {name: "OCPD", value: 0xFF6B},
+            {name: "SVBK", value: 0xFF70},
+            {name: "IE", value: 0xFFFF},
+        ]
+        for(var reg_info of registers)
+        {
+            text += (reg_info.name + ":       ").slice(0, 6) + ('00' + emulator.readMem(reg_info.value).toString(16)).slice(-2) + "\n";
+        }
+        display_text.value = text;
+        return;
     }
     if (typeof(data) == "undefined") return;
 
@@ -388,6 +430,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
         emu_view = "hram";
         updateTextView();
     };
+    document.getElementById("emulator_display_io").onclick = function() {
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "none";
+        document.getElementById("emulator_display_text").style.display = "";
+        emu_view = "io";
+        updateTextView();
+    };
     
     document.getElementById("download_rom").onclick = function() {
         if (typeof(rom) == "undefined") return;
@@ -424,6 +473,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <input type="radio" name="emulator_display_mode" id="emulator_display_rom" /><label for="emulator_display_rom">ROM</label>
                 <input type="radio" name="emulator_display_mode" id="emulator_display_wram" /><label for="emulator_display_wram">WRam</label>
                 <input type="radio" name="emulator_display_mode" id="emulator_display_hram" /><label for="emulator_display_hram">HRam</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_io" /><label for="emulator_display_io">IO</label>
             </div>
             <div class="emulator_screen_container">
                 <canvas class="emulator_canvas_screen" id="emulator_screen_canvas" width="160" height="144"></canvas>

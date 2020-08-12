@@ -56,6 +56,7 @@ this.compiler = new Object();
     
     function startCompile()
     {
+        log_callback(null);
         var targets = [];
         for (const name of Object.keys(storage.getFiles()))
             if (name.endsWith(".asm"))
