@@ -71,5 +71,31 @@ haltLoop:
         }
     }
     
+    class GithubGistStorage extends Storage {
+        constructor(url) {
+            this.gist_id = url;
+            this.github_username = null;
+            this.github_token = null;
+        }
+
+        load() {
+            var req = new XMLHttpRequest();
+            req.open("GET", "https://api.github.com/gists/" + this.gist_id, false);
+            req.send();
+            JSON.parse(req.response);
+        }
+    
+        save() {
+            var req = new XMLHttpRequest();
+            req.open("PATCH", "https://api.github.com/gists/" + this.gist_id, false);
+            req.setRequestHeader("Authorization", "Basic " + btoa(this.github_username + ":" + this.github_token));
+            var file_data = {};
+            for(var [name, data] of Object.entries(files))
+                file_data[name] = {content: data};
+            req.send(JSON.stringify({files: file_data}}));
+            console.log(req.response);
+        }
+    }
+    
     global.storage = new HashStorage()
 })(this);

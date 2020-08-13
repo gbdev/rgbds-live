@@ -75,7 +75,7 @@ canvas {
     grid-gap: 0;
     height: 100%;
 }
-.filelist {
+.sidebar {
     grid-column: 1;
     grid-row: 1;
     overflow: auto;

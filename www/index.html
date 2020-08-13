@@ -457,10 +457,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
 </head>
 <body>
 <div class="container">
-    <div class="filelist">
-        <ul id="filelist">
-        </ul>
-        <button id="newfile">+</button>
+    <div class="sidebar" style="position: relative">
+        <div class="filelist">
+            <ul id="filelist">
+            </ul>
+            <button id="newfile">+</button>
+        </div>
+        <div style="position: absolute; bottom: 0">
+            <button>Load</button><button>Save</button>
+            <input/>
+        </div>
     </div>
     <div class="editor" id="input"></div>
     <div class="emulator">
