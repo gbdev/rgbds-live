@@ -73,7 +73,11 @@ haltLoop:
     
     class GithubGistStorage extends Storage {
         constructor(url) {
-            this.gist_id = url;
+            super()
+            this.gist_id = null;
+            var m = /https:\/\/gist\.github\.com\/\w+\/(\w+)/.exec(url);
+            if (m)
+                this.gist_id = m[1];
             this.github_username = null;
             this.github_token = null;
         }
@@ -83,19 +87,34 @@ haltLoop:
             req.open("GET", "https://api.github.com/gists/" + this.gist_id, false);
             req.send();
             JSON.parse(req.response);
+
+            var result = JSON.parse(req.responseText);
+            for(var [name, data] of Object.entries(result.files)) {
+                files[name] = data.content;
+            }
         }
     
         save() {
+            if (this.github_username == null)
+                this.github_username = prompt("Github username");
+            if (this.github_token == null)
+                this.github_token = prompt("Github token");
+        
             var req = new XMLHttpRequest();
             req.open("PATCH", "https://api.github.com/gists/" + this.gist_id, false);
             req.setRequestHeader("Authorization", "Basic " + btoa(this.github_username + ":" + this.github_token));
             var file_data = {};
             for(var [name, data] of Object.entries(files))
                 file_data[name] = {content: data};
-            req.send(JSON.stringify({files: file_data}}));
-            console.log(req.response);
+            req.send(JSON.stringify({files: file_data}));
+            if (req.status >= 400)
+            {
+                this.github_username = null;
+                this.github_token = null;
+            }
         }
     }
     
     global.storage = new HashStorage()
+    global.storage = new GithubGistStorage("https://gist.github.com/daid/92dc49b9ddbad2906a48f41d1b3121a8")
 })(this);

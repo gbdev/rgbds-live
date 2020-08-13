@@ -32,9 +32,16 @@ var line_to_addr = {}
 var cpu_step_interval_id;
 var emu_view = "";
 var current_file = "main.asm";
+var live_patch = false;
 
 compiler.setLogCallback(function(str) {
     var output = document.getElementById('output');
+    if (str === null)
+    {
+        output.value = "";
+        editor.session.clearAnnotations();
+        return;
+    }
     output.value += str + "\n";
     output.scrollTop = output.clientHeight;
 });
@@ -48,26 +55,40 @@ compiler.setErrorCallback(function(type, filename, line_nr, str) {
 
 function compileCode()
 {
-    destroyEmulator();
     storage.update(current_file, editor.getValue());
-    document.getElementById('output').value = "";
-    editor.session.clearAnnotations();
 
     compiler.compile(function(_rom_file, _start_address, _addr_to_line) {
+        var pc_line;
+        if (live_patch && editor.session.getMarkers()[cpu_line_marker]) {
+            pc_line = editor.session.getMarkers()[cpu_line_marker].range.start.row + 1;
+        } else {
+            destroyEmulator();
+        }
         if (typeof(_rom_file) == 'undefined') {
             return;
         }
-        rom = _rom_file
-        start_address = _start_address
-        addr_to_line = _addr_to_line
+
+        if (live_patch) {
+            if (!emulator.updateRom(_rom_file))
+                destroyEmulator();
+        }
+        rom = _rom_file;
+        start_address = _start_address;
+        addr_to_line = _addr_to_line;
         for(var addr in addr_to_line) {
             var [file, line] = addr_to_line[addr];
             if (typeof(line_to_addr[line]) == "undefined")
                 line_to_addr[line] = [];
             line_to_addr[line].push(addr);
+            
+            if (live_patch && typeof(pc_line) != "undefined" && file == pc_line[0] && line == pc_line[1])
+            {
+                console.log("Live patch PC update:", emulator.getPC().toString(16), addr.toString(16), pc_line);
+                emulator.setPC(addr);
+            }
         }
         updateTextView();
-    })
+    });
 }
 
 function destroyEmulator()
@@ -368,7 +389,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         document.getElementById("cpu_run_check").checked = false;
                     }
                 }
-            }, 16);
+            }, 10);
         }
     }
     var canvas = document.getElementById("emulator_screen_canvas");
@@ -451,6 +472,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
         document.body.removeChild(element);
         window.URL.revokeObjectURL(url);
     };
+    
+    document.getElementById("loadproject").onclick = function() {
+        storage.load();
+    };
+    document.getElementById("saveproject").onclick = function() {
+        storage.save();
+    };
 });
 
 </script>
@@ -464,8 +492,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             <button id="newfile">+</button>
         </div>
         <div style="position: absolute; bottom: 0">
-            <button>Load</button><button>Save</button>
-            <input/>
+            <button id="loadproject">Load</button><button id="saveproject">Save</button>
         </div>
     </div>
     <div class="editor" id="input"></div>
