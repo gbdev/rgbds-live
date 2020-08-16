@@ -295,17 +295,6 @@ function updateFileList()
         entry.textContent = name;
         filelist.appendChild(entry);
         
-        if (Object.keys(storage.getFiles()).length > 1)
-        {
-            var delbutton = document.createElement('button');
-            delbutton.textContent = "x";
-            entry.appendChild(delbutton);
-            delbutton.onclick = function(e) {
-                e.cancelBubble = true;
-                deleteFile(name);
-            }
-        }
-        
         if (name == current_file)
             entry.className = "active";
     }
@@ -353,6 +342,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
         storage.update(current_file, "");
         editor.setValue("");
         updateFileList();
+    }
+    document.getElementById("delfile").onclick = function()
+    {
+        deleteFile(current_file);
     }
 
     editor.setValue(storage.getFiles()[current_file]);
@@ -473,10 +466,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
         window.URL.revokeObjectURL(url);
     };
     
-    document.getElementById("loadproject").onclick = function() {
+    document.getElementById("importmenu").onclick = function() {
         storage.load();
     };
-    document.getElementById("saveproject").onclick = function() {
+    document.getElementById("exportmenu").onclick = function() {
         storage.save();
     };
 });
@@ -485,14 +478,30 @@ window.addEventListener('DOMContentLoaded', (event) => {
 </head>
 <body>
 <div class="container">
+    <div class="menubar">
+        <ul>
+            <li>File<ul>
+                <li id="newfile">New file...</li>
+                <li id="delfile">Delete current file</li>
+                <li id="importmenu">Import project...</li>
+                <li id="exportmenu">Export project...</li>
+            </ul>
+            </li>
+            <li>About<ul>
+                <li>Source:</li>
+                <li><a href="https://github.com/daid/rgbds-live" target="_blank">https://github.com/daid/rgbds-live</a></li>
+                <li>Uses:</li>
+                <li><a href="https://github.com/rednex/rgbds/" target="_blank">rgbds</a>: Rednex Game Boy Development System</li>
+                <li>(MIT License, Copyright (c) 1997-2018, Carsten Sorensen and RGBDS contributors)</li>
+                <li><a href="https://github.com/binji/binjgb" target="_blank">binjgb</a>: Gameboy Emulator</li>
+                <li>(MIT License, Copyright (C) 2016, Ben Smith)</li>
+            </ul></li>
+        </ul>
+    </div>
     <div class="sidebar" style="position: relative">
         <div class="filelist">
             <ul id="filelist">
             </ul>
-            <button id="newfile">+</button>
-        </div>
-        <div style="position: absolute; bottom: 0">
-            <button id="loadproject">Load</button><button id="saveproject">Save</button>
         </div>
     </div>
     <div class="editor" id="input"></div>
