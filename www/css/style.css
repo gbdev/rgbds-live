@@ -49,6 +49,9 @@ canvas {
     image-rendering: pixelated;
 }
 
+.menubar {
+  background: #aaa
+}
 .menubar ul {
   padding: 0;
   margin: 0;
