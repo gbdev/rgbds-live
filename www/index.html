@@ -327,6 +327,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     updateFileList();
     document.getElementById("filelist").onclick = function(e)
     {
+        if (!e.target.childNodes[0].wholeText) return;
         current_file = e.target.childNodes[0].wholeText;
         editor.setValue(storage.getFiles()[current_file]);
         updateFileList();

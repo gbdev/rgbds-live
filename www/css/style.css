@@ -89,8 +89,10 @@ canvas {
   background: #eee;
   font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
   padding: 1px;
+  cursor: pointer;
+  user-select: none;
 }
-.filelist li:nth-child(odd) {background: #fff}
+.filelist li:nth-child(even) {background: #fff}
 .filelist li.active {background: #ccf}
 .filelist button {
   font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
