@@ -295,6 +295,8 @@ function updateFileList()
 
 function deleteFile(name)
 {
+    if (Object.keys(storage.getFiles()).length < 2)
+        return;
     storage.update(name, null);
     if (editor.getCurrentFilename() == name)
         editor.setCurrentFile(Object.keys(storage.getFiles()).sort()[0]);
@@ -328,7 +330,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
     document.getElementById("delfile").onclick = function()
     {
-        deleteFile(editor.getCurrentFilename());
+        if (confirm("Are you sure you want to delete: " + editor.getCurrentFilename() + "?"))
+            deleteFile(editor.getCurrentFilename());
     }
 
     compileCode();
@@ -438,8 +441,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
     };
     
     document.getElementById("importmenu").onclick = function() {
-        storage.load();
+        //storage.load();
+        document.getElementById("importdialog").style.display = "block";
     };
+    document.getElementById("importdialog").onclick = function(e) { if (e.target == document.getElementById("importdialog")) document.getElementById("importdialog").style.display = "none"; }
+    document.getElementById("importdialogclose").onclick = function() { document.getElementById("importdialog").style.display = "none"; }
     document.getElementById("exportmenu").onclick = function() {
         storage.save();
     };
@@ -501,6 +507,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
         </table>
     </div>
     <div class="console"><textarea style="height: 100%; width: 100%" id="output" readonly></textarea></div>
+    
+    <div id="importdialog" class="modal">
+        <div class="content">
+            <span id="importdialogclose" class="close">&times;</span>
+            <p>Some text in the Modal..</p>
+        </div>
+    </div>
 </div>
 </body>
 </html>
