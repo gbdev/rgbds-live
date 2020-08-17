@@ -155,7 +155,7 @@ this.compiler = new Object();
             {
                 if (line.indexOf("__SEC_") > -1)
                 {
-                    var sym = line.substr(line.indexOf("__SEC_") + 6);
+                    var sym = line.substr(line.lastIndexOf("__SEC_") + 6);
                     var file = sym.substr(sym.indexOf("_") + 1);
                     file = file.substr(file.indexOf("_") + 1).replace("#", ".");
                     var line_nr = parseInt(sym.split("_")[1], 16);

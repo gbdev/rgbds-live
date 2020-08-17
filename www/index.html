@@ -109,10 +109,7 @@ function initEmulator()
 function stepEmulator(step_type)
 {
     if (!emulator.isAvailable())
-    {
         initEmulator();
-        return;
-    }
     var result = emulator.step(step_type);
     updateCpuState(step_type == "single" || step_type == "frame");
     return result

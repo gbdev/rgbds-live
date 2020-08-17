@@ -111,6 +111,9 @@ this.editor = new Object();
             editors[0].session.removeMarker(cpu_line_marker);
             cpu_line_marker = null;
         }
+        
+        if (scroll_to_line && current_file != null && current_file != cpu_line_filename)
+            editor.setCurrentFile(cpu_line_filename);
 
         if (cpu_line_filename == current_file)
         {
