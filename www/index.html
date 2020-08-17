@@ -96,13 +96,13 @@ function destroyEmulator()
     editor.setCpuLine(null, null);
 }
 
-function initEmulator()
+function initEmulator(jump_to_pc)
 {
     if (typeof(rom) == "undefined") return;
     
     emulator.init(document.getElementById("emulator_screen_canvas"), rom);
     emulator.setPC(start_address)
-    updateCpuState();
+    updateCpuState(jump_to_pc);
     updateBreakpoints();
 }
 
@@ -110,8 +110,7 @@ function stepEmulator(step_type)
 {
     if (!emulator.isAvailable())
     {
-        initEmulator();
-        updateCpuState(step_type == "single" || step_type == "frame");
+        initEmulator(step_type == "single" || step_type == "frame");
         return false;
     }
     var result = emulator.step(step_type);
@@ -336,7 +335,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     document.getElementById("cpu_single_step").onclick = function() { stepEmulator("single"); };
     document.getElementById("cpu_frame_step").onclick = function() { stepEmulator("frame"); };
-    document.getElementById("cpu_reset").onclick = function() { initEmulator(); };
+    document.getElementById("cpu_reset").onclick = function() { initEmulator(true); };
     document.getElementById("cpu_run_check").onclick = function() {
         clearInterval(cpu_step_interval_id);
         if (document.getElementById("cpu_run_check").checked)
