@@ -9,6 +9,7 @@ this.editor = new Object();
     var cpu_line_line_nr = null;
     var cpu_line_marker = null;
     var breakpoints = []
+    var cursor_position_per_file = {}
 
     editor.register = function(div_id)
     {
@@ -45,9 +46,18 @@ this.editor = new Object();
     
     editor.setCurrentFile = function(filename)
     {
+        if (current_file != null)
+            cursor_position_per_file[current_file] = editors[0].selection.getCursor();
         current_file = filename;
         editors[0].setValue(storage.getFiles()[filename]);
+        editors[0].selection.clearSelection();
         editors[0].session.getUndoManager().reset();
+        if (current_file in cursor_position_per_file)
+            editors[0].selection.moveCursorToPosition(cursor_position_per_file[current_file]);
+        else
+            editors[0].selection.moveCursorTo(0, 0);
+        editors[0].scrollToLine(editors[0].selection.getCursor().row, true);
+        editors[0].focus();
         editor.updateErrors();
         updateCpuLine();
     }
@@ -106,14 +116,14 @@ this.editor = new Object();
     
     function updateCpuLine(scroll_to_line)
     {
+        if (scroll_to_line && current_file != null && current_file != cpu_line_filename)
+            editor.setCurrentFile(cpu_line_filename);
+
         if (cpu_line_marker != null)
         {
             editors[0].session.removeMarker(cpu_line_marker);
             cpu_line_marker = null;
         }
-        
-        if (scroll_to_line && current_file != null && current_file != cpu_line_filename)
-            editor.setCurrentFile(cpu_line_filename);
 
         if (cpu_line_filename == current_file)
         {
