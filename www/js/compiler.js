@@ -7,7 +7,7 @@ this.compiler = new Object();
     var start_delay_timer;
     var done_callback;
     var log_callback;
-    var error_callback;
+    var error_list = [];
 
     var line_nr_regex = /([\w\.]+)[\w\.\:]*\(([0-9]+)\)/gi;
 
@@ -24,7 +24,7 @@ this.compiler = new Object();
             for(var m of line_nr_match)
             {
                 var error_line = parseInt(m[2]);
-                error_callback(type, m[1], error_line, str);
+                error_list.push([type, m[1], error_line, str]);
             }
         }
     }
@@ -33,10 +33,6 @@ this.compiler = new Object();
         log_callback = callback;
     }
     
-    compiler.setErrorCallback = function(callback) {
-        error_callback = callback;
-    }
-
     compiler.compile = function(callback) {
         done_callback = callback;
         if (busy) {
@@ -45,6 +41,10 @@ this.compiler = new Object();
             busy = true;
             trigger();
         }
+    }
+    
+    compiler.getErrors = function() {
+        return error_list;
     }
     
     function trigger()
@@ -57,6 +57,8 @@ this.compiler = new Object();
     function startCompile()
     {
         log_callback(null);
+        error_list = [];
+        
         var targets = [];
         for (const name of Object.keys(storage.getFiles()))
             if (name.endsWith(".asm"))

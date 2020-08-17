@@ -12,6 +12,7 @@
 <script src="js/compiler.js"></script>
 <script src="js/emulator.js"></script>
 <script src="js/storage.js"></script>
+<script src="js/editor.js"></script>
 
 <script src="js/ace/ace.js"></script>
 <script src="js/ace/theme-tomorrow.js"></script>
@@ -23,7 +24,6 @@
 <script>
 "use strict";
 
-var editor;
 var cpu_line_marker = undefined;
 var start_address;
 var rom;
@@ -31,7 +31,6 @@ var addr_to_line = {}
 var line_to_addr = {}
 var cpu_step_interval_id;
 var emu_view = "";
-var current_file = "main.asm";
 var live_patch = false;
 
 compiler.setLogCallback(function(str) {
@@ -39,25 +38,18 @@ compiler.setLogCallback(function(str) {
     if (str === null)
     {
         output.value = "";
-        editor.session.clearAnnotations();
         return;
     }
     output.value += str + "\n";
     output.scrollTop = output.clientHeight;
 });
-compiler.setErrorCallback(function(type, filename, line_nr, str) {
-    if (filename != current_file)
-        return;
-    var annotations = editor.session.getAnnotations();
-    annotations.push({row: line_nr-1, column: 0, type: type, text: str});
-    editor.session.setAnnotations(annotations);
-});
 
 function compileCode()
 {
-    storage.update(current_file, editor.getValue());
-
     compiler.compile(function(_rom_file, _start_address, _addr_to_line) {
+        editor.updateErrors();
+        updateFileList();
+
         var pc_line;
         if (live_patch && editor.session.getMarkers()[cpu_line_marker]) {
             pc_line = editor.session.getMarkers()[cpu_line_marker].range.start.row + 1;
@@ -76,10 +68,12 @@ function compileCode()
         start_address = _start_address;
         addr_to_line = _addr_to_line;
         for(var addr in addr_to_line) {
-            var [file, line] = addr_to_line[addr];
-            if (typeof(line_to_addr[line]) == "undefined")
-                line_to_addr[line] = [];
-            line_to_addr[line].push(addr);
+            var [filename, line] = addr_to_line[addr];
+            if (typeof(line_to_addr[filename]) == "undefined")
+                line_to_addr[filename] = {};
+            if (typeof(line_to_addr[filename][line]) == "undefined")
+                line_to_addr[filename][line] = [];
+            line_to_addr[filename][line].push(addr);
             
             if (live_patch && typeof(pc_line) != "undefined" && file == pc_line[0] && line == pc_line[1])
             {
@@ -99,11 +93,7 @@ function destroyEmulator()
     line_to_addr = {}
     rom = undefined;
 
-    if (typeof(cpu_line_marker) != "undefined")
-    {
-        editor.session.removeMarker(cpu_line_marker);
-        cpu_line_marker = undefined;
-    }
+    editor.setCpuLine(null, null);
 }
 
 function initEmulator()
@@ -124,20 +114,21 @@ function stepEmulator(step_type)
         return;
     }
     var result = emulator.step(step_type);
-    updateCpuState();
+    updateCpuState(step_type == "single" || step_type == "frame");
     return result
 }
 
 function updateBreakpoints()
 {
     emulator.clearBreakpoints();
-    var breakpoints = editor.session.getBreakpoints();
-    for(var line_nr in breakpoints)
+    var breakpoints = editor.getBreakpoints();
+    for(var data of breakpoints)
     {
-        if (typeof(breakpoints[line_nr]) == "undefined") continue;
-        line_nr = parseInt(line_nr) + 1;
-        if (typeof(line_to_addr[line_nr]) == "undefined") continue;
-        for(var addr of line_to_addr[line_nr])
+        var [filename, line_nr, valid] = data;
+        data[2] = false;
+        if (typeof(line_to_addr[filename]) == "undefined" || typeof(line_to_addr[filename][line_nr]) == "undefined") continue;
+        data[2] = true;
+        for(var addr of line_to_addr[filename][line_nr])
             emulator.setBreakpoint(addr);
     }
 }
@@ -164,14 +155,8 @@ function toHex(num, digits)
     return "$" + ("0000" + num.toString(16)).slice(-digits);
 }
 
-function updateCpuState()
+function updateCpuState(afterSingleStep)
 {
-    if (typeof(cpu_line_marker) != "undefined")
-    {
-        editor.session.removeMarker(cpu_line_marker);
-        cpu_line_marker = undefined;
-    }
-
     emulator.renderScreen()
 
     var pc = emulator.getPC();
@@ -186,13 +171,10 @@ function updateCpuState()
     var file_line_nr = addr_to_line[pc];
     if (typeof(file_line_nr) == "undefined")
         file_line_nr = addr_to_line[pc - 1];
-    if (typeof(file_line_nr) != "undefined" && file_line_nr[0] == current_file)
-    {
-        cpu_line_marker = editor.session.addMarker(new ace.Range(file_line_nr[1]-1, 0, file_line_nr[1]-1, 1), "cpuLineMarker", "fullLine");
-        
-        if (!document.getElementById("cpu_run_check").checked)
-            editor.scrollToLine(file_line_nr[1]-1, true, false, function() {});
-    }
+    if (typeof(file_line_nr) != "undefined")
+        editor.setCpuLine(file_line_nr[0], file_line_nr[1], afterSingleStep);
+    else
+        editor.setCpuLine(null, null);
     updateVRamCanvas();
     updateTextView();
 }
@@ -295,41 +277,45 @@ function updateFileList()
         entry.textContent = name;
         filelist.appendChild(entry);
         
-        if (name == current_file)
-            entry.className = "active";
+        if (name == editor.getCurrentFilename())
+            entry.classList.add("active");
+        for(var [type, filename, line_nr, message] of compiler.getErrors())
+        {
+            if (filename != name)
+                continue;
+            entry.classList.add(type);
+            if (type == "error")
+            {
+                entry.classList.remove("warning");
+                break;
+            }
+        }
     }
 }
 
 function deleteFile(name)
 {
     storage.update(name, null);
-    if (current_file == name)
+    if (editor.getCurrentFile() == name)
     {
-        current_file = Object.keys(storage.getFiles()).sort()[0];
+        editor.setCurrentFile(Object.keys(storage.getFiles()).sort()[0]);
         editor.setValue(storage.getFiles()[current_file]);
     }
     updateFileList();
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
-    editor = ace.edit("input");
-    editor.setTheme("ace/theme/tomorrow");
-    editor.session.setMode("ace/mode/gbz80");
-    editor.setOptions({
-        tabSize: 2,
-        useSoftTabs: true,
-        enableLiveAutocompletion: true,
-        enableSnippets: true,
-    });
-    editor.completers = [gbz80Completer]
-
     storage.load();
+
+    editor.register("input");
+    editor.setCurrentFile("main.asm");
     updateFileList();
+
     document.getElementById("filelist").onclick = function(e)
     {
         if (!e.target.childNodes[0].wholeText) return;
-        current_file = e.target.childNodes[0].wholeText;
-        editor.setValue(storage.getFiles()[current_file]);
+        editor.setCurrentFile(e.target.childNodes[0].wholeText);
+        
         updateFileList();
         updateCpuState();
     }
@@ -339,32 +325,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
         if (!result) return;
         if (result.indexOf(".") < 0) result += ".asm";
         if (result in storage.getFiles()) return;
-        current_file = result;
-        storage.update(current_file, "");
-        editor.setValue("");
+        storage.update(result, "");
+        setCurrentFile(result);
         updateFileList();
     }
     document.getElementById("delfile").onclick = function()
     {
-        deleteFile(current_file);
+        deleteFile(editor.getCurrentFile());
     }
 
-    editor.setValue(storage.getFiles()[current_file]);
-    editor.session.on('change', function(delta) { if (editor.curOp && editor.curOp.command.name) compileCode(); });
-    editor.on("guttermousedown", function(e) {
-        var target = e.domEvent.target;
-
-        if (target.className.indexOf("ace_gutter-cell") == -1)
-            return;
-        var row = e.getDocumentPosition().row;
-        var breakpoints = e.editor.session.getBreakpoints();
-        if (typeof(breakpoints[row]) == "undefined")
-            e.editor.session.setBreakpoint(row);
-        else
-            e.editor.session.clearBreakpoint(row);
-        updateBreakpoints();
-        e.stop();
-    });
     compileCode();
 
     document.getElementById("cpu_single_step").onclick = function() { stepEmulator("single"); };
