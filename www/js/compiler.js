@@ -63,7 +63,7 @@ this.compiler = new Object();
         for (const name of Object.keys(storage.getFiles()))
             if (name.endsWith(".asm"))
                 targets.push(name);
-        runRgbAsm(targets, []);
+        runRgbAsm(targets, {});
     }
     
     function runRgbAsm(targets, obj_files) {
@@ -82,7 +82,7 @@ this.compiler = new Object();
             if (repeat) { buildFailed(); return; }
             var FS = m.FS;
             try { var obj_file = FS.readFile("output.o"); } catch { buildFailed(); return; }
-            obj_files.push(obj_file);
+            obj_files[target] = obj_file;
             if (targets.length > 0)
                 runRgbAsm(targets, obj_files);
             else
@@ -93,14 +93,14 @@ this.compiler = new Object();
     function runRgbLink(obj_files) {
         logFunction("Running rgblink");
         var args = ['-o', 'output.gb', '--sym', 'output.sym']
-        for(var idx=0; idx<obj_files.length; idx++)
-            args.push(idx.toString() + ".o");
+        for(var name in obj_files)
+            args.push(name + ".o");
         createRgbLink({
             'arguments': args,
             'preRun': function(m) {
                 var FS = m.FS;
-                for(var idx=0; idx<obj_files.length; idx++)
-                    FS.writeFile(idx.toString() + ".o", obj_files[idx]);
+                for(var name in obj_files)
+                    FS.writeFile(name + ".o", obj_files[name]);
             },
             'print': logFunction, 'printErr': logFunction,
         }).then(function(m) {
