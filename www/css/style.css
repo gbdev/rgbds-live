@@ -169,19 +169,28 @@ canvas {
     .container {
         display: grid;
         grid-template-columns: auto;
-        grid-template-rows: 600px auto 300px;
+        grid-template-rows: 22px 600px auto 100px 300px;
         grid-gap: 0;
     }
-    .editor {
+    .menubar {
         grid-column: 1;
         grid-row: 1;
     }
-    .emulator {
+    .sidebar {
+        grid-column: 1;
+        grid-row: 4;
+        overflow: auto;
+    }
+    .editor {
         grid-column: 1;
         grid-row: 2;
     }
-    .console {
+    .emulator {
         grid-column: 1;
         grid-row: 3;
+    }
+    .console {
+        grid-column: 1;
+        grid-row: 5;
     }
 }
