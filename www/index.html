@@ -109,7 +109,11 @@ function initEmulator()
 function stepEmulator(step_type)
 {
     if (!emulator.isAvailable())
+    {
         initEmulator();
+        updateCpuState(step_type == "single" || step_type == "frame");
+        return false;
+    }
     var result = emulator.step(step_type);
     updateCpuState(step_type == "single" || step_type == "frame");
     return result
@@ -293,11 +297,8 @@ function updateFileList()
 function deleteFile(name)
 {
     storage.update(name, null);
-    if (editor.getCurrentFile() == name)
-    {
+    if (editor.getCurrentFilename() == name)
         editor.setCurrentFile(Object.keys(storage.getFiles()).sort()[0]);
-        editor.setValue(storage.getFiles()[current_file]);
-    }
     updateFileList();
 }
 
@@ -323,12 +324,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
         if (result.indexOf(".") < 0) result += ".asm";
         if (result in storage.getFiles()) return;
         storage.update(result, "");
-        setCurrentFile(result);
+        editor.setCurrentFile(result);
         updateFileList();
     }
     document.getElementById("delfile").onclick = function()
     {
-        deleteFile(editor.getCurrentFile());
+        deleteFile(editor.getCurrentFilename());
     }
 
     compileCode();
@@ -361,7 +362,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
     canvas.onkeyup = function(e) {
         handleGBKey(e.keyCode, false);
         e.preventDefault();
-    };    
+    };
+    document.onkeydown = function(e) {
+        if (e.code == "F8") { stepEmulator("single"); e.preventDefault(); }
+        if (e.code == "F9") { stepEmulator("frame"); e.preventDefault(); }
+    }
 
     document.getElementById("emulator_display_screen").onclick = function() {
         document.getElementById("emulator_screen_canvas").style.display = "";
