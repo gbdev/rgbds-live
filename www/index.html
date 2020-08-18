@@ -511,7 +511,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
     <div id="importdialog" class="modal">
         <div class="content">
             <span id="importdialogclose" class="close">&times;</span>
-            <p>Some text in the Modal..</p>
+            <div class="tabs">
+                <input type="radio" name="import_mode" id="import_mode_y" checked /><label for="import_mode_y">Y</label><div>Y</div>
+                <input type="radio" name="import_mode" id="import_mode_z" /><label for="import_mode_z">Z</label><div>Z</div>
+                <input type="radio" name="import_mode" id="import_mode_x" /><label for="import_mode_x">X</label><div>X</div>
+            </div>
         </div>
     </div>
 </div>

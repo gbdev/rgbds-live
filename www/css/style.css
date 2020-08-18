@@ -16,13 +16,14 @@
 }
 
 .tabs {
+    display: flex;
+    flex-wrap: wrap;
     border-bottom: 1px solid #999;
 }
 .tabs input {
     display: none;
 }
-.tabs label, .tabs button {
-    display: inline-block;
+.tabs label {
     border: 1px solid #999;
     background: #EEE;
     padding: 4px 12px;
@@ -31,8 +32,17 @@
     top: 1px;
 }
 .tabs input:checked + label {
-  background: #FFF;
-  border-bottom: 1px solid transparent;
+    background: #FFF;
+    border-bottom: 1px solid transparent;
+}
+.tabs input + label + div {
+    order: 99;
+    display: none;
+    flex-basis: 100%;
+    border-top: 1px solid #999;
+}
+.tabs input:checked + label + div {
+    display: block;
 }
 
 table {
