@@ -447,8 +447,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
     document.getElementById("importdialog").onclick = function(e) { if (e.target == document.getElementById("importdialog")) document.getElementById("importdialog").style.display = "none"; }
     document.getElementById("importdialogclose").onclick = function() { document.getElementById("importdialog").style.display = "none"; }
     document.getElementById("exportmenu").onclick = function() {
-        storage.save();
+        //storage.save();
+        document.getElementById("exportdialog").style.display = "block";
     };
+    document.getElementById("exportdialog").onclick = function(e) { if (e.target == document.getElementById("exportdialog")) document.getElementById("exportdialog").style.display = "none"; }
+    document.getElementById("exportdialogclose").onclick = function() { document.getElementById("exportdialog").style.display = "none"; }
 });
 
 </script>
@@ -515,6 +518,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <input type="radio" name="import_mode" id="import_mode_y" checked /><label for="import_mode_y">Y</label><div>Y</div>
                 <input type="radio" name="import_mode" id="import_mode_z" /><label for="import_mode_z">Z</label><div>Z</div>
                 <input type="radio" name="import_mode" id="import_mode_x" /><label for="import_mode_x">X</label><div>X</div>
+            </div>
+        </div>
+    </div>
+    <div id="exportdialog" class="modal">
+        <div class="content">
+            <span id="exportdialogclose" class="close">&times;</span>
+            <div class="tabs">
+                <input type="radio" name="export_mode" id="export_mode_url" checked /><label for="export_mode_url">URL</label>
+                <div>
+                    <p>Export the project as URL. Only suitable for small projects.</p>
+                    <p><input id="export_url"></input></p>
+                </div>
+                <input type="radio" name="export_mode" id="export_mode_z" /><label for="export_mode_z">Z</label><div>Z</div>
+                <input type="radio" name="export_mode" id="export_mode_x" /><label for="export_mode_x">X</label><div>X</div>
             </div>
         </div>
     </div>
