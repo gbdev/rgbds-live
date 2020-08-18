@@ -20,7 +20,7 @@
     flex-wrap: wrap;
     border-bottom: 1px solid #999;
 }
-.tabs input {
+.tabs input[type=radio] {
     display: none;
 }
 .tabs label {
@@ -39,7 +39,10 @@
     order: 99;
     display: none;
     flex-basis: 100%;
+    padding: 16px;
     border-top: 1px solid #999;
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
 }
 .tabs input:checked + label + div {
     display: block;
