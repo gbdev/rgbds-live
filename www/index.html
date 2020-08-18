@@ -448,7 +448,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
     };
     document.getElementById("importdialog").onclick = function(e) { if (e.target == document.getElementById("importdialog")) document.getElementById("importdialog").style.display = "none"; }
     document.getElementById("importdialogclose").onclick = function() { document.getElementById("importdialog").style.display = "none"; }
-    document.getElementById("import_zipfile").onchange = function(e) { if (e.target.files.length > 0) { storage.loadZip(e.target.files[0]); document.getElementById("importdialog").style.display = "none"; } }
+    document.getElementById("import_zipfile").onchange = function(e) {
+        if (e.target.files.length > 0) {
+            storage.loadZip(e.target.files[0]);
+            e.target.value = "";
+            document.getElementById("importdialog").style.display = "none";
+        }
+    }
     document.getElementById("exportmenu").onclick = function() {
         //storage.save();
         document.getElementById("exportdialog").style.display = "block";
