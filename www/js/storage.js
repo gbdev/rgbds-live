@@ -22,6 +22,8 @@ haltLoop:
         if (location.hash.length > 1) {
             if (location.hash.startsWith("#https://gist.github.com/"))
                 storage.loadGithubGist(location.hash.slice(1));
+            else if (location.hash.startsWith("#http://") || location.hash.startsWith("#https://"))
+                storage.loadSingleUrl(location.hash.slice(1));
             else
                 storage.loadUrlHash();
         }
@@ -164,6 +166,15 @@ haltLoop:
             }
             loadNextFile();
         });
+    }
+    
+    storage.loadSingleUrl = function(url) {
+        files = {"hardware.inc": hardware_inc};
+        var req = new XMLHttpRequest();
+        req.open("GET", url, false);
+        req.send();
+        files["main.asm"] = req.response;
+        postLoadUIUpdate();
     }
     
     class LocalStorageStorage {
