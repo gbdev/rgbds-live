@@ -20,18 +20,10 @@ haltLoop:
     storage.autoLoad = function()
     {
         if (location.hash.length > 1) {
-            var all_code = LZString.decompressFromEncodedURIComponent(location.hash.slice(1));
-            if (all_code != null) {
-                if (all_code.indexOf("\0") < 0) {
-                    files["main.asm"] = all_code;
-                } else {
-                    all_code = all_code.split("\0");
-                    files = {"hardware.inc": hardware_inc};
-                    for(var idx=0; idx<all_code.length-1; idx+=2) {
-                        files[all_code[idx]] = all_code[idx+1];
-                    }
-                }
-            }
+            if (location.hash.startsWith("#https://gist.github.com/"))
+                storage.loadGithubGist(location.hash.slice(1));
+            else
+                storage.loadUrlHash();
         }
     }
 
@@ -47,24 +39,48 @@ haltLoop:
         else
             files[name] = code;
     }
+
+    storage.loadUrlHash = function() {
+        var all_code = LZString.decompressFromEncodedURIComponent(location.hash.slice(1));
+        if (all_code == null)
+            return false;
+
+        if (all_code.indexOf("\0") < 0) {
+            files["main.asm"] = all_code;
+            return true;
+        }
+        all_code = all_code.split("\0");
+        files = {"hardware.inc": hardware_inc};
+        for(var idx=0; idx<all_code.length-1; idx+=2) {
+            files[all_code[idx]] = all_code[idx+1];
+        }
+        return true;
+    }
     
     storage.getHashUrl = function()
     {
-        var url = new URL(document.location);
         var all_code = "";
         for(var [name, data] of Object.entries(files)) {
             if (name == "hardware.inc" && data == hardware_inc)
                 continue;
             all_code += name + "\0" + data + "\0";
         }
+        var url = new URL(document.location);
         url.hash = LZString.compressToEncodedURIComponent(all_code);
         if (url.hash.length > 1024 * 2)
             return "Sorry, code too large for direct URL generation";
         return url.toString();
     }
 
+    function urlToGistID(url) {
+        var m = /https:\/\/gist\.github\.com\/\w+\/(\w+)/.exec(url);
+        if (m)
+            return m[1];
+        return null;
+    }
+
     storage.loadGithubGist = function(url) {
-        var gist_id = urlToGistId(url);
+        var gist_id = urlToGistID(url);
         if (gist_id == null)
             return;
 
@@ -78,31 +94,40 @@ haltLoop:
         for(var [name, data] of Object.entries(result.files)) {
             files[name] = data.content;
         }
+        postLoadUIUpdate();
     }
 
     storage.saveGithubGist = function(username, token, url) {
-        var gist_id = urlToGistId(url);
+        var file_data = {};
+        for(var [name, data] of Object.entries(files))
+            file_data[name] = {content: data};
+
+        if (url == "")
+        {
+            var req = new XMLHttpRequest();
+            req.open("POST", "https://api.github.com/gists", false);
+            req.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + token));
+            req.send(JSON.stringify({files: file_data}));
+            if (req.status >= 400)
+            {
+                return null;
+            }
+            return JSON.parse(req.response).html_url;
+        }
+
+        var gist_id = urlToGistID(url);
         if (gist_id == null)
-            return;
+            return null;
 
         var req = new XMLHttpRequest();
         req.open("PATCH", "https://api.github.com/gists/" + gist_id, false);
         req.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + token));
-        var file_data = {};
-        for(var [name, data] of Object.entries(files))
-            file_data[name] = {content: data};
         req.send(JSON.stringify({files: file_data}));
         if (req.status >= 400)
         {
-            
+            return null;
         }
-    }
-    
-    function urlToGistID(url) {
-        var m = /https:\/\/gist\.github\.com\/\w+\/(\w+)/.exec(url);
-        if (m)
-            return m[1];
-        return null;
+        return url;
     }
     
     storage.downloadZip = function() {
@@ -134,7 +159,7 @@ haltLoop:
                 entry.async("string").then(function(contents) {
                     files[entry.name] = contents;
                     loadNextFile();
-                    //TODO: Update UI
+                    postLoadUIUpdate();
                 });
             }
             loadNextFile();
@@ -156,5 +181,10 @@ haltLoop:
                     files[name.substr(14)] = data;
             }
         }
+    }
+    
+    function postLoadUIUpdate() {
+        editor.setCurrentFile(Object.keys(files)[0]);
+        updateFileList();
     }
 })(storage);

@@ -306,9 +306,8 @@ function deleteFile(name)
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
-    storage.autoLoad();
-
     editor.register("input");
+    storage.autoLoad();
     editor.setCurrentFile("main.asm");
     updateFileList();
 
@@ -448,6 +447,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
     };
     document.getElementById("importdialog").onclick = function(e) { if (e.target == document.getElementById("importdialog")) document.getElementById("importdialog").style.display = "none"; }
     document.getElementById("importdialogclose").onclick = function() { document.getElementById("importdialog").style.display = "none"; }
+    document.getElementById("import_gist").onclick = function() {
+        storage.loadGithubGist(document.getElementById("import_gist_url").value);
+        document.getElementById("importdialog").style.display = "none";
+    }
     document.getElementById("import_zipfile").onchange = function(e) {
         if (e.target.files.length > 0) {
             storage.loadZip(e.target.files[0]);
@@ -463,6 +466,22 @@ window.addEventListener('DOMContentLoaded', (event) => {
     };
     document.getElementById("exportdialog").onclick = function(e) { if (e.target == document.getElementById("exportdialog")) document.getElementById("exportdialog").style.display = "none"; }
     document.getElementById("exportdialogclose").onclick = function() { document.getElementById("exportdialog").style.display = "none"; }
+    document.getElementById("export_gist").onclick = function() {
+        var url = document.getElementById("export_gist_url").value;
+        var username = document.getElementById("export_gist_username").value;
+        var token = document.getElementById("export_gist_token").value;
+        
+        url = storage.saveGithubGist(username, token, url);
+        if (url == null) {
+            document.getElementById("export_gist_import_url").value = "Gist create/update failed. Incorrect token?";
+        } else {
+            document.getElementById("export_gist_url").value = url;
+
+            var auto_import_url = new URL(document.location);
+            auto_import_url.hash = url;
+            document.getElementById("export_gist_import_url").value = auto_import_url.toString();
+        }
+    }
     document.getElementById("export_zip").onclick = function() { storage.downloadZip(); }
 });
 
@@ -527,8 +546,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
         <div class="content">
             <span id="importdialogclose" class="close">&times;</span>
             <div class="tabs">
-                <input type="radio" name="import_mode" id="import_mode_gist" checked /><label for="import_mode_gist">GitHub Gist</label><div>TODO</div>
-                <input type="radio" name="import_mode" id="import_mode_github" /><label for="import_mode_github">GitHub</label><div>TODO</div>
+                <input type="radio" name="import_mode" id="import_mode_gist" checked /><label for="import_mode_gist">GitHub Gist</label>
+                <div>
+                    <p>Import code from a GitHub Gist:</p>
+                    <p>Gist URL: <input id="import_gist_url" /></p>
+                    <p><button id="import_gist">Import</button></p>
+                </div>
+                <input type="radio" name="import_mode" id="import_mode_github" /><label for="import_mode_github">GitHub</label>
+                <div>
+                    <p>At some point in the future you will be able to directly import github repositories here.</p>
+                </div>
                 <input type="radio" name="import_mode" id="import_mode_upload" /><label for="import_mode_upload">Load .zip</label>
                 <div>
                     <p>Load a zip file:</p>
@@ -549,10 +576,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <input type="radio" name="export_mode" id="export_mode_gist" /><label for="export_mode_gist">GitHub Gist</label>
                 <div>
                     <p>Export the code as a new GitHub Gist, or update an existing Gist with new code.</p>
-                    <p>Gist URL: <input id="export_gist_url" onClick="this.select();" /></p>
                     <p>Github username: <input id="export_gist_username" /></p>
-                    <p>Github token: <input id="export_gist_token" /></p>
-                    <p><button>Save</button></p>
+                    <p>Github token: <input id="export_gist_token" autocomplete="off"/></p>
+                    <p>Gist URL: <input id="export_gist_url" /> (leave empty for new gist)</p>
+                    <p><button id="export_gist">Save</button></p>
                     <p><input id="export_gist_import_url" style="width: 100%" onClick="this.select();" readonly /></p>
                 </div>
                 <input type="radio" name="export_mode" id="export_mode_github" /><label for="export_mode_github">GitHub</label>
