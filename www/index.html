@@ -308,7 +308,7 @@ function deleteFile(name)
 window.addEventListener('DOMContentLoaded', (event) => {
     editor.register("input");
     storage.autoLoad();
-    editor.setCurrentFile("main.asm");
+    //editor.setCurrentFile("main.asm");
     updateFileList();
 
     document.getElementById("filelist").onclick = function(e)
@@ -483,6 +483,24 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }
     }
     document.getElementById("export_zip").onclick = function() { storage.downloadZip(); }
+
+    document.getElementById("infomenu").onclick = function() { document.getElementById("infodialog").style.display = "block"; }
+    document.getElementById("infodialog").onclick = function(e) { if (e.target == document.getElementById("infodialog")) document.getElementById("infodialog").style.display = "none"; }
+    document.getElementById("infodialogclose").onclick = function() { document.getElementById("infodialog").style.display = "none"; }
+    
+    document.getElementById("auto_url_update").checked = storage.autoUrl;
+    document.getElementById("auto_url_update").onclick = function() {
+        storage.autoUrl = document.getElementById("auto_url_update").checked;
+        if (storage.autoUrl)
+            storage.update();
+        else
+            document.location.hash = "";
+    }
+    document.getElementById("auto_local_storage_update").checked = storage.autoLocalStorage;
+    document.getElementById("auto_local_storage_update").onclick = function() {
+        storage.autoLocalStorage = document.getElementById("auto_local_storage_update").checked;
+        storage.update();
+    }
 });
 
 </script>
@@ -496,9 +514,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <li id="delfile">Delete current file</li>
                 <li id="importmenu">Import project...</li>
                 <li id="exportmenu">Export project...</li>
-            </ul>
-            </li>
+            </ul></li>
+            <li>Options<ul>
+                <li><input type="checkbox" id="auto_url_update"/><label for="auto_url_update">Auto URL update</label></li>
+                <li><input type="checkbox" id="auto_local_storage_update"/><label for="auto_local_storage_update">Store data between sessions</label></li>
+            </ul></li>
             <li>About<ul>
+                <li id="infomenu">Info...</li>
+                <li><a href="https://rednex.github.io/rgbds/" target="_blank">rgbds manual</a></li>
+                <li><a href="https://github.com/daid/rgbds-live/issues" target="_blank">Report a problem</a></li>
                 <li>Source:</li>
                 <li><a href="https://github.com/daid/rgbds-live" target="_blank">https://github.com/daid/rgbds-live</a></li>
                 <li>Uses:</li>
@@ -541,6 +565,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
         </table>
     </div>
     <div class="console"><textarea style="height: 100%; width: 100%" id="output" readonly></textarea></div>
+
+    <div id="infodialog" class="modal">
+        <div class="content">
+            <span id="infodialogclose" class="close">&times;</span>
+            <p>rgbds-live is a Gameboy programming environment. Allowing for realtime assembly programming for the gameboy.</p>
+            <p>The environment runs 100% in your browser. Your source code does not leave your browser, unless you export it.</p>
+            <p>It is powered by the excelent binjgb emulator, the ace javascript sourcecode editor and rgbds compiled for webassembly.</p>
+        </div>
+    </div>
     
     <div id="importdialog" class="modal">
         <div class="content">
@@ -577,7 +610,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <div>
                     <p>Export the code as a new GitHub Gist, or update an existing Gist with new code.</p>
                     <p>Github username: <input id="export_gist_username" /></p>
-                    <p>Github token: <input id="export_gist_token" autocomplete="off"/></p>
+                    <p>Github personal access token: <input id="export_gist_token" autocomplete="off"/> (<a href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token" target="_blank">info</a>)</p>
                     <p>Gist URL: <input id="export_gist_url" /> (leave empty for new gist)</p>
                     <p><button id="export_gist">Save</button></p>
                     <p><input id="export_gist_import_url" style="width: 100%" onClick="this.select();" readonly /></p>

@@ -16,16 +16,28 @@ haltLoop:
   halt
   jr haltLoop
 `};
+    storage.autoUrl = false;
+    storage.autoLocalStorage = false;
 
     storage.autoLoad = function()
     {
         if (location.hash.length > 1) {
-            if (location.hash.startsWith("#https://gist.github.com/"))
+            if (location.hash.startsWith("#https://gist.github.com/")) {
                 storage.loadGithubGist(location.hash.slice(1));
-            else if (location.hash.startsWith("#http://") || location.hash.startsWith("#https://"))
+                location.hash = "";
+            } else if (location.hash.startsWith("#http://") || location.hash.startsWith("#https://")) {
                 storage.loadSingleUrl(location.hash.slice(1));
-            else
+                location.hash = "";
+            } else {
                 storage.loadUrlHash();
+                storage.autoUrl = true;
+            }
+        } else if ("rgbds_storage" in localStorage) {
+            files = {"hardware.inc": hardware_inc};
+            for(var [filename, data] of Object.entries(JSON.parse(localStorage["rgbds_storage"]))) {
+                files[filename] = data;
+            }
+            storage.autoLocalStorage = true;
         }
     }
 
@@ -36,10 +48,18 @@ haltLoop:
 
     storage.update = function(name, code)
     {
-        if (code === null)
-            delete files[name]
-        else
-            files[name] = code;
+        if (typeof(name) !== "undefined")
+        {
+            if (code === null)
+                delete files[name]
+            else
+                files[name] = code;
+        }
+        
+        if (storage.autoUrl)
+            document.location.hash = new URL(storage.getHashUrl()).hash;
+        if (storage.autoLocalStorage)
+            localStorage["rgbds_storage"] = JSON.stringify(files);
     }
 
     storage.loadUrlHash = function() {
@@ -175,23 +195,6 @@ haltLoop:
         req.send();
         files["main.asm"] = req.response;
         postLoadUIUpdate();
-    }
-    
-    class LocalStorageStorage {
-        autoSave(name, code) {
-            if (code === null)
-                delete localStorage["rgbds_storage_" + name]
-            else
-                localStorage["rgbds_storage_" + name] = code
-        }
-
-        load() {
-            for(var [name, data] of Object.entries(localStorage))
-            {
-                if (name.startsWith("rgbds_storage_"))
-                    files[name.substr(14)] = data;
-            }
-        }
     }
     
     function postLoadUIUpdate() {
