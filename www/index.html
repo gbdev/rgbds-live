@@ -308,7 +308,7 @@ function deleteFile(name)
 window.addEventListener('DOMContentLoaded', (event) => {
     editor.register("input");
     storage.autoLoad();
-    //editor.setCurrentFile("main.asm");
+    editor.setCurrentFile(Object.keys(storage.getFiles()).pop());
     updateFileList();
 
     document.getElementById("filelist").onclick = function(e)
@@ -530,6 +530,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <li>(MIT License, Copyright (c) 1997-2018, Carsten Sorensen and RGBDS contributors)</li>
                 <li><a href="https://github.com/binji/binjgb" target="_blank">binjgb</a>: Gameboy Emulator</li>
                 <li>(MIT License, Copyright (C) 2016, Ben Smith)</li>
+                <li><a href="https://ace.c9.io/" target="_blank">Ace</a>: High performance code editor for web</li>
+                <li>(BSD License, Copyright (c) 2010, Ajax.org B.V.)</li>
             </ul></li>
         </ul>
     </div>
