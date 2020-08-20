@@ -1093,7 +1093,9 @@ var gbz80HardwareInc = [
     {name: "OAMB_BANK1",      description: "Bit number to set on OAM attribute byte to use a sprite graphics from VRAM Bank 1 in GBC mode.<br>Value: 3"},
 
     // IO Registers
-    {name: "rP1", description: "Register for reading joy pad info. (R/W)<br>Value: $FF00"},
+    {name: "rP1", description: `Register for reading joy pad info. (R/W)
+Use P1F_* constants to interact with it.
+Value: $FF00`},
 
     {name: "P1F_5", description: "%00100000 ; P15 out port, set to 0 to get buttons"},
     {name: "P1F_4", description: "%00010000 ; P14 out port, set to 0 to get dpad"},
@@ -1122,7 +1124,9 @@ var gbz80HardwareInc = [
     {name: "rTMA", description: "Timer modulo (R/W)<br>Value: $FF06"},
 
     //TAC ($FF07)
-    {name: "rTAC", description: "Timer control (R/W)<br>Value: $FF07"},
+    {name: "rTAC", description: `Timer control (R/W)
+Use TAFC_* constants to configure the timer.
+Value: $FF07`},
 
     {name: "TACF_START",  description: "%00000100"},
     {name: "TACF_STOP",   description: "%00000000"},
@@ -1132,10 +1136,16 @@ var gbz80HardwareInc = [
     {name: "TACF_262KHZ", description: "%00000001"},
 
     //IF ($FF0F)
-    {name: "rIF", description: "Interrupt Flag (R/W)<br>Contains the currently 'ready' interrupts, set by hardware, cleared when interrupt is executed.<br>Value: $FF0F"},
+    {name: "rIF", description: `Interrupt Flag (R/W)
+Contains the currently 'ready' interrupts, set by hardware, cleared when interrupt is executed.
+Generally only written to zero to clear pending interrupts before enabling interrupts.
+Else, use IEF_* constants to interact with this register.
+Value: $FF0F`},
 
     //LCDC ($FF40)
-    {name: "rLCDC", description: "LCD Control (R/W)<br>See: LCDCF_* constants for options.<br>Value: $FF40"},
+    {name: "rLCDC", description: `LCD Control (R/W)
+See: LCDCF_* constants for options.
+Value: $FF40`},
 
     {name: "LCDCF_OFF",     description: "%00000000 ; LCD Control Operation"},
     {name: "LCDCF_ON",      description: "%10000000 ; LCD Control Operation"},
@@ -1156,12 +1166,14 @@ var gbz80HardwareInc = [
 
 
     //STAT ($FF41)
-    {name: "rSTAT", description: "LCDC Status   (R/W)<br>Value: $FF41"},
+    {name: "rSTAT", description: `LCDC Status (R/W)
+See STATF_* constants for bits.
+Value: $FF41`},
 
-    {name: "STATF_LYC",     description: " %01000000 ; LYCEQULY Coincidence (Selectable)"},
-    {name: "STATF_MODE10",  description: " %00100000 ; Mode 10"},
-    {name: "STATF_MODE01",  description: " %00010000 ; Mode 01 (V-Blank)"},
-    {name: "STATF_MODE00",  description: " %00001000 ; Mode 00 (H-Blank)"},
+    {name: "STATF_LYC",     description: " %01000000 ; LYC=LY Coincidence interrupt enabled (writable)"},
+    {name: "STATF_MODE10",  description: " %00100000 ; Mode 10 OAM STAT interrupt enabled (writable)"},
+    {name: "STATF_MODE01",  description: " %00010000 ; Mode 01 V-Blank STAT interrupt enabled (writable)"},
+    {name: "STATF_MODE00",  description: " %00001000 ; Mode 00 H-Blank STAT interrupt enabled (writable)"},
     {name: "STATF_LYCF",    description: " %00000100 ; Coincidence Flag"},
     {name: "STATF_HB",      description: " %00000000 ; H-Blank"},
     {name: "STATF_VB",      description: " %00000001 ; V-Blank"},
@@ -1220,28 +1232,22 @@ var gbz80HardwareInc = [
     {name: "rRP", description: "Infrared Communications Port (R/W) GBC Only!<br>Value: $FF56"},
 
     //BCPS ($FF68)
-    //Background Color Palette Specification (R/W)
-    {name: "rBCPS", description: "$FF68"},
+    {name: "rBCPS", description: "Background Color Palette Specification (R/W) GBC Only!<br>Value: $FF68"},
 
     //BCPD ($FF69)
-    //Background Color Palette Data (R/W)
-    {name: "rBCPD", description: "$FF69"},
+    {name: "rBCPD", description: "Background Color Palette Data (R/W) GBC Only!<br>Value: $FF69"},
 
     //BCPS ($FF6A)
-    //Object Color Palette Specification (R/W)
-    {name: "rOCPS", description: "$FF6A"},
+    {name: "rOCPS", description: "Object Color Palette Specification (R/W) GBC Only!<br>Value: $FF6A"},
 
     //BCPD ($FF6B)
-    //Object Color Palette Data (R/W)
-    {name: "rOCPD", description: "$FF6B"},
+    {name: "rOCPD", description: "Object Color Palette Data (R/W) GBC Only!<br>Value: $FF6B"},
 
     //SVBK ($FF4F)
-    //Select Main RAM Bank (R/W)
-    {name: "rSVBK", description: "$FF70"},
+    {name: "rSVBK", description: "Select Main RAM Bank (R/W) GBC Only!<br>Value: $FF70"},
 
     //IE ($FFFF)
-    //Interrupt Enable (R/W)
-    {name: "rIE", description: "$FFFF"},
+    {name: "rIE", description: "Interrupt Enable (R/W)<br>Value: $FFFF"},
 
     {name: "IEF_HILO",   description: "%00010000 ; Transition from High to Low of Pin number P10-P13"},
     {name: "IEF_SERIAL", description: "%00001000 ; Serial I/O transfer end"},
@@ -1252,34 +1258,14 @@ var gbz80HardwareInc = [
     ///Sound control registers
 
     //AUDVOL/NR50 ($FF24)
-    //Channel control / ON-OFF / Volume (R/W)
-    //Bit 7   - Vin->SO2 ON/OFF (Vin??)
-    //Bit 6-4 - SO2 output level (volume) (# 0-7)
-    //Bit 3   - Vin->SO1 ON/OFF (Vin??)
-    //Bit 2-0 - SO1 output level (volume) (# 0-7)
-    {name: "rNR50", description: "$FF24"},
-    {name: "rAUDVOL", description: "Alias of rNR50"},
-
+    {name: "rNR50", description: "Channel control / ON-OFF / Volume (R/W)<br>Bit 7   - Vin->SO2 ON/OFF (Vin??)<br>Bit 6-4 - SO2 output level (volume) (# 0-7)<br>Bit 3   - Vin->SO1 ON/OFF (Vin??)<br>Bit 2-0 - SO1 output level (volume) (# 0-7)<br>Value: $FF24<br>Aliased as rAUDVOL"},
+    {name: "rAUDVOL", description: "Channel control / ON-OFF / Volume (R/W)<br>Bit 7   - Vin->SO2 ON/OFF (Vin??)<br>Bit 6-4 - SO2 output level (volume) (# 0-7)<br>Bit 3   - Vin->SO1 ON/OFF (Vin??)<br>Bit 2-0 - SO1 output level (volume) (# 0-7)<br>Value: $FF24<br>Alias of rNR50"},
     {name: "AUDVOL_VIN_LEFT",  description: "%10000000 ; SO2"},
     {name: "AUDVOL_VIN_RIGHT", description: "%00001000 ; SO1"},
 
-
-    //
     //AUDTERM/NR51 ($FF25)
-    //Selection of Sound output terminal (R/W)
-    //
-    //Bit 7   - Output sound 4 to SO2 terminal
-    //Bit 6   - Output sound 3 to SO2 terminal
-    //Bit 5   - Output sound 2 to SO2 terminal
-    //Bit 4   - Output sound 1 to SO2 terminal
-    //Bit 3   - Output sound 4 to SO1 terminal
-    //Bit 2   - Output sound 3 to SO1 terminal
-    //Bit 1   - Output sound 2 to SO1 terminal
-    //Bit 0   - Output sound 0 to SO1 terminal
-    //
-    {name: "rNR51", description: "$FF25"},
-    {name: "rAUDTERM", description: "Alias of rNR51"},
-
+    {name: "rNR51", description: "Selection of Sound output terminal (R/W)<br>Bit 7   - Output sound 4 to SO2 terminal<br>Bit 6   - Output sound 3 to SO2 terminal<br>Bit 5   - Output sound 2 to SO2 terminal<br>Bit 4   - Output sound 1 to SO2 terminal<br>Bit 3   - Output sound 4 to SO1 terminal<br>Bit 2   - Output sound 3 to SO1 terminal<br>Bit 1   - Output sound 2 to SO1 terminal<br>Bit 0   - Output sound 0 to SO1 terminal<br>Value: $FF25<br>Aliased as rAUDTERM"},
+    {name: "rAUDTERM", description: "Selection of Sound output terminal (R/W)<br>Bit 7   - Output sound 4 to SO2 terminal<br>Bit 6   - Output sound 3 to SO2 terminal<br>Bit 5   - Output sound 2 to SO2 terminal<br>Bit 4   - Output sound 1 to SO2 terminal<br>Bit 3   - Output sound 4 to SO1 terminal<br>Bit 2   - Output sound 3 to SO1 terminal<br>Bit 1   - Output sound 2 to SO1 terminal<br>Bit 0   - Output sound 0 to SO1 terminal<br>Value: $FF25<br>Alias of rNR51"},
     //SO2
     {name: "AUDTERM_4_LEFT",  description: "%10000000"},
     {name: "AUDTERM_3_LEFT",  description: "%01000000"},
@@ -1292,77 +1278,51 @@ var gbz80HardwareInc = [
     {name: "AUDTERM_1_RIGHT", description: "%00000001"},
 
 
-    //
     //AUDENA/NR52 ($FF26)
-    //Sound on/off (R/W)
-    //
-    //Bit 7   - All sound on/off (sets all audio regs to 0!)
-    //Bit 3   - Sound 4 ON flag (doesn't work!)
-    //Bit 2   - Sound 3 ON flag (doesn't work!)
-    //Bit 1   - Sound 2 ON flag (doesn't work!)
-    //Bit 0   - Sound 1 ON flag (doesn't work!)
-    //
-    {name: "rNR52", description: "$FF26"},
-    {name: "rAUDENA", description: "Alias of rNR52"},
-
+    {name: "rNR52", description: "Sound on/off (R/W)<br>Bit 7   - All sound on/off (sets all audio regs to 0!)<br>Bit 3   - Sound 4 ON flag (read only)<br>Bit 2   - Sound 3 ON flag (read only)<br>Bit 1   - Sound 2 ON flag (read only)<br>Bit 0   - Sound 1 ON flag (read only)<br>Value: $FF26<br>Aliased as rAUDENA"},
+    {name: "rAUDENA", description: "Sound on/off (R/W)<br>Bit 7   - All sound on/off (sets all audio regs to 0!)<br>Bit 3   - Sound 4 ON flag (read only)<br>Bit 2   - Sound 3 ON flag (read only)<br>Bit 1   - Sound 2 ON flag (read only)<br>Bit 0   - Sound 1 ON flag (read only)<br>Value: $FF26<br>Alias of rNR52"},
     {name: "AUDENA_ON",    description: "%10000000"},
     {name: "AUDENA_OFF",   description: "%00000000  ; sets all audio regs to 0!"},
 
-
     ///SoundChannel #1 registers
 
-    //
     //AUD1SWEEP/NR10 ($FF10)
-    //Sweep register (R/W)
-    //
-    //Bit 6-4 - Sweep Time
-    //Bit 3   - Sweep Increase/Decrease
-    //          0: Addition    (frequency increases???)
-    //          1: Subtraction (frequency increases???)
-    //Bit 2-0 - Number of sweep shift (# 0-7)
-    //Sweep Time: (n*7.8ms)
-    //
-    {name: "rNR10", description: "$FF10"},
-    {name: "rAUD1SWEEP", description: "Alias of rNR10"},
-
+    {name: "rNR10", description: "Sweep register (R/W)<br>Bit 6-4 - Sweep Time<br>Bit 3   - Sweep Increase/Decrease<br>&nbsp; 0: Addition<br>&nbsp; 1: Subtraction<br>Bit 2-0 - Number of sweep shift (# 0-7)<br>Sweep Time: (n*7.8ms)<br>Value: $FF10<br>Aliased as rAUD1SWEEP"},
+    {name: "rAUD1SWEEP", description: "Sweep register (R/W)<br>Bit 6-4 - Sweep Time<br>Bit 3   - Sweep Increase/Decrease<br>&nbsp; 0: Addition<br>&nbsp; 1: Subtraction<br>Bit 2-0 - Number of sweep shift (# 0-7)<br>Sweep Time: (n*7.8ms)<br>Value: $FF10<br>Alias of rNR10"},
     {name: "AUD1SWEEP_UP",   description: "%00000000"},
     {name: "AUD1SWEEP_DOWN", description: "%00001000"},
 
-
-    //
     //AUD1LEN/NR11 ($FF11)
-    //Sound length/Wave pattern duty (R/W)
-    //
-    //Bit 7-6 - Wave Pattern Duty (00:12.5% 01:25% 10:50% 11:75%)
-    //Bit 5-0 - Sound length data (# 0-63)
-    //
-    {name: "rNR11", description: "$FF11"},
-    {name: "rAUD1LEN", description: "Alias of rNR11"},
+    {name: "rNR11", description: "Sound length/Wave pattern duty (R/W)<br>Bit 7-6 - Wave Pattern Duty (00:12.5% 01:25% 10:50% 11:75%)<br>Bit 5-0 - Sound length data (# 0-63)<br>Value: $FF11<br>Aliased as rAUD1LEN"},
+    {name: "rAUD1LEN", description: "Sound length/Wave pattern duty (R/W)<br>Bit 7-6 - Wave Pattern Duty (00:12.5% 01:25% 10:50% 11:75%)<br>Bit 5-0 - Sound length data (# 0-63)<br>Value: $FF11<br>Alias of rNR11"},
 
-
-    //
     //AUD1ENV/NR12 ($FF12)
-    //Envelope (R/W)
-    //
-    //Bit 7-4 - Initial value of envelope
-    //Bit 3   - Envelope UP/DOWN
-    //          0: Decrease
-    //          1: Range of increase
-    //Bit 2-0 - Number of envelope sweep (# 0-7)
-    //
-    {name: "rNR12", description: "$FF12"},
-    {name: "rAUD1ENV", description: "Alias of rNR12"},
+    {name: "rNR12", description: `Envelope (R/W)
+Bit 7-4 - Initial value of envelope
+Bit 3   - Envelope UP/DOWN
+        0: Decrease
+        1: Range of increase
+Bit 2-0 - Number of envelope sweep (# 0-7)
+Value: $FF12
+Aliased as rAUD1ENV`},
+    {name: "rAUD1ENV", description: `Envelope (R/W)
+Bit 7-4 - Initial value of envelope
+Bit 3   - Envelope UP/DOWN
+        0: Decrease
+        1: Range of increase
+Bit 2-0 - Number of envelope sweep (# 0-7)
+Value: $FF12
+Alias of rNR12`},
 
 
-    //
     //AUD1LOW/NR13 ($FF13)
-    //Frequency lo (W)
-    //
-    {name: "rNR13", description: "$FF13"},
-    {name: "rAUD1LOW", description: "Alias of rNR13"},
+    {name: "rNR13", description: `Frequency lo (W)
+Value: $FF13
+Aliased as rAUD1LOW`},
+    {name: "rAUD1LOW", description: `Frequency lo (W)
+Value: $FF13
+Alias of rNR13`},
 
-
-    //
     //AUD1HIGH/NR14 ($FF14)
     //Frequency hi (W)
     //
@@ -1570,50 +1530,50 @@ var gbz80HardwareInc = [
     {name: "AUDHIGH_LENGTH_OFF",  description: "%00000000"},
 
     //Cart related
-    {name: "CART_COMPATIBLE_DMG",     description: "$00"},
-    {name: "CART_COMPATIBLE_DMG_GBC", description: "$80"},
-    {name: "CART_COMPATIBLE_GBC",     description: "$C0"},
+    {name: "CART_COMPATIBLE_DMG",     description: "Store at $0143 to indicate DMG cartridge. ($00)"},
+    {name: "CART_COMPATIBLE_DMG_GBC", description: "Store at $0143 to indicate DMG and GBC compatible cartridge. ($80)"},
+    {name: "CART_COMPATIBLE_GBC",     description: "Store at $0143 to indicate GBC compatible cartridge. ($C0)"},
 
-    {name: "CART_ROM",                     description: "$00"},
-    {name: "CART_ROM_MBC1",                description: "$01"},
-    {name: "CART_ROM_MBC1_RAM",            description: "$02"},
-    {name: "CART_ROM_MBC1_RAM_BAT",        description: "$03"},
-    {name: "CART_ROM_MBC2",                description: "$05"},
-    {name: "CART_ROM_MBC2_BAT",            description: "$06"},
-    {name: "CART_ROM_RAM",                 description: "$08"},
-    {name: "CART_ROM_RAM_BAT",             description: "$09"},
-    {name: "CART_ROM_MBC3_BAT_RTC",        description: "$0F"},
-    {name: "CART_ROM_MBC3_RAM_BAT_RTC",    description: "$10"},
-    {name: "CART_ROM_MBC3",                description: "$11"},
-    {name: "CART_ROM_MBC3_RAM",            description: "$12"},
-    {name: "CART_ROM_MBC3_RAM_BAT",        description: "$13"},
-    {name: "CART_ROM_MBC5",                description: "$19"},
-    {name: "CART_ROM_MBC5_BAT",            description: "$1A"},
-    {name: "CART_ROM_MBC5_RAM_BAT",        description: "$1B"},
-    {name: "CART_ROM_MBC5_RUMBLE",         description: "$1C"},
-    {name: "CART_ROM_MBC5_RAM_RUMBLE",     description: "$1D"},
-    {name: "CART_ROM_MBC5_RAM_BAT_RUMBLE", description: "$1E"},
-    {name: "CART_ROM_MBC7_RAM_BAT_GYRO",   description: "$22"},
-    {name: "CART_ROM_POCKET_CAMERA",       description: "$FC"},
+    {name: "CART_ROM",                     description: "Store at $0147 to cart type. ($00)"},
+    {name: "CART_ROM_MBC1",                description: "Store at $0147 to cart type. ($01)"},
+    {name: "CART_ROM_MBC1_RAM",            description: "Store at $0147 to cart type. ($02)"},
+    {name: "CART_ROM_MBC1_RAM_BAT",        description: "Store at $0147 to cart type. ($03)"},
+    {name: "CART_ROM_MBC2",                description: "Store at $0147 to cart type. ($05)"},
+    {name: "CART_ROM_MBC2_BAT",            description: "Store at $0147 to cart type. ($06)"},
+    {name: "CART_ROM_RAM",                 description: "Store at $0147 to cart type. ($08)"},
+    {name: "CART_ROM_RAM_BAT",             description: "Store at $0147 to cart type. ($09)"},
+    {name: "CART_ROM_MBC3_BAT_RTC",        description: "Store at $0147 to cart type. ($0F)"},
+    {name: "CART_ROM_MBC3_RAM_BAT_RTC",    description: "Store at $0147 to cart type. ($10)"},
+    {name: "CART_ROM_MBC3",                description: "Store at $0147 to cart type. ($11)"},
+    {name: "CART_ROM_MBC3_RAM",            description: "Store at $0147 to cart type. ($12)"},
+    {name: "CART_ROM_MBC3_RAM_BAT",        description: "Store at $0147 to cart type. ($13)"},
+    {name: "CART_ROM_MBC5",                description: "Store at $0147 to cart type. ($19)"},
+    {name: "CART_ROM_MBC5_BAT",            description: "Store at $0147 to cart type. ($1A)"},
+    {name: "CART_ROM_MBC5_RAM_BAT",        description: "Store at $0147 to cart type. ($1B)"},
+    {name: "CART_ROM_MBC5_RUMBLE",         description: "Store at $0147 to cart type. ($1C)"},
+    {name: "CART_ROM_MBC5_RAM_RUMBLE",     description: "Store at $0147 to cart type. ($1D)"},
+    {name: "CART_ROM_MBC5_RAM_BAT_RUMBLE", description: "Store at $0147 to cart type. ($1E)"},
+    {name: "CART_ROM_MBC7_RAM_BAT_GYRO",   description: "Store at $0147 to cart type. ($22)"},
+    {name: "CART_ROM_POCKET_CAMERA",       description: "Store at $0147 to cart type. ($FC)"},
 
-    {name: "CART_ROM_256K", description: "0 ; 2 banks"},
-    {name: "CART_ROM_512K", description: "1 ; 4 banks"},
-    {name: "CART_ROM_1M",   description: "2 ; 8 banks"},
-    {name: "CART_ROM_2M",   description: "3 ; 16 banks"},
-    {name: "CART_ROM_4M",   description: "4 ; 32 banks"},
-    {name: "CART_ROM_8M",   description: "5 ; 64 banks"},
-    {name: "CART_ROM_16M",  description: "6 ; 128 banks"},
-    {name: "CART_ROM_32M",  description: "7 ; 256 banks"},
-    {name: "CART_ROM_64M",  description: "8 ; 512 banks"},
+    {name: "CART_ROM_256K", description: "Store at $0148 to indicate the number of ROM banks: 2 banks"},
+    {name: "CART_ROM_512K", description: "Store at $0148 to indicate the number of ROM banks: 4 banks"},
+    {name: "CART_ROM_1M",   description: "Store at $0148 to indicate the number of ROM banks: 8 banks"},
+    {name: "CART_ROM_2M",   description: "Store at $0148 to indicate the number of ROM banks: 16 banks"},
+    {name: "CART_ROM_4M",   description: "Store at $0148 to indicate the number of ROM banks: 32 banks"},
+    {name: "CART_ROM_8M",   description: "Store at $0148 to indicate the number of ROM banks: 64 banks"},
+    {name: "CART_ROM_16M",  description: "Store at $0148 to indicate the number of ROM banks: 128 banks"},
+    {name: "CART_ROM_32M",  description: "Store at $0148 to indicate the number of ROM banks: 256 banks"},
+    {name: "CART_ROM_64M",  description: "Store at $0148 to indicate the number of ROM banks: 512 banks"},
 
-    {name: "CART_RAM_NONE", description: "0"},
-    {name: "CART_RAM_16K",  description: "1 ; 1 incomplete bank"},
-    {name: "CART_RAM_64K",  description: "2 ; 1 bank"},
-    {name: "CART_RAM_256K", description: "3 ; 4 banks"},
-    {name: "CART_RAM_1M",   description: "4 ; 16 banks"},
+    {name: "CART_RAM_NONE", description: "Store at $0149 to indicate the amount of SRAM: No SRAM"},
+    {name: "CART_RAM_16K",  description: "Store at $0149 to indicate the amount of SRAM: 2 KiloByte, 1 bank"},
+    {name: "CART_RAM_64K",  description: "Store at $0149 to indicate the amount of SRAM: 8 KiloByte, 1 bank"},
+    {name: "CART_RAM_256K", description: "Store at $0149 to indicate the amount of SRAM: 32 KiloByte, 4 banks"},
+    {name: "CART_RAM_1M",   description: "Store at $0149 to indicate the amount of SRAM: 128 KiloByte, 16 banks"},
 
-    {name: "CART_RAM_ENABLE",  description: "$0A"},
-    {name: "CART_RAM_DISABLE", description: "$00"},
+    {name: "CART_RAM_ENABLE",  description: "Write this value to $0000 to enable SRAM. ($0A)"},
+    {name: "CART_RAM_DISABLE", description: "Write this value to $0000 to disable SRAM. ($00)"},
 
     //Keypad related
     {name: "PADF_DOWN",   description: "$80"},
@@ -1635,15 +1595,15 @@ var gbz80HardwareInc = [
     {name: "PADB_A",      description: "$0"},
 
     //Screen related
-    {name: "SCRN_X",    description: "160 ; Width of screen in pixels"},
-    {name: "SCRN_Y",    description: "144 ; Height of screen in pixels"},
-    {name: "SCRN_X_B",  description: "20  ; Width of screen in bytes"},
-    {name: "SCRN_Y_B",  description: "18  ; Height of screen in bytes"},
+    {name: "SCRN_X",    description: "Width of screen in pixels<br>Value: 160"},
+    {name: "SCRN_Y",    description: "Height of screen in pixels<br>Value: 144"},
+    {name: "SCRN_X_B",  description: "Width of screen in bytes<br>Value: 20"},
+    {name: "SCRN_Y_B",  description: "Height of screen in bytes<br>Value: 18"},
 
-    {name: "SCRN_VX",   description: "256 ; Virtual width of screen in pixels"},
-    {name: "SCRN_VY",   description: "256 ; Virtual height of screen in pixels"},
-    {name: "SCRN_VX_B", description: "32  ; Virtual width of screen in bytes"},
-    {name: "SCRN_VY_B", description: "32  ; Virtual height of screen in bytes"},
+    {name: "SCRN_VX",   description: "Virtual width of screen in pixels<br>Value: 256"},
+    {name: "SCRN_VY",   description: "Virtual height of screen in pixels<br>Value: 256"},
+    {name: "SCRN_VX_B", description: "Virtual width of screen in bytes<br>Value: 32"},
+    {name: "SCRN_VY_B", description: "Virtual height of screen in bytes<br>Value: 32"},
 ]
 
 var gbz80CompleterInstructions = []
@@ -1678,7 +1638,6 @@ var gbz80Completer = {
         var line = session.getLine(pos.row);
         // Check if we are possibly typing an instruction.
         var before = line.substr(0, pos.column - 1).trim();
-        console.log(before);
         if (before.trim() == "" || before.trim().endsWith(":")) {
             callback(null, gbz80CompleterInstructions.filter(function(c) {
                 return c.value.startsWith(prefix.toLowerCase());

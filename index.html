@@ -1,15 +1,20 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate">
 <link rel="stylesheet" href="css/style.css">
 
 <script src="wasm/rgbasm"></script>
 <script src="wasm/rgblink"></script>
 <script src="wasm/rgbfix"></script>
-<script src="js/hardware.inc.js"></script>
 <script src="js/lz-string.min.js"></script>
+<script src="js/jszip.min.js"></script>
+
+<script src="js/hardware.inc.js"></script>
 <script src="js/compiler.js"></script>
 <script src="js/emulator.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/editor.js"></script>
 
 <script src="js/ace/ace.js"></script>
 <script src="js/ace/theme-tomorrow.js"></script>
@@ -21,48 +26,65 @@
 <script>
 "use strict";
 
-var editor;
 var cpu_line_marker = undefined;
 var start_address;
 var rom;
 var addr_to_line = {}
 var line_to_addr = {}
 var cpu_step_interval_id;
-var vram_view = "";
+var emu_view = "";
+var live_patch = false;
 
 compiler.setLogCallback(function(str) {
     var output = document.getElementById('output');
+    if (str === null)
+    {
+        output.value = "";
+        return;
+    }
     output.value += str + "\n";
     output.scrollTop = output.clientHeight;
-});
-compiler.setErrorCallback(function(type, line_nr, str) {
-    var annotations = editor.session.getAnnotations();
-    annotations.push({row: line_nr-1, column: 0, type: type, text: str});
-    editor.session.setAnnotations(annotations);
 });
 
 function compileCode()
 {
-    destroyEmulator();
-    var code = editor.getValue();
-    document.getElementById('output').value = "";
-    editor.session.clearAnnotations();
-    location.hash = LZString.compressToEncodedURIComponent(code);
+    compiler.compile(function(_rom_file, _start_address, _addr_to_line) {
+        editor.updateErrors();
+        updateFileList();
 
-    compiler.compile(code, function(_rom_file, _start_address, _addr_to_line) {
+        var pc_line;
+        if (live_patch && editor.session.getMarkers()[cpu_line_marker]) {
+            pc_line = editor.session.getMarkers()[cpu_line_marker].range.start.row + 1;
+        } else {
+            destroyEmulator();
+        }
         if (typeof(_rom_file) == 'undefined') {
             return;
         }
-        rom = _rom_file
-        start_address = _start_address
-        addr_to_line = _addr_to_line
-        for(var addr in addr_to_line) {
-            var line = addr_to_line[addr];
-            if (typeof(line_to_addr[line]) == "undefined")
-                line_to_addr[line] = [];
-            line_to_addr[line].push(addr);
+
+        if (live_patch) {
+            if (!emulator.updateRom(_rom_file))
+                destroyEmulator();
         }
-    })
+        rom = _rom_file;
+        start_address = _start_address;
+        addr_to_line = _addr_to_line;
+        for(var addr in addr_to_line) {
+            var [filename, line] = addr_to_line[addr];
+            if (typeof(line_to_addr[filename]) == "undefined")
+                line_to_addr[filename] = {};
+            if (typeof(line_to_addr[filename][line]) == "undefined")
+                line_to_addr[filename][line] = [];
+            line_to_addr[filename][line].push(addr);
+            
+            if (live_patch && typeof(pc_line) != "undefined" && file == pc_line[0] && line == pc_line[1])
+            {
+                console.log("Live patch PC update:", emulator.getPC().toString(16), addr.toString(16), pc_line);
+                emulator.setPC(addr);
+            }
+        }
+        updateTextView();
+    });
 }
 
 function destroyEmulator()
@@ -73,19 +95,16 @@ function destroyEmulator()
     line_to_addr = {}
     rom = undefined;
 
-    if (typeof(cpu_line_marker) != "undefined")
-    {
-        editor.session.removeMarker(cpu_line_marker);
-        cpu_line_marker = undefined;
-    }
+    editor.setCpuLine(null, null);
 }
 
-function initEmulator()
+function initEmulator(jump_to_pc)
 {
     if (typeof(rom) == "undefined") return;
     
-    emulator.init(document.getElementById("gbcanvas"), rom, start_address);
-    updateCpuState();
+    emulator.init(document.getElementById("emulator_screen_canvas"), rom);
+    emulator.setPC(start_address)
+    updateCpuState(jump_to_pc);
     updateBreakpoints();
 }
 
@@ -93,24 +112,25 @@ function stepEmulator(step_type)
 {
     if (!emulator.isAvailable())
     {
-        initEmulator();
-        return;
+        initEmulator(step_type == "single" || step_type == "frame");
+        return false;
     }
     var result = emulator.step(step_type);
-    updateCpuState();
+    updateCpuState(step_type == "single" || step_type == "frame");
     return result
 }
 
 function updateBreakpoints()
 {
     emulator.clearBreakpoints();
-    var breakpoints = editor.session.getBreakpoints();
-    for(var line_nr in breakpoints)
+    var breakpoints = editor.getBreakpoints();
+    for(var data of breakpoints)
     {
-        if (typeof(breakpoints[line_nr]) == "undefined") continue;
-        line_nr = parseInt(line_nr) + 1;
-        if (typeof(line_to_addr[line_nr]) == "undefined") continue;
-        for(var addr of line_to_addr[line_nr])
+        var [filename, line_nr, valid] = data;
+        data[2] = false;
+        if (typeof(line_to_addr[filename]) == "undefined" || typeof(line_to_addr[filename][line_nr]) == "undefined") continue;
+        data[2] = true;
+        for(var addr of line_to_addr[filename][line_nr])
             emulator.setBreakpoint(addr);
     }
 }
@@ -126,6 +146,10 @@ function handleGBKey(keycode, down)
     if (keycode == 65) emulator.setKeyPad("b", down);
     if (keycode == 16) emulator.setKeyPad("select", down);
     if (keycode == 13) emulator.setKeyPad("start", down);
+    if (keycode == 27) {
+        document.getElementById("cpu_run_check").checked = false;
+        document.getElementById("cpu_run_check").onclick();
+    }
 }
 
 function toHex(num, digits)
@@ -133,14 +157,8 @@ function toHex(num, digits)
     return "$" + ("0000" + num.toString(16)).slice(-digits);
 }
 
-function updateCpuState()
+function updateCpuState(afterSingleStep)
 {
-    if (typeof(cpu_line_marker) != "undefined")
-    {
-        editor.session.removeMarker(cpu_line_marker);
-        cpu_line_marker = undefined;
-    }
-
     emulator.renderScreen()
 
     var pc = emulator.getPC();
@@ -152,70 +170,176 @@ function updateCpuState()
     document.getElementById("cpu_hl").innerHTML = toHex(emulator.getHL(), 4);
     document.getElementById("cpu_flags").innerHTML = emulator.getFlags();
 
-    var line_nr = addr_to_line[pc];
-    if (typeof(line_nr) == "undefined")
-        line_nr = addr_to_line[pc - 1];
-    if (typeof(line_nr) == "undefined")
-        line_nr = addr_to_line[pc - 2];
-    if (typeof(line_nr) != "undefined")
-    {
-        cpu_line_marker = editor.session.addMarker(new ace.Range(line_nr-1, 0, line_nr-1, 1), "cpuLineMarker", "fullLine");
-        editor.scrollToLine(line_nr-1, true, false, function() {});
-    }
+    var file_line_nr = addr_to_line[pc];
+    if (typeof(file_line_nr) == "undefined")
+        file_line_nr = addr_to_line[pc - 1];
+    if (typeof(file_line_nr) != "undefined")
+        editor.setCpuLine(file_line_nr[0], file_line_nr[1], afterSingleStep);
+    else
+        editor.setCpuLine(null, null);
     updateVRamCanvas();
+    updateTextView();
 }
 
 function updateVRamCanvas()
 {
-    var canvas = document.getElementById("vramcanvas");
+    var canvas = document.getElementById("emulator_vram_canvas");
     if (canvas.style.display != "") return;
 
-    if (vram_view == "vram")
+    if (emu_view == "vram")
         emulator.renderVRam(canvas);
-    if (vram_view == "bg0")
+    if (emu_view == "bg0")
         emulator.renderBackground(canvas, 0);
-    if (vram_view == "bg1")
+    if (emu_view == "bg1")
         emulator.renderBackground(canvas, 1);
 }
 
-window.addEventListener('DOMContentLoaded', (event) => {
-    editor = ace.edit("input");
-    editor.setTheme("ace/theme/tomorrow");
-    editor.session.setMode("ace/mode/gbz80");
-    editor.setOptions({
-        tabSize: 2,
-        useSoftTabs: true,
-        enableLiveAutocompletion: true,
-        enableSnippets: true,
-    });
-    editor.completers = [gbz80Completer]
-
-    if (location.hash.length > 1)
+function updateTextView()
+{
+    var display_text = document.getElementById("emulator_display_text");
+    if (display_text.style.display != "") return;
+    var data = rom;
+    var bank_size = 0x4000;
+    var offset = 0x0000;
+    if (emu_view == "wram")
     {
-        var code = LZString.decompressFromEncodedURIComponent(location.hash.slice(1));
-        if (code != null)
-            editor.setValue(code);
+        data = emulator.getWRam();
+        bank_size = 0x1000;
+        offset = 0xC000;
     }
-    editor.session.on('change', function(delta) { compileCode() });
-    editor.on("guttermousedown", function(e) {
-        var target = e.domEvent.target;
+    if (emu_view == "hram")
+    {
+        data = emulator.getHRam();
+        bank_size = 0x1000;
+        offset = 0xFF80;
+    }
+    if (emu_view == "io")
+    {
+        var text = "";
+        var registers = [
+            {name: "P1", value: 0xFF00},
+            {name: "SB", value: 0xFF01},
+            {name: "SC", value: 0xFF02},
+            {name: "DIV", value: 0xFF04},
+            {name: "TIMA", value: 0xFF05},
+            {name: "TMA", value: 0xFF06},
+            {name: "TAC", value: 0xFF07},
+            {name: "IF", value: 0xFF0F},
+            {name: "LCDC", value: 0xFF40},
+            {name: "STAT", value: 0xFF41},
+            {name: "SCY", value: 0xFF42},
+            {name: "SCX", value: 0xFF43},
+            {name: "LY", value: 0xFF44},
+            {name: "LYC", value: 0xFF45},
+            {name: "DMA", value: 0xFF46},
+            {name: "BGP", value: 0xFF47},
+            {name: "OBP0", value: 0xFF48},
+            {name: "OBP1", value: 0xFF49},
+            {name: "WY", value: 0xFF4A},
+            {name: "WX", value: 0xFF4B},
+            {name: "KEY1", value: 0xFF4D},
+            {name: "VBK", value: 0xFF4F},
+            {name: "RP", value: 0xFF56},
+            {name: "BCPS", value: 0xFF68},
+            {name: "BCPD", value: 0xFF69},
+            {name: "OCPS", value: 0xFF6A},
+            {name: "OCPD", value: 0xFF6B},
+            {name: "SVBK", value: 0xFF70},
+            {name: "IE", value: 0xFFFF},
+        ]
+        for(var reg_info of registers)
+        {
+            text += (reg_info.name + ":       ").slice(0, 6) + ('00' + emulator.readMem(reg_info.value).toString(16)).slice(-2) + "\n";
+        }
+        display_text.value = text;
+        return;
+    }
+    if (typeof(data) == "undefined") return;
 
-        if (target.className.indexOf("ace_gutter-cell") == -1)
-            return;
-        var row = e.getDocumentPosition().row;
-        var breakpoints = e.editor.session.getBreakpoints();
-        if (typeof(breakpoints[row]) == "undefined")
-            e.editor.session.setBreakpoint(row);
-        else
-            e.editor.session.clearBreakpoint(row);
-        updateBreakpoints();
-        e.stop();
-    });
+    var text = "         0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n";
+    for(var n=0; n<data.length; n+=16)
+    {
+        var hex = Array.prototype.map.call(data.slice(n, n + 16), x => ('00' + x.toString(16)).slice(-2)).join(' ');
+        var bank = ~~(n / bank_size);
+        var addr = (n & (bank_size - 1))
+        if (bank > 0)
+            addr += bank_size;
+        text += ("00" + bank.toString(16)).slice(-2) + ":" + ("0000" + (addr + offset).toString(16)).slice(-4) + " " + hex + "\n";
+    }
+    display_text.value = text;
+}
+
+function updateFileList()
+{
+    var filelist = document.getElementById("filelist");
+    filelist.textContent = "";
+    
+    for (const name of Object.keys(storage.getFiles()).sort()) {
+        var entry = document.createElement('li');
+        entry.textContent = name;
+        filelist.appendChild(entry);
+        
+        if (name == editor.getCurrentFilename())
+            entry.classList.add("active");
+        for(var [type, filename, line_nr, message] of compiler.getErrors())
+        {
+            if (filename != name)
+                continue;
+            entry.classList.add(type);
+            if (type == "error")
+            {
+                entry.classList.remove("warning");
+                break;
+            }
+        }
+    }
+}
+
+function deleteFile(name)
+{
+    if (Object.keys(storage.getFiles()).length < 2)
+        return;
+    storage.update(name, null);
+    if (editor.getCurrentFilename() == name)
+        editor.setCurrentFile(Object.keys(storage.getFiles()).sort()[0]);
+    updateFileList();
+}
+
+window.addEventListener('DOMContentLoaded', (event) => {
+    editor.register("input");
+    storage.autoLoad();
+    editor.setCurrentFile(Object.keys(storage.getFiles()).pop());
+    updateFileList();
+
+    document.getElementById("filelist").onclick = function(e)
+    {
+        if (!e.target.childNodes[0].wholeText) return;
+        editor.setCurrentFile(e.target.childNodes[0].wholeText);
+        
+        updateFileList();
+        updateCpuState();
+    }
+    document.getElementById("newfile").onclick = function()
+    {
+        var result = prompt("Name of new file?");
+        if (!result) return;
+        if (result.indexOf(".") < 0) result += ".asm";
+        if (result in storage.getFiles()) return;
+        storage.update(result, "");
+        editor.setCurrentFile(result);
+        updateFileList();
+    }
+    document.getElementById("delfile").onclick = function()
+    {
+        if (confirm("Are you sure you want to delete: " + editor.getCurrentFilename() + "?"))
+            deleteFile(editor.getCurrentFilename());
+    }
+
     compileCode();
 
     document.getElementById("cpu_single_step").onclick = function() { stepEmulator("single"); };
     document.getElementById("cpu_frame_step").onclick = function() { stepEmulator("frame"); };
-    document.getElementById("cpu_reset").onclick = function() { initEmulator(); };
+    document.getElementById("cpu_reset").onclick = function() { initEmulator(true); };
     document.getElementById("cpu_run_check").onclick = function() {
         clearInterval(cpu_step_interval_id);
         if (document.getElementById("cpu_run_check").checked)
@@ -229,10 +353,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         document.getElementById("cpu_run_check").checked = false;
                     }
                 }
-            }, 16);
+            }, 10);
         }
     }
-    var canvas = document.getElementById("gbcanvas");
+    var canvas = document.getElementById("emulator_screen_canvas");
     canvas.tabIndex = -1;
     canvas.onkeydown = function(e) {
         handleGBKey(e.keyCode, true);
@@ -241,36 +365,182 @@ window.addEventListener('DOMContentLoaded', (event) => {
     canvas.onkeyup = function(e) {
         handleGBKey(e.keyCode, false);
         e.preventDefault();
-    };    
+    };
+    document.onkeydown = function(e) {
+        if (e.code == "F8") { stepEmulator("single"); e.preventDefault(); }
+        if (e.code == "F9") { stepEmulator("frame"); e.preventDefault(); }
+    }
 
     document.getElementById("emulator_display_screen").onclick = function() {
-        document.getElementById("gbcanvas").style.display = "";
-        document.getElementById("vramcanvas").style.display = "none";
+        document.getElementById("emulator_screen_canvas").style.display = "";
+        document.getElementById("emulator_vram_canvas").style.display = "none";
+        document.getElementById("emulator_display_text").style.display = "none";
+        emu_view = "display";
     };
     document.getElementById("emulator_display_vram").onclick = function() {
-        document.getElementById("gbcanvas").style.display = "none";
-        document.getElementById("vramcanvas").style.display = "";
-        vram_view = "vram";
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "";
+        document.getElementById("emulator_display_text").style.display = "none";
+        emu_view = "vram";
         updateVRamCanvas();
     };
     document.getElementById("emulator_display_bg0").onclick = function() {
-        document.getElementById("gbcanvas").style.display = "none";
-        document.getElementById("vramcanvas").style.display = "";
-        vram_view = "bg0";
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "";
+        document.getElementById("emulator_display_text").style.display = "none";
+        emu_view = "bg0";
         updateVRamCanvas();
     };
     document.getElementById("emulator_display_bg1").onclick = function() {
-        document.getElementById("gbcanvas").style.display = "none";
-        document.getElementById("vramcanvas").style.display = "";
-        vram_view = "bg1";
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "";
+        document.getElementById("emulator_display_text").style.display = "none";
+        emu_view = "bg1";
         updateVRamCanvas();
     };
+    document.getElementById("emulator_display_rom").onclick = function() {
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "none";
+        document.getElementById("emulator_display_text").style.display = "";
+        emu_view = "rom";
+        updateTextView();
+    };
+    document.getElementById("emulator_display_wram").onclick = function() {
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "none";
+        document.getElementById("emulator_display_text").style.display = "";
+        emu_view = "wram";
+        updateTextView();
+    };
+    document.getElementById("emulator_display_hram").onclick = function() {
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "none";
+        document.getElementById("emulator_display_text").style.display = "";
+        emu_view = "hram";
+        updateTextView();
+    };
+    document.getElementById("emulator_display_io").onclick = function() {
+        document.getElementById("emulator_screen_canvas").style.display = "none";
+        document.getElementById("emulator_vram_canvas").style.display = "none";
+        document.getElementById("emulator_display_text").style.display = "";
+        emu_view = "io";
+        updateTextView();
+    };
+    
+    document.getElementById("download_rom").onclick = function() {
+        if (typeof(rom) == "undefined") return;
+        var element = document.createElement('a');
+        var url = window.URL.createObjectURL(new Blob([rom.buffer], {type: 'application/octet-stream'}));
+        element.setAttribute('href', url);
+        element.setAttribute('download', "rom.gb");
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+        window.URL.revokeObjectURL(url);
+    };
+    
+    document.getElementById("importmenu").onclick = function() {
+        //storage.load();
+        document.getElementById("importdialog").style.display = "block";
+    };
+    document.getElementById("importdialog").onclick = function(e) { if (e.target == document.getElementById("importdialog")) document.getElementById("importdialog").style.display = "none"; }
+    document.getElementById("importdialogclose").onclick = function() { document.getElementById("importdialog").style.display = "none"; }
+    document.getElementById("import_gist").onclick = function() {
+        storage.loadGithubGist(document.getElementById("import_gist_url").value);
+        document.getElementById("importdialog").style.display = "none";
+    }
+    document.getElementById("import_zipfile").onchange = function(e) {
+        if (e.target.files.length > 0) {
+            storage.loadZip(e.target.files[0]);
+            e.target.value = "";
+            document.getElementById("importdialog").style.display = "none";
+        }
+    }
+    document.getElementById("exportmenu").onclick = function() {
+        //storage.save();
+        document.getElementById("exportdialog").style.display = "block";
+        
+        document.getElementById("export_hash_url").value = storage.getHashUrl();
+    };
+    document.getElementById("exportdialog").onclick = function(e) { if (e.target == document.getElementById("exportdialog")) document.getElementById("exportdialog").style.display = "none"; }
+    document.getElementById("exportdialogclose").onclick = function() { document.getElementById("exportdialog").style.display = "none"; }
+    document.getElementById("export_gist").onclick = function() {
+        var url = document.getElementById("export_gist_url").value;
+        var username = document.getElementById("export_gist_username").value;
+        var token = document.getElementById("export_gist_token").value;
+        
+        url = storage.saveGithubGist(username, token, url);
+        if (url == null) {
+            document.getElementById("export_gist_import_url").value = "Gist create/update failed. Incorrect token?";
+        } else {
+            document.getElementById("export_gist_url").value = url;
+
+            var auto_import_url = new URL(document.location);
+            auto_import_url.hash = url;
+            document.getElementById("export_gist_import_url").value = auto_import_url.toString();
+        }
+    }
+    document.getElementById("export_zip").onclick = function() { storage.downloadZip(); }
+
+    document.getElementById("infomenu").onclick = function() { document.getElementById("infodialog").style.display = "block"; }
+    document.getElementById("infodialog").onclick = function(e) { if (e.target == document.getElementById("infodialog")) document.getElementById("infodialog").style.display = "none"; }
+    document.getElementById("infodialogclose").onclick = function() { document.getElementById("infodialog").style.display = "none"; }
+    
+    document.getElementById("auto_url_update").checked = storage.autoUrl;
+    document.getElementById("auto_url_update").onclick = function() {
+        storage.autoUrl = document.getElementById("auto_url_update").checked;
+        if (storage.autoUrl)
+            storage.update();
+        else
+            document.location.hash = "";
+    }
+    document.getElementById("auto_local_storage_update").checked = storage.autoLocalStorage;
+    document.getElementById("auto_local_storage_update").onclick = function() {
+        storage.autoLocalStorage = document.getElementById("auto_local_storage_update").checked;
+        storage.update();
+    }
 });
 
 </script>
 </head>
 <body>
 <div class="container">
+    <div class="menubar">
+        <ul>
+            <li>File<ul>
+                <li id="newfile">New file...</li>
+                <li id="delfile">Delete current file</li>
+                <li id="importmenu">Import project...</li>
+                <li id="exportmenu">Export project...</li>
+            </ul></li>
+            <li>Options<ul>
+                <li><input type="checkbox" id="auto_url_update"/><label for="auto_url_update">Auto URL update</label></li>
+                <li><input type="checkbox" id="auto_local_storage_update"/><label for="auto_local_storage_update">Store data between sessions</label></li>
+            </ul></li>
+            <li>About<ul>
+                <li id="infomenu">Info...</li>
+                <li><a href="https://rednex.github.io/rgbds/" target="_blank">rgbds manual</a></li>
+                <li><a href="https://github.com/daid/rgbds-live/issues" target="_blank">Report a problem</a></li>
+                <li>Source:</li>
+                <li><a href="https://github.com/daid/rgbds-live" target="_blank">https://github.com/daid/rgbds-live</a></li>
+                <li>Uses:</li>
+                <li><a href="https://github.com/rednex/rgbds/" target="_blank">rgbds</a>: Rednex Game Boy Development System</li>
+                <li>(MIT License, Copyright (c) 1997-2018, Carsten Sorensen and RGBDS contributors)</li>
+                <li><a href="https://github.com/binji/binjgb" target="_blank">binjgb</a>: Gameboy Emulator</li>
+                <li>(MIT License, Copyright (C) 2016, Ben Smith)</li>
+                <li><a href="https://ace.c9.io/" target="_blank">Ace</a>: High performance code editor for web</li>
+                <li>(BSD License, Copyright (c) 2010, Ajax.org B.V.)</li>
+            </ul></li>
+        </ul>
+    </div>
+    <div class="sidebar" style="position: relative">
+        <div class="filelist">
+            <ul id="filelist">
+            </ul>
+        </div>
+    </div>
     <div class="editor" id="input"></div>
     <div class="emulator">
         <table><tr><td colspan="4">
@@ -279,12 +549,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <input type="radio" name="emulator_display_mode" id="emulator_display_vram" /><label for="emulator_display_vram">VRAM</label>
                 <input type="radio" name="emulator_display_mode" id="emulator_display_bg0" /><label for="emulator_display_bg0">BG0</label>
                 <input type="radio" name="emulator_display_mode" id="emulator_display_bg1" /><label for="emulator_display_bg1">BG1</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_rom" /><label for="emulator_display_rom">ROM</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_wram" /><label for="emulator_display_wram">WRam</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_hram" /><label for="emulator_display_hram">HRam</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_io" /><label for="emulator_display_io">IO</label>
             </div>
-            <div style="width: 512; height: 512">
-                <canvas id="gbcanvas" width="160" height="144" style="width: 480; image-rendering: pixelated"></canvas>
-                <canvas id="vramcanvas" width="256" height="256" style="width: 512; image-rendering: pixelated; display: none"></canvas>
+            <div class="emulator_screen_container">
+                <canvas class="emulator_canvas_screen" id="emulator_screen_canvas" width="160" height="144"></canvas>
+                <canvas class="emulator_vram_screen" id="emulator_vram_canvas" width="256" height="256" style="display: none"></canvas>
+                <textarea style="height: 100%; width: 100%; display: none" id="emulator_display_text" readonly></textarea>
             </div>
-        <tr><td class="right"><td><button id="cpu_single_step">step</button><button id="cpu_frame_step">frame</button><input id="cpu_run_check" type="checkbox">run<td><button id="cpu_reset">Reset</button><td>
+        <tr><td class="right"><button id="download_rom">Download</button><td><button id="cpu_single_step">step</button><button id="cpu_frame_step">frame</button><input id="cpu_run_check" type="checkbox">run<td><button id="cpu_reset">Reset</button><td>
         <tr><td class="right">PC:<td id="cpu_pc">-<td class="right">A:<td id="cpu_a">-
         <tr><td class="right">SP:<td id="cpu_sp">-<td class="right">BC:<td id="cpu_bc">-
         <tr><td class="right">Flags:<td id="cpu_flags">-<td class="right">DE:<td id="cpu_de">-
@@ -292,6 +567,68 @@ window.addEventListener('DOMContentLoaded', (event) => {
         </table>
     </div>
     <div class="console"><textarea style="height: 100%; width: 100%" id="output" readonly></textarea></div>
+
+    <div id="infodialog" class="modal">
+        <div class="content">
+            <span id="infodialogclose" class="close">&times;</span>
+            <p>rgbds-live is a Gameboy programming environment. Allowing for realtime assembly programming for the gameboy.</p>
+            <p>The environment runs 100% in your browser. Your source code does not leave your browser, unless you export it.</p>
+            <p>It is powered by the excelent binjgb emulator, the ace javascript sourcecode editor and rgbds compiled for webassembly.</p>
+        </div>
+    </div>
+    
+    <div id="importdialog" class="modal">
+        <div class="content">
+            <span id="importdialogclose" class="close">&times;</span>
+            <div class="tabs">
+                <input type="radio" name="import_mode" id="import_mode_gist" checked /><label for="import_mode_gist">GitHub Gist</label>
+                <div>
+                    <p>Import code from a GitHub Gist:</p>
+                    <p>Gist URL: <input id="import_gist_url" /></p>
+                    <p><button id="import_gist">Import</button></p>
+                </div>
+                <input type="radio" name="import_mode" id="import_mode_github" /><label for="import_mode_github">GitHub</label>
+                <div>
+                    <p>At some point in the future you will be able to directly import github repositories here.</p>
+                </div>
+                <input type="radio" name="import_mode" id="import_mode_upload" /><label for="import_mode_upload">Load .zip</label>
+                <div>
+                    <p>Load a zip file:</p>
+                    <p><input type="file" id="import_zipfile" /></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="exportdialog" class="modal">
+        <div class="content">
+            <span id="exportdialogclose" class="close">&times;</span>
+            <div class="tabs">
+                <input type="radio" name="export_mode" id="export_mode_url" checked /><label for="export_mode_url">URL</label>
+                <div>
+                    <p>Export the project as URL. Only suitable for small projects.</p>
+                    <p><input id="export_hash_url" style="width: 100%" onClick="this.select();" readonly /></p>
+                </div>
+                <input type="radio" name="export_mode" id="export_mode_gist" /><label for="export_mode_gist">GitHub Gist</label>
+                <div>
+                    <p>Export the code as a new GitHub Gist, or update an existing Gist with new code.</p>
+                    <p>Github username: <input id="export_gist_username" /></p>
+                    <p>Github personal access token: <input id="export_gist_token" autocomplete="off"/> (<a href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token" target="_blank">info</a>)</p>
+                    <p>Gist URL: <input id="export_gist_url" /> (leave empty for new gist)</p>
+                    <p><button id="export_gist">Save</button></p>
+                    <p><input id="export_gist_import_url" style="width: 100%" onClick="this.select();" readonly /></p>
+                </div>
+                <input type="radio" name="export_mode" id="export_mode_github" /><label for="export_mode_github">GitHub</label>
+                <div>
+                    <p>At some point in the future you will be able to save your code to a github repository here.</p>
+                </div>
+                <input type="radio" name="export_mode" id="export_mode_download" /><label for="export_mode_download">Download</label>
+                <div>
+                    <p>Download your project as a zip archive.</p>
+                    <p><button id="export_zip">Save</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

@@ -10,7 +10,7 @@ this.emulator = new Object();
     var audio_ctx;
     var audio_time;
     
-    emulator.init = function(canvas, rom_data, start_address) {
+    emulator.init = function(canvas, rom_data) {
         if (emulator.isAvailable()) emulator.destroy();
 
         if (typeof(audio_ctx) == "undefined")
@@ -33,7 +33,6 @@ this.emulator = new Object();
         Module._emulator_set_bw_palette_simple(e, 0, 0xFFC2F0C4, 0xFFA8B95A, 0xFF6E601E, 0xFF001B2D);
         Module._emulator_set_bw_palette_simple(e, 1, 0xFFC2F0C4, 0xFFA8B95A, 0xFF6E601E, 0xFF001B2D);
         Module._emulator_set_bw_palette_simple(e, 2, 0xFFC2F0C4, 0xFFA8B95A, 0xFF6E601E, 0xFF001B2D);
-        Module._emulator_set_PC(e, start_address);
         Module._emulator_set_default_joypad_callback(e, 0);
         
         canvas_ctx = canvas.getContext("2d");
@@ -41,6 +40,21 @@ this.emulator = new Object();
         
         audio_ctx.resume()
         audio_time = audio_ctx.currentTime;
+    }
+    
+    emulator.updateRom = function(rom_data)
+    {
+        if (!emulator.isAvailable()) return false;
+
+        var required_size = ((rom_data.length - 1) | 0x3FFF) + 1;
+        if (required_size < 0x8000) required_size = 0x8000;
+        if (rom_size < required_size)
+            return false;
+        for(var n=0; n<rom_size; n++)
+            Module.HEAP8[rom_ptr + n] = 0
+        for(var n=0; n<rom.length; n++)
+            Module.HEAP8[rom_ptr + n] = rom_data[n];
+        return true;
     }
     
     emulator.destroy = function() {
@@ -72,7 +86,6 @@ this.emulator = new Object();
                 return false;
             if (step_type == "run")
             {
-                console.log(audio_time - audio_ctx.currentTime);
                 if (result & 4)
                 {
                     // Sync to the audio buffer, make sure we have 100ms of audio data buffered.
@@ -116,8 +129,25 @@ this.emulator = new Object();
         Module._free(ptr);
     }
     
+    emulator.getWRam = function() {
+        if (!emulator.isAvailable()) return;
+        
+        var ptr = Module._emulator_get_wram_ptr(e);
+        return new Uint8Array(Module.HEAP8.buffer, ptr, 0x8000);
+    }
+
+    emulator.getHRam = function() {
+        if (!emulator.isAvailable()) return;
+        
+        var ptr = Module._emulator_get_hram_ptr(e);
+        return new Uint8Array(Module.HEAP8.buffer, ptr, 0x7F);
+    }
+    
     emulator.getPC = function() {
         return Module._emulator_get_PC(e);
+    }
+    emulator.setPC = function(pc) {
+        Module._emulator_set_PC(e, pc);
     }
     emulator.getSP = function() {
         return Module._emulator_get_SP(e);
@@ -142,6 +172,10 @@ this.emulator = new Object();
         if (flags & 0x20) result += "H ";
         if (flags & 0x40) result += "N ";
         return result;
+    }
+    emulator.readMem = function(addr) {
+        if (!emulator.isAvailable()) return 0xFF;
+        return Module._emulator_read_mem(e, addr);
     }
 
     emulator.setBreakpoint = function(pc) {

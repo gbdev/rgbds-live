@@ -23,7 +23,7 @@ var hardware_inc = "\
 ;* Rev 2.5 - 03-May-15 : Fixed format (AntonioND)\n\
 ;* Rev 2.6 - 09-Apr-16 : Added GBC OAM and cart defines (AntonioND)\n\
 ;* Rev 2.7 - 19-Jan-19 : Added rPCMXX (ISSOtm)\n\
-;* Rev 2.8 - 03-Feb-19 : Added audio registers flags (Álvaro Cuesta)\n\
+;* Rev 2.8 - 03-Feb-19 : Added audio registers flags (Alvaro Cuesta)\n\
 ;* Rev 2.9 - 28-Feb-20 : Added utility rP1 constants\n\
 \n\
 ; If all of these are already defined, don't do it again.\n\
@@ -34,8 +34,8 @@ HARDWARE_INC SET 1\n\
 rev_Check_hardware_inc : MACRO\n\
 ;NOTE: REVISION NUMBER CHANGES MUST BE ADDED\n\
 ;TO SECOND PARAMETER IN FOLLOWING LINE.\n\
-    IF  \1 > 2.9 ;PUT REVISION NUMBER HERE\n\
-        WARN    \"Version \1 or later of 'hardware.inc' is required.\"\n\
+    IF  \\1 > 2.9 ;PUT REVISION NUMBER HERE\n\
+        WARN    \"Version \\1 or later of 'hardware.inc' is required.\"\n\
     ENDC\n\
 ENDM\n\
 \n\
