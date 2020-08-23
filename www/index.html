@@ -201,17 +201,20 @@ function updateTextView()
     var data = rom;
     var bank_size = 0x4000;
     var offset = 0x0000;
+    var symbols = compiler.getRomSymbols();
     if (emu_view == "wram")
     {
         data = emulator.getWRam();
         bank_size = 0x1000;
         offset = 0xC000;
+        symbols = compiler.getRamSymbols();
     }
     if (emu_view == "hram")
     {
         data = emulator.getHRam();
         bank_size = 0x1000;
         offset = 0xFF80;
+        symbols = compiler.getRamSymbols();
     }
     if (emu_view == "io")
     {
@@ -249,24 +252,50 @@ function updateTextView()
         ]
         for(var reg_info of registers)
         {
-            text += (reg_info.name + ":       ").slice(0, 6) + ('00' + emulator.readMem(reg_info.value).toString(16)).slice(-2) + "\n";
+            text += "<span style='float: left; width: 50px'>" + reg_info.name + ":</span>" + ('00' + emulator.readMem(reg_info.value).toString(16)).slice(-2) + "<br/>";
         }
-        display_text.value = text;
+        display_text.innerHTML = text;
         return;
     }
     if (typeof(data) == "undefined") return;
 
-    var text = "         0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n";
+    var text = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp; 1&nbsp; 2&nbsp; 3&nbsp; 4&nbsp; 5&nbsp; 6&nbsp; 7&nbsp; 8&nbsp; 9&nbsp; a&nbsp; b&nbsp; c&nbsp; d&nbsp; e&nbsp; f<br/>";
+    var symbol = null;
+    var span = false;
+    var span_color = 0;
     for(var n=0; n<data.length; n+=16)
     {
-        var hex = Array.prototype.map.call(data.slice(n, n + 16), x => ('00' + x.toString(16)).slice(-2)).join(' ');
+        var hex = Array.prototype.map.call(data.slice(n, n + 16), x => ('00' + x.toString(16)).slice(-2));
         var bank = ~~(n / bank_size);
         var addr = (n & (bank_size - 1))
         if (bank > 0)
             addr += bank_size;
-        text += ("00" + bank.toString(16)).slice(-2) + ":" + ("0000" + (addr + offset).toString(16)).slice(-4) + " " + hex + "\n";
+        text += ("00" + bank.toString(16)).slice(-2) + ":" + ("0000" + (addr + offset).toString(16)).slice(-4);
+        for(var idx=0; idx<hex.length; idx++)
+        {
+            text += " ";
+            var new_symbol = symbols[n + idx + offset];
+            if (new_symbol)
+            {
+                symbol = new_symbol;
+                if (span)
+                    text += "</span>";
+                span = false;
+                span_color = (span_color + 47) % 360;
+            }
+            if (symbol && !span)
+            {
+                text += "<span title='"+symbol+"' style='background-color: hsl(" + span_color + ", 50%, 50%)'>";
+                span = true;
+            }
+            text += hex[idx];
+        }
+        if (span)
+            text += "</span>";
+        span = false;
+        text += "<br/>";
     }
-    display_text.value = text;
+    display_text.innerHTML = text;
 }
 
 function updateFileList()
@@ -557,7 +586,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             <div class="emulator_screen_container">
                 <canvas class="emulator_canvas_screen" id="emulator_screen_canvas" width="160" height="144"></canvas>
                 <canvas class="emulator_vram_screen" id="emulator_vram_canvas" width="256" height="256" style="display: none"></canvas>
-                <textarea style="height: 100%; width: 100%; display: none" id="emulator_display_text" readonly></textarea>
+                <div style="height: 100%; width: 100%; display: none; overflow: scroll;" id="emulator_display_text"></div>
             </div>
         <tr><td class="right"><button id="download_rom">Download</button><td><button id="cpu_single_step">step</button><button id="cpu_frame_step">frame</button><input id="cpu_run_check" type="checkbox">run<td><button id="cpu_reset">Reset</button><td>
         <tr><td class="right">PC:<td id="cpu_pc">-<td class="right">A:<td id="cpu_a">-

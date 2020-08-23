@@ -8,6 +8,8 @@ this.compiler = new Object();
     var done_callback;
     var log_callback;
     var error_list = [];
+    var rom_symbols = [];
+    var ram_symbols = [];
 
     var line_nr_regex = /([\w\.]+)[\w\.\:]*\(([0-9]+)\)/gi;
 
@@ -47,6 +49,14 @@ this.compiler = new Object();
         return error_list;
     }
     
+    compiler.getRomSymbols = function() {
+        return rom_symbols
+    }
+
+    compiler.getRamSymbols = function() {
+        return ram_symbols
+    }
+    
     function trigger()
     {
         if (typeof(start_delay_timer) != "undefined")
@@ -58,6 +68,8 @@ this.compiler = new Object();
     {
         log_callback(null);
         error_list = [];
+        rom_symbols = [];
+        ram_symbols = [];
         
         var targets = [];
         for (const name of Object.keys(storage.getFiles()))
@@ -168,6 +180,22 @@ this.compiler = new Object();
                     var addr = line.split(" ")[0].split(":");
                     addr = (parseInt(addr[0], 16) * 0x4000) | (parseInt(addr[1], 16) & 0x3FFF)
                     start_address = addr;
+                }
+                else if (line.length > 0 && !line.startsWith(";"))
+                {
+                    var [addr, label] = line.split(" ");
+                    addr = addr.split(":");
+                    var bank = parseInt(addr[0], 16)
+                    var addr = parseInt(addr[1], 16)
+                    if (addr < 0x8000)
+                    {
+                        addr = (addr & 0x3fff) | (bank << 14);
+                        rom_symbols[addr] = label
+                    }
+                    else
+                    {
+                        ram_symbols[addr] = label
+                    }
                 }
             }
             logFunction("Build done");
