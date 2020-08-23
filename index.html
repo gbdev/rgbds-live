@@ -45,6 +45,14 @@ compiler.setLogCallback(function(str) {
     output.value += str + "\n";
     output.scrollTop = output.clientHeight;
 });
+emulator.setSerialCallback(function(value) {
+    var output = document.getElementById('output');
+    if ((value >= 32 && value < 128) || value == 13)
+        output.value += String.fromCharCode(value);
+    else
+        output.value += "[" + ("00" + value.toString(16)).slice(-2) + "]";
+    output.scrollTop = output.clientHeight;
+});
 
 function compileCode()
 {

@@ -9,6 +9,7 @@ this.emulator = new Object();
     var canvas_image_data;
     var audio_ctx;
     var audio_time;
+    var serial_callback = null;
     
     emulator.init = function(canvas, rom_data) {
         if (emulator.isAvailable()) emulator.destroy();
@@ -197,6 +198,15 @@ this.emulator = new Object();
         if (key == "b") Module._set_joyp_B(e, down);
         if (key == "select") Module._set_joyp_select(e, down);
         if (key == "start") Module._set_joyp_start(e, down);
+    }
+    
+    emulator.setSerialCallback = function(callback) {
+        serial_callback = callback;
+    }
+    
+    emulator.serialCallback = function(value) {
+        if (serial_callback)
+            serial_callback(value);
     }
     
     function processAudioBuffer()
