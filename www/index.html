@@ -267,7 +267,7 @@ function updateTextView()
     }
     if (typeof(data) == "undefined") return;
 
-    var text = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp; 1&nbsp; 2&nbsp; 3&nbsp; 4&nbsp; 5&nbsp; 6&nbsp; 7&nbsp; 8&nbsp; 9&nbsp; a&nbsp; b&nbsp; c&nbsp; d&nbsp; e&nbsp; f<br/>";
+    var text = "<div style='position: fixed; background-color: #fff'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp; 1&nbsp; 2&nbsp; 3&nbsp; 4&nbsp; 5&nbsp; 6&nbsp; 7&nbsp; 8&nbsp; 9&nbsp; a&nbsp; b&nbsp; c&nbsp; d&nbsp; e&nbsp; f</div><br/>";
     var symbol = null;
     var span = false;
     var span_color = 0;
@@ -289,7 +289,7 @@ function updateTextView()
                 if (span)
                     text += "</span>";
                 span = false;
-                span_color = (span_color + 47) % 360;
+                span_color = (span_color + 71) % 360;
             }
             if (symbol && !span)
             {

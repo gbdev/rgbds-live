@@ -129,7 +129,7 @@ this.compiler = new Object();
     function runRgbFix(input_rom_file, sym_file) {
         logFunction("Running rgbfix");
         createRgbFix({
-            'arguments': ['-v', 'output.gb'],
+            'arguments': ['-v', 'output.gb', '-p', '0xff'],
             'preRun': function(m) {
                 var FS = m.FS;
                 FS.writeFile("output.gb", input_rom_file);
