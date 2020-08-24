@@ -82,7 +82,7 @@ this.compiler = new Object();
         var target = targets.pop();
         logFunction("Running rgbasm: " + target);
         createRgbAsm({
-            'arguments': [target, '-o', 'output.o', '-e', '-Wall'],
+            'arguments': [target, '-o', 'output.o', '-Wall'],
             'preRun': function(m) {
                 var FS = m.FS;
                 for (const [key, value] of Object.entries(storage.getFiles())) {
