@@ -11,7 +11,7 @@ index e1a420e..4df87e6 100644
  struct Symbol *sym_AddReloc(char const *symName);
  void sym_Export(char const *symName);
 diff --git a/src/asm/asmy.y b/src/asm/asmy.y
-index c5f7082..4c67a21 100644
+index 4b687f3..3e04ba4 100644
 --- a/src/asm/asmy.y
 +++ b/src/asm/asmy.y
 @@ -663,7 +663,7 @@ lines		: /* empty */
@@ -23,7 +23,7 @@ index c5f7082..4c67a21 100644
  		| label macro
  		| label simple_pseudoop
  		| pseudoop
-@@ -1502,7 +1502,7 @@ sectattrs	: /* empty */ {
+@@ -1507,7 +1507,7 @@ sectattrs	: /* empty */ {
  ;
  
  
@@ -33,16 +33,17 @@ index c5f7082..4c67a21 100644
  		| { nPCOffset = 1; } z80_and
  		| { nPCOffset = 1; } z80_bit
 diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index 4887b36..e374cdd 100644
+index 4887b36..df6fd5f 100644
 --- a/src/asm/symbol.c
 +++ b/src/asm/symbol.c
-@@ -361,6 +361,24 @@ struct Symbol *sym_AddSet(char const *symName, int32_t value)
+@@ -361,6 +361,28 @@ struct Symbol *sym_AddSet(char const *symName, int32_t value)
  	return sym;
  }
  
 +static uint32_t secret_counter = 0;
 +struct Symbol *sym_AddSecret()
 +{
++    struct Symbol *sym;
 +    char name[MAXSYMLEN + 1];
 +    secret_counter += 1;
 +    sprintf(name, ".__SEC_%x_%x_%s", secret_counter, nLineNo, tzCurrentFileName);
@@ -53,8 +54,11 @@ index 4887b36..e374cdd 100644
 +            *s = 0;
 +    }
 +    if (symbolScope)
-+        return sym_AddLocalReloc(name);
-+    return sym_AddReloc(name + 1);
++        sym = sym_AddLocalReloc(name);
++    else
++        sym = sym_AddReloc(name + 1);
++    sym->isExported = true;
++    return sym;
 +}
 +
 +
