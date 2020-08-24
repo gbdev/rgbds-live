@@ -33,7 +33,7 @@ index 4b687f3..3e04ba4 100644
  		| { nPCOffset = 1; } z80_and
  		| { nPCOffset = 1; } z80_bit
 diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index 4887b36..df6fd5f 100644
+index 4887b36..85fac88 100644
 --- a/src/asm/symbol.c
 +++ b/src/asm/symbol.c
 @@ -361,6 +361,28 @@ struct Symbol *sym_AddSet(char const *symName, int32_t value)
@@ -46,18 +46,18 @@ index 4887b36..df6fd5f 100644
 +    struct Symbol *sym;
 +    char name[MAXSYMLEN + 1];
 +    secret_counter += 1;
-+    sprintf(name, ".__SEC_%x_%x_%s", secret_counter, nLineNo, tzCurrentFileName);
-+    for(char* s = name + 1; *s; s++) {
-+        if (*s == '.')
-+            *s = '#';
-+        if (*s == ':')
-+            *s = 0;
-+    }
-+    if (symbolScope)
-+        sym = sym_AddLocalReloc(name);
-+    else
-+        sym = sym_AddReloc(name + 1);
++    sprintf(name, "__SEC_%x_%x_%s", secret_counter, nLineNo, tzCurrentFileName);
++
++    sym = createsymbol(name);
++	sym->type = SYM_LABEL;
++	sym->callback = NULL;
++	sym->value = curOffset;
 +    sym->isExported = true;
++
++	sym->scope = NULL;
++	sym->section = sect_GetSymbolSection();
++
++	updateSymbolFilename(sym);
 +    return sym;
 +}
 +
