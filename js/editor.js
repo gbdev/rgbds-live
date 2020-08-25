@@ -19,6 +19,7 @@ this.editor = new Object();
         e.setOptions({
             tabSize: 2,
             useSoftTabs: true,
+            navigateWithinSoftTabs: true,
             enableLiveAutocompletion: true,
             enableSnippets: true,
         });
