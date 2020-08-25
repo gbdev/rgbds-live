@@ -290,6 +290,12 @@ function updateTextView()
                     text += "</span>";
                 span = false;
                 span_color = (span_color + 71) % 360;
+            } else if (new_symbol === null)
+            {
+                symbol = null;
+                if (span)
+                    text += "</span>";
+                span = false;
             }
             if (symbol && !span)
             {
