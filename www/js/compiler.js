@@ -80,7 +80,7 @@ this.compiler = new Object();
     
     function runRgbAsm(targets, obj_files) {
         var target = targets.pop();
-        logFunction("Running rgbasm: " + target);
+        logFunction("Running: rgbasm " + target + ' -o ' + target + '.o -Wall');
         createRgbAsm({
             'arguments': [target, '-o', 'output.o', '-Wall'],
             'preRun': function(m) {
@@ -103,10 +103,10 @@ this.compiler = new Object();
     }
 
     function runRgbLink(obj_files) {
-        logFunction("Running rgblink");
         var args = ['-o', 'output.gb', '--map', 'output.map']
         for(var name in obj_files)
             args.push(name + ".o");
+        logFunction("Running: " + args.join(" "));
         createRgbLink({
             'arguments': args,
             'preRun': function(m) {
@@ -127,7 +127,7 @@ this.compiler = new Object();
     }
 
     function runRgbFix(input_rom_file, map_file) {
-        logFunction("Running rgbfix");
+        logFunction("Running: rgbfix -v output.gb -p 0xff");
         createRgbFix({
             'arguments': ['-v', 'output.gb', '-p', '0xff'],
             'preRun': function(m) {
@@ -213,7 +213,13 @@ this.compiler = new Object();
                     section_type = m[1];
                     bank_nr = parseInt(m[2]);
                 } else if (m = slack_re.exec(line)) {
-                    logFunction("Space left: " + section_type + "[" + bank_nr + "]: " + parseInt(m[1], 16));
+                    var space = parseInt(m[1], 16);
+                    var total = 0x4000;
+                    if (section_type.startsWith("WRAM"))
+                        total = 0x1000;
+                    else if (section_type.startsWith("HRAM"))
+                        total = 127;
+                    logFunction("Space left: " + section_type + "[" + bank_nr + "]: " + space + "  (" + (space / total * 100).toFixed(1) + "%)");
                 }
             }
             logFunction("Build done");
