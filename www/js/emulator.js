@@ -27,7 +27,7 @@ this.emulator = new Object();
         }
         for(var n=0; n<rom_size; n++)
             Module.HEAP8[rom_ptr + n] = 0
-        for(var n=0; n<rom.length; n++)
+        for(var n=0; n<rom_data.length; n++)
             Module.HEAP8[rom_ptr + n] = rom_data[n];
         
         e = Module._emulator_new_simple(rom_ptr, rom_size, audio_ctx.sampleRate, 4096);
@@ -36,8 +36,11 @@ this.emulator = new Object();
         Module._emulator_set_bw_palette_simple(e, 2, 0xFFC2F0C4, 0xFFA8B95A, 0xFF6E601E, 0xFF001B2D);
         Module._emulator_set_default_joypad_callback(e, 0);
         
-        canvas_ctx = canvas.getContext("2d");
-        canvas_image_data = canvas_ctx.createImageData(canvas.width, canvas.height);
+        if (canvas)
+        {
+            canvas_ctx = canvas.getContext("2d");
+            canvas_image_data = canvas_ctx.createImageData(canvas.width, canvas.height);
+        }
         
         audio_ctx.resume()
         audio_time = audio_ctx.currentTime;

@@ -14,7 +14,8 @@ this.compiler = new Object();
     var line_nr_regex = /([\w\.]+)[\w\.\:]*\(([0-9]+)\)/gi;
 
     function logFunction(str) {
-        log_callback(str);
+        if (log_callback)
+            log_callback(str);
 
         if (str.startsWith("error: ") || str.startsWith("ERROR: ") || str.startsWith("warning: "))
         {
@@ -66,7 +67,8 @@ this.compiler = new Object();
     
     function startCompile()
     {
-        log_callback(null);
+        if (log_callback)
+            log_callback(null);
         error_list = [];
         rom_symbols = [];
         ram_symbols = [];
