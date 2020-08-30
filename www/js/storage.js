@@ -3,8 +3,7 @@
 this.storage = new Object();
 (function(storage) {
 
-    var files = {"hardware.inc": hardware_inc, "main.asm": `
-INCLUDE "hardware.inc"
+    var files = {"hardware.inc": hardware_inc, "main.asm": `INCLUDE "hardware.inc"
 
 SECTION "entry", ROM0[$100]
   jp start
@@ -18,6 +17,22 @@ haltLoop:
 `};
     storage.autoUrl = false;
     storage.autoLocalStorage = false;
+
+    storage.reset = function()
+    {
+        files = {"hardware.inc": hardware_inc, "main.asm": `INCLUDE "hardware.inc"
+
+SECTION "entry", ROM0[$100]
+  jp start
+
+SECTION "main", ROM0[$150]
+start:
+  nop
+haltLoop:
+  halt
+  jr haltLoop
+`}
+    }
 
     storage.autoLoad = function()
     {

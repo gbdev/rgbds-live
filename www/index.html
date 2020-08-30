@@ -377,6 +377,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
         if (confirm("Are you sure you want to delete: " + editor.getCurrentFilename() + "?"))
             deleteFile(editor.getCurrentFilename());
     }
+    document.getElementById("newproject").onclick = function()
+    {
+        if (!confirm("Are you sure to clear the current project?"))
+            return;
+        storage.reset();
+        editor.setCurrentFile("main.asm");
+        updateFileList();
+    }
 
     compileCode();
 
@@ -557,6 +565,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <li id="delfile">Delete current file</li>
                 <li id="importmenu">Import project...</li>
                 <li id="exportmenu">Export project...</li>
+                <li id="newproject">New project...</li>
             </ul></li>
             <li>Options<ul>
                 <li><input type="checkbox" id="auto_url_update"/><label for="auto_url_update">Auto URL update</label></li>
