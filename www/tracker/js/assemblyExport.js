@@ -55,7 +55,7 @@ function exportSongAsAssembly(song)
     data += "duty_instruments:\n";
     for(var instr of song.duty_instruments)
     {
-        var nr10 = (instr.frequency_sweep_time << 4) | (instr.frequency_sweep_direction << 3) | (instr.frequency_sweep_shift);
+        var nr10 = (instr.frequency_sweep_time << 4) | (instr.frequency_sweep_shift < 0 ? 0x08 : 0x00) | Math.abs(instr.frequency_sweep_shift);
         var nr11 = (instr.duty_cycle << 6) | (instr.length !== null ? instr.length : 0);
         var nr12 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00) | Math.abs(instr.volume_sweep_change);
         var nr14 = 0x80 | (instr.length !== null ? 0x40 : 0);

@@ -193,22 +193,22 @@ window.addEventListener('DOMContentLoaded', (event) => {
         <tr type="DN"><td colspan="2"><canvas id="instrumentVolumeCanvas" width="300" height="50"/></td></tr>
 
         <tr type="D"><th colspan="2">Frequency sweep</th></tr>
-        <tr type="D"><td>Sweep time:</td><td><select><option>Off</option><option>1/128Hz</option><option>2/128Hz</option><option>3/128Hz</option><option>4/128Hz</option><option>5/128Hz</option><option>6/128Hz</option><option>7/128Hz</option></select></td></tr>
-        <tr type="D"><td>Sweep size:</td><td><input type="range" min="-7" max="7" /></td></tr>
-        <tr type="D"><td colspan="2"><canvas width="300" height="50"/></td></tr>
+        <tr type="D"><td>Sweep time:</td><td><select id="instrumentSweepTime"><option>Off</option><option>1/128Hz</option><option>2/128Hz</option><option>3/128Hz</option><option>4/128Hz</option><option>5/128Hz</option><option>6/128Hz</option><option>7/128Hz</option></select></td></tr>
+        <tr type="D"><td>Sweep size:</td><td><input id="instrumentSweepChange" type="range" min="-7" max="7" /></td></tr>
+        <tr type="D"><td colspan="2"><canvas id="instrumentSweepCanvas" width="300" height="50"/></td></tr>
 
         <tr type="D"><th colspan="2">Duty cycle</th></tr>
-        <tr type="D"><td></td><td><select><option>12.5%</option><option>25%</option><option>50%</option><option>75%</option></select></td></tr>
+        <tr type="D"><td></td><td><select id="instrumentDuty"><option>12.5%</option><option>25%</option><option>50%</option><option>75%</option></select></td></tr>
 
         <tr type="W"><th colspan="2">Wave</th></tr>
-        <tr type="W"><td>Volume</td><td><select><option>Mute</option><option>100%</option><option>50%</option><option>25%</option></select></td></tr>
-        <tr type="W"><td>Waveform</td><td><select><option>1</option></select></td></tr>
-        <tr type="W"><td colspan="2"><canvas width="300" height="100"/></td></tr>
+        <tr type="W"><td>Volume</td><td><select id="instrumentWaveVolume"><option>Mute</option><option>100%</option><option>50%</option><option>25%</option></select></td></tr>
+        <tr type="W"><td>Waveform</td><td><select id="instrumentWaveIndex"><option>1</option></select></td></tr>
+        <tr type="W"><td colspan="2"><canvas id="instrumentWaveCanvas" width="300" height="100"/></td></tr>
 
         <tr type="N"><th colspan="2">Noise</th></tr>
-        <tr type="N"><td>Shift clock mask</td><td><input type="range" min="0" max="15"/></td></tr>
-        <tr type="N"><td>Dividing ratio</td><td><input type="range" min="0" max="7"/></td></tr>
-        <tr type="N"><td>7 bit counter</td><td><input type="checkbox"/></td></tr>
+        <tr type="N"><td>Shift clock mask</td><td><input id="instrumentNoiseShiftClockMask" type="range" min="0" max="15"/></td></tr>
+        <tr type="N"><td>Dividing ratio</td><td><input id="instrumentNoiseDividingRatio" type="range" min="0" max="7"/></td></tr>
+        <tr type="N"><td>7 bit counter</td><td><input id="instrumentNoise7bit" type="checkbox"/></td></tr>
 
         <tr><td></td><td><button>Test C-5</button></td></tr>
 

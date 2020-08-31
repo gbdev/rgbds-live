@@ -6,7 +6,7 @@ class InstrumentUI
     {
         this.updateInstrumentList();
         
-        document.getElementById("instrumentSelector").onclick = (e) => { this.showSelectedInstrument() };
+        document.getElementById("instrumentSelector").onchange = (e) => { this.showSelectedInstrument() };
     }
 
     updateInstrumentList()
@@ -77,6 +77,24 @@ class InstrumentUI
         {
             document.getElementById("instrumentInitialVolume").value = i.initial_volume;
             document.getElementById("instrumentVolumeChange").value = i.volume_sweep_change;
+        }
+        if (i instanceof DutyInstrument)
+        {
+            document.getElementById("instrumentSweepTime").selectedIndex = i.frequency_sweep_time;
+            document.getElementById("instrumentSweepChange").value = i.frequency_sweep_shift;
+
+            document.getElementById("instrumentDuty").selectedIndex = i.duty_cycle;
+        }
+        else if (i instanceof WaveInstrument)
+        {
+            document.getElementById("instrumentWaveVolume").selectedIndex = i.volume;
+            document.getElementById("instrumentWaveIndex").selectedIndex = i.wave_index;
+        }
+        else if (i instanceof NoiseInstrument)
+        {
+            document.getElementById("instrumentNoiseShiftClockMask").value = i.shift_clock_mask;
+            document.getElementById("instrumentNoiseDividingRatio").value = i.dividing_ratio;
+            document.getElementById("instrumentNoise7bit").checked = i.bit_count == 7;
         }
     }
     
