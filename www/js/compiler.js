@@ -10,6 +10,7 @@ this.compiler = new Object();
     var error_list = [];
     var rom_symbols = [];
     var ram_symbols = [];
+    var link_options = [];
 
     var line_nr_regex = /([\w\.]+)[\w\.\:]*\(([0-9]+)\)/gi;
 
@@ -56,6 +57,10 @@ this.compiler = new Object();
 
     compiler.getRamSymbols = function() {
         return ram_symbols
+    }
+    
+    compiler.setLinkOptions = function(options) {
+        link_options = options;
     }
     
     function trigger()
@@ -105,7 +110,7 @@ this.compiler = new Object();
     }
 
     function runRgbLink(obj_files) {
-        var args = ['-o', 'output.gb', '--map', 'output.map']
+        var args = ['-o', 'output.gb', '--map', 'output.map'].concat(link_options);
         for(var name in obj_files)
             args.push(name + ".o");
         logFunction("Running: " + args.join(" "));
