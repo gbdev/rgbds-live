@@ -7,6 +7,15 @@ class SequenceUI
     constructor()
     {
         this.update();
+        
+        document.getElementById("sequence").onclick = (e) => {
+            var idx = e.target.parentElement.index;
+            if (typeof(idx) == "undefined") return;
+
+            this.setCurrentPatternIndex(idx);
+            ui.tracker.loadPattern(idx);
+            ui.tracker.setSelectedRow(0);
+        }
     }
 
     update()
@@ -17,6 +26,7 @@ class SequenceUI
         for(var idx=0; idx<song.sequence.length; idx++)
         {
             var row_node = document.createElement("tr");
+            row_node.index = idx;
             var cell_node = document.createElement("td");
             cell_node.innerText = (idx + 1);
             row_node.appendChild(cell_node);
