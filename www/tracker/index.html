@@ -131,7 +131,66 @@ window.addEventListener('DOMContentLoaded', (event) => {
             <tr><th colspan="2">Sequence</th></tr>
         </table>
     </div>
-    <div class="tracker"><table id="tracker"></table></div>
+    <div class="tracker">
+        <div class="effectpopup" id="effectpopup">
+        Effect:
+            <select id="trackerEffectType">
+                <option>None</option>
+                <option>Arpeggio</option>
+                <option>Portamento up</option>
+                <option>Portamento down</option>
+                <option>Tone Portamento</option>
+                <option>Vibrato</option>
+                <option>Set Master Volume</option>
+                <option>Call routine</option>
+                <option>Note Delay</option>
+                <option>Set Panning</option>
+                <option>Set Duty Cycle</option>
+                <option>Volume Slide</option>
+                <option>Position Jump</option>
+                <option>Set Volume</option>
+                <option>Pattern Break</option>
+                <option>Note Cut</option>
+                <option>Set Speed</option>
+            </select>
+            <div id="trackerEffectInfo">-</div>
+            <input type="range" id="trackerEffectNibbleHigh" min="0" max="15"/><br/>
+            <input type="range" id="trackerEffectNibbleLow" min="0" max="15"/><br/>
+            <input type="range" id="trackerEffectByte" min="0" max="255"/><br/>
+            <select id="trackerEffectWaveform" style="font-family: monospace">
+                <option>_________________________</option>
+                <option>_-_-_-_-_-_-_-_-_-_-_-_-_</option>
+                <option>__--__--__--__--__--__--_</option>
+                <option>_---_---_---_---_---_---_</option>
+                <option>____----____----____----_</option>
+                <option>_-_-----_-_-----_-_-----_</option>
+                <option>__------__------__------_</option>
+                <option>_-------_-------_-------_</option>
+                <option>________--------________-</option>
+                <option>_-_-_-_---------_-_-_-_--</option>
+                <option>__--__----------__--__---</option>
+                <option>_---_-----------_---_----</option>
+                <option>____------------____-----</option>
+                <option>_-_-------------_-_------</option>
+                <option>__--------------__-------</option>
+                <option>_---------------_--------</option>
+            </select>
+            <table id="trackerEffectPanningTable" style="width: 100%">
+            <tr><th>Left</th><th>Right</th></tr>
+            <tr><td><input type="checkbox"/>Duty 1</td><td><input type="checkbox"/>Duty 1</td></tr>
+            <tr><td><input type="checkbox"/>Duty 2</td><td><input type="checkbox"/>Duty 2</td></tr>
+            <tr><td><input type="checkbox"/>Wave</td><td><input type="checkbox"/>Wave</td></tr>
+            <tr><td><input type="checkbox"/>Noise</td><td><input type="checkbox"/>Noise</td></tr>
+            </table>
+            <select id="trackerEffectDutyCycle" style="font-family: monospace">
+                <option>_-------_-------_------- 12.5%</option>
+                <option>__------__------__------ 25%</option>
+                <option>____----____----____---- 50%</option>
+                <option>______--______--______-- 75%</option>
+            </select>
+        </div>
+        <table id="tracker"></table>
+    </div>
     <div class="controls">
         <button id="playButton">PLAY</button>
         <button id="stopButton">STOP</button>

@@ -73,6 +73,13 @@ class TrackerUI
             tracker.appendChild(row_node);
         }
         
+        document.getElementById("trackerEffectType").onchange = (e) => {
+            this.setEffectType(e.target.selectedIndex > 0 ? e.target.selectedIndex - 1 : null);
+        }
+        document.getElementById("trackerEffectNibbleHigh").oninput = (e) => { this.setEffectParam(e.target.value << 4, 0xF0); }
+        document.getElementById("trackerEffectNibbleLow").oninput = (e) => { this.setEffectParam(e.target.value, 0x0F); }
+        document.getElementById("trackerEffectByte").oninput = (e) => { this.setEffectParam(e.target.value, 0xFF); }
+
         tracker.onclick = (e) => {
             e.preventDefault()
             e.stopPropagation()
@@ -198,18 +205,91 @@ class TrackerUI
         song.patterns[this.pattern_index][this.selected_row][this.selected_col].instrument = value;
         this.getCell(this.selected_row, this.selected_col, "instrument").innerText = instrumentNumberToText(value);
     }
+    setEffectType(value)
+    {
+        var c = song.patterns[this.pattern_index][this.selected_row][this.selected_col];
+        c.effectcode = value;
+        if (c.effectcode === null)
+            c.effectparam = null;
+        else if (c.effectparam === null)
+            c.effectparam = 0;
+        this.getCell(this.selected_row, this.selected_col, "effect").innerText = effectToText(c.effectcode, c.effectparam);
+        this.setSelection(this.selected_row, this.selected_col, "effect");
+    }
+    setEffectParam(value, mask)
+    {
+        var c = song.patterns[this.pattern_index][this.selected_row][this.selected_col];
+        c.effectparam = (c.effectparam & ~mask) | (value & mask);
+        this.getCell(this.selected_row, this.selected_col, "effect").innerText = effectToText(c.effectcode, c.effectparam);
+        this.updateEffectInfo();
+    }
     
     setSelection(row, col, type)
     {
         if (this.selected_row !== null)
-            this.getCell(this.selected_row, this.selected_col, this.selected_type).classList.remove("active");
+        {
+            var cell = this.getCell(this.selected_row, this.selected_col, this.selected_type);
+            for(var c of cell.parentElement.parentElement.children)
+                for(var cc of c.children)
+                    cc.classList.remove("highlight");
+            cell.classList.remove("active");
+        }
         this.selected_row = row;
         this.selected_col = col;
         this.selected_type = type;
         
         var cell = this.getCell(this.selected_row, this.selected_col, this.selected_type);
         cell.classList.add("active");
+        for(var c of cell.parentElement.parentElement.children)
+            for(var cc of c.children)
+                cc.classList.add("highlight");
         cell.scrollIntoViewIfNeeded();
+
+        var effectpopup = document.getElementById("effectpopup");
+        if (type != "effect")
+        {
+            effectpopup.style.display = "none";
+        } else {
+            effectpopup.style.display = "block";
+            effectpopup.style.top = cell.getBoundingClientRect().y + cell.getBoundingClientRect().height + 5 + document.getElementById("tracker").parentElement.scrollTop;
+            
+            var c = song.patterns[this.pattern_index][this.selected_row][this.selected_col];
+            if (c.effectcode == null)
+            {
+                document.getElementById("trackerEffectType").selectedIndex = 0;
+            } else {
+                document.getElementById("trackerEffectType").selectedIndex = c.effectcode + 1;
+                document.getElementById("trackerEffectNibbleLow").value = (c.effectparam & 0x0F);
+                document.getElementById("trackerEffectNibbleHigh").value = (c.effectparam & 0xF0) >> 4;
+                document.getElementById("trackerEffectByte").value = c.effectparam;
+            }
+            this.updateEffectInfo();
+        }
+    }
+    
+    updateEffectInfo()
+    {
+        var info = "???";
+        var c = song.patterns[this.pattern_index][this.selected_row][this.selected_col];
+        if (c.effectcode === null) info = "-";
+        else if (c.effectcode === 0) info = `Arpeggiate by +${c.effectparam>>4}, +${c.effectparam&0x0F} semitones`;
+        else if (c.effectcode === 1) info = `Slide up by ${c.effectparam} units`;
+        else if (c.effectcode === 2) info = `Slide down by ${c.effectparam} units`;
+        else if (c.effectcode === 3) info = `Tone portamento by ${c.effectparam} units`;
+        else if (c.effectcode === 4) info = `Depth ${c.effectparam&0x0F}`;
+        else if (c.effectcode === 5) info = `Set Left speaker vol to ${c.effectparam>>4}, Right speaker vol to ${c.effectparam&0x0F}`;
+        else if (c.effectcode === 6) info = `Call routine ${c.effectparam&0x0F}`;
+        else if (c.effectcode === 7) info = `Delay note by ${c.effectparam} ticks`;
+        else if (c.effectcode === 8) info = "";
+        else if (c.effectcode === 9) info = "";
+        else if (c.effectcode === 10) info = `Increase volume by ${c.effectparam>>4} units, decrease volume by ${c.effectparam&0x0F}`;
+        else if (c.effectcode === 11) info = `Jump to order ${c.effectparam}`;
+        else if (c.effectcode === 12) info = `Set volume to ${c.effectparam&0x0F}/15`;
+        else if (c.effectcode === 13) info = `Jump to row ${c.effectparam} on the next pattern`;
+        else if (c.effectcode === 14) info = `Cut note after ${c.effectparam} ticks`;
+        else if (c.effectcode === 15) info = `Set speed to ${c.effectparam} ticks`;
+        
+        document.getElementById("trackerEffectInfo").innerText = info;
     }
     
     setSelectedRow(row)
