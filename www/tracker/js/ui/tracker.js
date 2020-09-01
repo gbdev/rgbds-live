@@ -283,7 +283,6 @@ class TrackerUI
                 document.getElementById("trackerEffectPanningRN").checked = c.effectparam & 0x80;
                 document.getElementById("trackerEffectDutyCycle").selectedIndex = c.effectparam >> 6;
             }
-            console.log(c.effectcode in [9]);
             document.getElementById("trackerEffectNibbleLow").style.display = [0, 4, 5, 6, 10, 12].includes(c.effectcode) ? "" : "none";
             document.getElementById("trackerEffectNibbleHigh").style.display = [0, 5, 10].includes(c.effectcode) ? "" : "none";
             document.getElementById("trackerEffectByte").style.display = [1, 2, 3, 7, 11, 13, 14, 15].includes(c.effectcode) ? "" : "none";
