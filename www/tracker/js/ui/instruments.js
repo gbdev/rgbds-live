@@ -6,9 +6,15 @@ class InstrumentUI
     {
         this.updateInstrumentList();
         
-        document.getElementById("instrumentSelector").onchange = (e) => { this.showSelectedInstrument() };
+        document.getElementById("instrumentSelector").onchange = (e) => { this.showSelectedInstrument(); };
 
-        document.getElementById("instrumentName").onchange = (e) => {};
+        document.getElementById("instrumentName").oninput = (e) => {
+            this.getSelectedInstrument().name = e.target.value;
+            var tmp = document.getElementById("instrumentSelector").selectedIndex;
+            this.updateInstrumentList();
+            document.getElementById("instrumentSelector").selectedIndex = tmp;
+            this.showSelectedInstrument();
+        };
         document.getElementById("instrumentLengthEnabled").onchange = (e) => {
             if (e.target.checked) {
                 this.getSelectedInstrument().length = 32;

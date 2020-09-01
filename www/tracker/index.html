@@ -20,6 +20,7 @@
 <script src="js/song.js"></script>
 <script src="js/ugeLoader.js"></script>
 <script src="js/assemblyExport.js"></script>
+<script src="js/player.js"></script>
 
 <script src="js/ui/instruments.js"></script>
 
@@ -29,6 +30,7 @@
 var song = new Song();
 song.createDefaults();
 var ui = {}
+var player = null;
 
 var noteName = ["C-", "C#", "D-", "D#", "E-", "F-", "F#", "G-", "G#", "A-", "A#", "B-"]
 function noteToText(note)
@@ -123,36 +125,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
     
     document.getElementById("playButton").onclick = (event) => {
-        storage.update("song.asm", exportSongAsAssembly(song));
-        compiler.compile((rom_file, start_address, addr_to_line) => {
-            emulator.init(null, rom_file);
-            setInterval(() => {
-                emulator.step("run");
-
-                var addr = compiler.getRamSymbols().findIndex((v) => {return v == "current_order"});
-                var current_pattern = emulator.readMem(addr) / 2;
-                showPattern(current_pattern);
-
-                var addr = compiler.getRamSymbols().findIndex((v) => {return v == "row"});
-                var row = emulator.readMem(addr);
-                tracker.children[row+1].focus();
-            }, 10);
-        });
+        player.play();
+    };
+    document.getElementById("stopButton").onclick = (event) => {
+        player.stop();
     };
     
-    compiler.setLogCallback(console.log);
-    compiler.setLinkOptions(['-t', '-w']);
-    function getFile(url, name)
-    {
-        var req = new XMLHttpRequest();
-        req.open("GET", url, false);
-        req.send();
-        storage.update(name, req.response.replace(/include\//g, ""));
-    }
-    getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/player-rgbds/rgbds_player.z80", "main.asm");
-    getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/driver_lite.z80", "driver_lite.asm");
-    getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/constants.inc", "constants.inc");
-    getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/music.inc", "music.inc");
     
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         document.body.addEventListener(eventName, function (e) {
@@ -169,7 +147,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             ui.instruments.updateInstrumentList();
         });
     }, false)
-    
+
+    player = new Player();
     ui.instruments = new InstrumentUI();
 });
 </script>
