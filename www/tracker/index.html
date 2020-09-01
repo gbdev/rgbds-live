@@ -188,13 +188,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
         <tr><td>Length:<input type="checkbox" id="instrumentLengthEnabled"/></td><td><input id="instrumentLength" type="range" min="0" max="63" /></td></tr>
 
         <tr type="DN"><th colspan="2">Volume envelope</th></tr>
-        <tr type="DN"><td>Initial volume:</td><td><input id="instrumentInitialVolume" type="range" min="0" max="15" /></td></tr>
-        <tr type="DN"><td>Change:</td><td><input  id="instrumentVolumeChange" type="range" min="-7" max="7" /></td></tr>
+        <tr type="DN"><td>Initial volume:</td><td><input id="instrumentInitialVolume" type="range" min="0" max="15" list="tickmarks15" /></td></tr>
+        <tr type="DN"><td>Change:</td><td><input  id="instrumentVolumeChange" type="range" min="-7" max="7" list="tickmarks7" /></td></tr>
         <tr type="DN"><td colspan="2"><canvas id="instrumentVolumeCanvas" width="300" height="50"/></td></tr>
 
         <tr type="D"><th colspan="2">Frequency sweep</th></tr>
         <tr type="D"><td>Sweep time:</td><td><select id="instrumentSweepTime"><option>Off</option><option>1/128Hz</option><option>2/128Hz</option><option>3/128Hz</option><option>4/128Hz</option><option>5/128Hz</option><option>6/128Hz</option><option>7/128Hz</option></select></td></tr>
-        <tr type="D"><td>Sweep size:</td><td><input id="instrumentSweepChange" type="range" min="-7" max="7" /></td></tr>
+        <tr type="D"><td>Sweep size:</td><td><input id="instrumentSweepChange" type="range" min="-7" max="7" list="tickmarks7" /></td></tr>
         <tr type="D"><td colspan="2"><canvas id="instrumentSweepCanvas" width="300" height="50"/></td></tr>
 
         <tr type="D"><th colspan="2">Duty cycle</th></tr>
@@ -206,13 +206,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
         <tr type="W"><td colspan="2"><canvas id="instrumentWaveCanvas" width="300" height="100"/></td></tr>
 
         <tr type="N"><th colspan="2">Noise</th></tr>
-        <tr type="N"><td>Shift clock mask</td><td><input id="instrumentNoiseShiftClockMask" type="range" min="0" max="15"/></td></tr>
-        <tr type="N"><td>Dividing ratio</td><td><input id="instrumentNoiseDividingRatio" type="range" min="0" max="7"/></td></tr>
+        <tr type="N"><td>Shift clock mask</td><td><input id="instrumentNoiseShiftClockMask" type="range" min="0" max="15" list="tickmarks15"/></td></tr>
+        <tr type="N"><td>Dividing ratio</td><td><input id="instrumentNoiseDividingRatio" type="range" min="0" max="7" list="tickmarks7"/></td></tr>
         <tr type="N"><td>7 bit counter</td><td><input id="instrumentNoise7bit" type="checkbox"/></td></tr>
 
         <tr><td></td><td><button>Test C-5</button></td></tr>
-
         </table>
+
+        <datalist id="tickmarks7"><option value="-7"/><option value="0"/><option value="7"/></datalist>
+        <datalist id="tickmarks15"><option value="-15"/><option value="0"/><option value="15"/></datalist>
     </div>
     <div class="sequence">
         <table id="sequence">

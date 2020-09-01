@@ -9,7 +9,21 @@ class InstrumentUI
         document.getElementById("instrumentSelector").onchange = (e) => { this.showSelectedInstrument() };
 
         document.getElementById("instrumentName").onchange = (e) => {};
-        document.getElementById("instrumentLengthEnabled").onchange = (e) => {};
+        document.getElementById("instrumentLengthEnabled").onchange = (e) => {
+            if (e.target.checked) {
+                this.getSelectedInstrument().length = 32;
+                document.getElementById("instrumentLength").value = this.getSelectedInstrument().length;
+            } else {
+                this.getSelectedInstrument().length = null;
+                document.getElementById("instrumentLength").value = 0;
+            }
+            this.updateDrawings();
+        };
+        document.getElementById("instrumentLength").oninput = (e) => {
+            this.getSelectedInstrument().length = e.target.value;
+            document.getElementById("instrumentLengthEnabled").checked = true;
+            this.updateDrawings();
+        };
 
         document.getElementById("instrumentInitialVolume").oninput = (e) => {
             this.getSelectedInstrument().initial_volume = e.target.value;
