@@ -93,6 +93,25 @@ class Song
         }
         list.splice(index, 1);
     }
+
+    patternEqual(idx0, idx1)
+    {
+        var a = this.patterns[idx0];
+        var b = this.patterns[idx1];
+        if (a.length != b.length)
+            return false;
+        for(var idx=0; idx<a.length; idx++)
+        {
+            for(var col=0; col<4; col++)
+            {
+                if (a[idx][col].note != b[idx][col].note) return false;
+                if (a[idx][col].instrument != b[idx][col].instrument) return false;
+                if (a[idx][col].effectcode != b[idx][col].effectcode) return false;
+                if (a[idx][col].effectparam != b[idx][col].effectparam) return false;
+            }
+        }
+        return true;
+    }
 }
 class DutyInstrument
 {

@@ -21,9 +21,9 @@ order_cnt: db ${song.sequence.length * 2}
         data += `_order${track+1}: dw ` + song.sequence.map((n) => `PAT_${track}_${n}`).join(", ") + "\n";
     for(var track=0; track<4; track++)
     {
-        for(var n=0; n<song.sequence.length; n++)
+        for(var n=0; n<song.patterns.length; n++)
         {
-            var pattern = song.patterns[song.sequence[n]];
+            var pattern = song.patterns[n];
             data += `PAT_${track}_${n}:\n`;
             for(var m=0; m<pattern.length; m++)
             {

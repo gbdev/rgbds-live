@@ -194,8 +194,19 @@ function loadUGESong(data)
             }
             pattern.push(row);
         }
-        song.sequence.push(song.patterns.length);
         song.patterns.push(pattern);
+        var added = false;
+        for(var idx=0; idx<song.patterns.length-1; idx++)
+        {
+            if (song.patternEqual(idx, song.patterns.length-1))
+            {
+                song.sequence.push(idx);
+                song.patterns.pop()
+                added = true;
+            }
+        }
+        if (!added)
+            song.sequence.push(song.patterns.length-1);
     }
     
     //TODO: Remove unused instruments, unused waves, and deduplicate patterns.

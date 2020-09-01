@@ -13,7 +13,7 @@ class SequenceUI
             if (typeof(idx) == "undefined") return;
 
             this.setCurrentPatternIndex(idx);
-            ui.tracker.loadPattern(idx);
+            ui.tracker.loadPattern(song.sequence[idx]);
             ui.tracker.setSelectedRow(0);
         }
     }
