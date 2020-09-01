@@ -45,6 +45,12 @@ body {
 .sequence tr:nth-child(2n+2) td {
     background-color: #70b0f0;
 }
+.sequence tr.highlight td {
+    background-color: #c0c0ff;
+}
+.sequence tr.active td {
+    background-color: #e0e0ff;
+}
 
 .tracker {
     overflow: auto;
@@ -88,7 +94,6 @@ body {
     background: white;
     left: 5;
     right: 5;
-    top: 0;
     padding: 5px;
     border: solid 1px;
     display: none;

@@ -35,6 +35,7 @@ class Player {
 
                 var current_pattern = emulator.readMem(current_order_addr) / 2;
                 ui.tracker.loadPattern(current_pattern);
+                ui.sequence.setCurrentPatternIndex(current_pattern);
 
                 var row = emulator.readMem(row_addr);
                 ui.tracker.setSelectedRow(row);
