@@ -261,7 +261,6 @@ class TrackerUI
             effectpopup.style.display = "none";
         } else {
             effectpopup.style.display = "block";
-            effectpopup.style.top = cell.getBoundingClientRect().y + cell.getBoundingClientRect().height + 5 + document.getElementById("tracker").parentElement.scrollTop;
             
             var c = song.patterns[this.pattern_index][this.selected_row][this.selected_col];
             if (c.effectcode == null)
@@ -290,6 +289,13 @@ class TrackerUI
             document.getElementById("trackerEffectPanningTable").style.display = [8].includes(c.effectcode) ? "" : "none";
             document.getElementById("trackerEffectDutyCycle").style.display = [9].includes(c.effectcode) ? "" : "none";
             this.updateEffectInfo();
+
+            if (cell.getBoundingClientRect().y < document.getElementById("tracker").getBoundingClientRect().height * 0.5 - document.getElementById("tracker").parentElement.scrollTop)
+            {
+                effectpopup.style.top = cell.getBoundingClientRect().y + cell.getBoundingClientRect().height + 5 + document.getElementById("tracker").parentElement.scrollTop;
+            } else {
+                effectpopup.style.top = cell.getBoundingClientRect().y - effectpopup.getBoundingClientRect().height - 5 + document.getElementById("tracker").parentElement.scrollTop;
+            }
         }
     }
     

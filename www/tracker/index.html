@@ -24,6 +24,7 @@
 
 <script src="js/ui/instruments.js"></script>
 <script src="js/ui/tracker.js"></script>
+<script src="js/ui/sequence.js"></script>
 
 <script>
 "use strict";
@@ -32,25 +33,6 @@ var song = new Song();
 song.createDefaults();
 var ui = {}
 var player = null;
-
-
-function showSequence()
-{
-    var sequence = document.getElementById("sequence");
-    while(sequence.children.length > 1)
-        sequence.children[1].remove();
-    for(var idx=0; idx<song.sequence.length; idx++)
-    {
-        var row_node = document.createElement("tr");
-        var cell_node = document.createElement("td");
-        cell_node.innerText = (idx + 1);
-        row_node.appendChild(cell_node);
-        cell_node = document.createElement("td");
-        cell_node.innerText = song.sequence[idx];
-        row_node.appendChild(cell_node);
-        sequence.appendChild(row_node);
-    }
-}
 
 
 window.addEventListener('DOMContentLoaded', (event) => {
@@ -73,7 +55,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             song = loadUGESong(data);
             console.log(song);
             ui.tracker.loadPattern(0);
-            showSequence();
+            ui.sequence.update();
             ui.instruments.updateInstrumentList();
         });
     }, false)
@@ -81,6 +63,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     player = new Player();
     ui.instruments = new InstrumentUI();
     ui.tracker = new TrackerUI();
+    ui.sequence = new SequenceUI();
 });
 </script>
 </head>
