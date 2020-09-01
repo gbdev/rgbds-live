@@ -79,6 +79,16 @@ class TrackerUI
         document.getElementById("trackerEffectNibbleHigh").oninput = (e) => { this.setEffectParam(e.target.value << 4, 0xF0); }
         document.getElementById("trackerEffectNibbleLow").oninput = (e) => { this.setEffectParam(e.target.value, 0x0F); }
         document.getElementById("trackerEffectByte").oninput = (e) => { this.setEffectParam(e.target.value, 0xFF); }
+        document.getElementById("trackerEffectWaveform").onchange = (e) => { this.setEffectParam(e.target.selectedIndex << 4, 0xF0); }
+        document.getElementById("trackerEffectPanningLD1").oninput = (e) => { this.setEffectParam(e.target.checked ? 0x01 : 0x00, 0x01); }
+        document.getElementById("trackerEffectPanningLD2").oninput = (e) => { this.setEffectParam(e.target.checked ? 0x02 : 0x00, 0x02); }
+        document.getElementById("trackerEffectPanningLW").oninput = (e) => { this.setEffectParam(e.target.checked ? 0x04 : 0x00, 0x04); }
+        document.getElementById("trackerEffectPanningLN").oninput = (e) => { this.setEffectParam(e.target.checked ? 0x08 : 0x00, 0x08); }
+        document.getElementById("trackerEffectPanningRD1").oninput = (e) => { this.setEffectParam(e.target.checked ? 0x10 : 0x00, 0x10); }
+        document.getElementById("trackerEffectPanningRD2").oninput = (e) => { this.setEffectParam(e.target.checked ? 0x20 : 0x00, 0x20); }
+        document.getElementById("trackerEffectPanningRW").oninput = (e) => { this.setEffectParam(e.target.checked ? 0x40 : 0x00, 0x40); }
+        document.getElementById("trackerEffectPanningRN").oninput = (e) => { this.setEffectParam(e.target.checked ? 0x80 : 0x00, 0x80); }
+        document.getElementById("trackerEffectDutyCycle").onchange = (e) => { this.setEffectParam(e.target.selectedIndex << 6, 0xC0); }
 
         tracker.onclick = (e) => {
             e.preventDefault()
@@ -262,7 +272,24 @@ class TrackerUI
                 document.getElementById("trackerEffectNibbleLow").value = (c.effectparam & 0x0F);
                 document.getElementById("trackerEffectNibbleHigh").value = (c.effectparam & 0xF0) >> 4;
                 document.getElementById("trackerEffectByte").value = c.effectparam;
+                document.getElementById("trackerEffectWaveform").selectedIndex = c.effectparam >> 4;
+                document.getElementById("trackerEffectPanningLD1").checked = c.effectparam & 0x01;
+                document.getElementById("trackerEffectPanningLD2").checked = c.effectparam & 0x02;
+                document.getElementById("trackerEffectPanningLW").checked = c.effectparam & 0x04;
+                document.getElementById("trackerEffectPanningLN").checked = c.effectparam & 0x08;
+                document.getElementById("trackerEffectPanningRD1").checked = c.effectparam & 0x10;
+                document.getElementById("trackerEffectPanningRD2").checked = c.effectparam & 0x20;
+                document.getElementById("trackerEffectPanningRW").checked = c.effectparam & 0x40;
+                document.getElementById("trackerEffectPanningRN").checked = c.effectparam & 0x80;
+                document.getElementById("trackerEffectDutyCycle").selectedIndex = c.effectparam >> 6;
             }
+            console.log(c.effectcode in [9]);
+            document.getElementById("trackerEffectNibbleLow").style.display = [0, 4, 5, 6, 10, 12].includes(c.effectcode) ? "" : "none";
+            document.getElementById("trackerEffectNibbleHigh").style.display = [0, 5, 10].includes(c.effectcode) ? "" : "none";
+            document.getElementById("trackerEffectByte").style.display = [1, 2, 3, 7, 11, 13, 14, 15].includes(c.effectcode) ? "" : "none";
+            document.getElementById("trackerEffectWaveform").style.display = [4].includes(c.effectcode) ? "" : "none";
+            document.getElementById("trackerEffectPanningTable").style.display = [8].includes(c.effectcode) ? "" : "none";
+            document.getElementById("trackerEffectDutyCycle").style.display = [9].includes(c.effectcode) ? "" : "none";
             this.updateEffectInfo();
         }
     }
