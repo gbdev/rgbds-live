@@ -37,7 +37,7 @@ function loadUGESong(data)
         var length_enabled = uint8data[offset];
         offset += 1;
         var initial_volume = uint8data[offset];
-        if (initial_volume > 15) initial_volume = 15; //???
+        if (initial_volume > 15) initial_volume = 15; //??? bug in the song files?
         offset += 1;
         var volume_direction = uint8data[offset];
         offset += 4;
@@ -73,6 +73,9 @@ function loadUGESong(data)
         // TODO: Unreleased V4 format has some kind of "noise macro" after this data, most likely 6 bytes or integers.
         
         if (type == 0) {
+            length = 64 - length;
+            if (length == 64) length = 0;
+
             var instr = new DutyInstrument(name);
             if (length_enabled)
                 instr.length = length;
@@ -87,6 +90,9 @@ function loadUGESong(data)
             duty_instrument_mapping[(n % 15) + 1] = song.duty_instruments.length;
             song.duty_instruments.push(instr);
         } else if (type == 1) {
+            length = 256 - length;
+            if (length == 256) length = 0;
+
             var instr = new WaveInstrument(name);
             if (length_enabled)
                 instr.length = length;
@@ -97,6 +103,9 @@ function loadUGESong(data)
             wave_instrument_mapping[(n % 15) + 1] = song.wave_instruments.length;
             song.wave_instruments.push(instr);
         } else if (type == 2) {
+            length = 64 - length;
+            if (length == 64) length = 0;
+
             var instr = new NoiseInstrument(name);
             if (length_enabled)
                 instr.length = length;

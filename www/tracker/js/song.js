@@ -26,7 +26,7 @@ class Song
         this.patterns.push(pattern);
         this.sequence = [0];
     
-        for(var [sweep_value, sweep_name] of [[0, ""], [1, " plink"]])
+        for(var [sweep_value, sweep_name] of [[0, ""], [-7, " plink"]])
         {
             for(var [duty_value, duty_name] of [[0, "12.5%"], [1, "25%"], [2, "50%"], [3, "75%"]])
             {
