@@ -7,33 +7,24 @@ function asmHex2(n)
 
 function exportSongAsAssembly(song)
 {
-    var data = "";
-    data += "SECTION \"Song Data\", ROM0\n";
-    data += "_song_descriptor::\n";
-    data += "db " + song.ticks_per_row + "\n";
-    data += "dw order_cnt\n";
-    data += "dw _order1, _order2, _order3, _order4\n";
-    data += "dw duty_instruments, wave_instruments, noise_instruments\n";
-    data += "dw routines\n";
-    data += "dw waves\n";
-    data += "order_cnt: db " + (song.sequence.length * 2) + "\n";
+    var data = `SECTION "Song Data", ROM0
+_song_descriptor::
+db ${song.ticks_per_row}
+dw order_cnt
+dw _order1, _order2, _order3, _order4
+dw duty_instruments, wave_instruments, noise_instruments
+dw routines
+dw waves
+order_cnt: db ${song.sequence.length * 2}
+`
+    for(var track=0; track<4; track++)
+        data += `_order${track+1}: dw ` + song.sequence.map((n) => `PAT_${track}_${n}`).join(", ") + "\n";
     for(var track=0; track<4; track++)
     {
-        data += "_order" + (track+1) + ":\n";
-        data += "dw ";
-        for(var n=0; n<song.sequence.length; n++)
+        for(var n=0; n<song.patterns.length; n++)
         {
-            if (n > 0) data += ", ";
-            data += "PAT_" + track + "_" + n;
-        }
-        data += "\n";
-    }
-    for(var track=0; track<4; track++)
-    {
-        for(var n=0; n<song.sequence.length; n++)
-        {
-            var pattern = song.patterns[song.sequence[n]];
-            data += "PAT_" + track + "_" + n + ":\n";
+            var pattern = song.patterns[n];
+            data += `PAT_${track}_${n}:\n`;
             for(var m=0; m<pattern.length; m++)
             {
                 var cell = pattern[m][track];

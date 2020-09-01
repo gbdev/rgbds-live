@@ -194,11 +194,43 @@ function loadUGESong(data)
             }
             pattern.push(row);
         }
-        song.sequence.push(song.patterns.length);
         song.patterns.push(pattern);
+        var added = false;
+        for(var idx=0; idx<song.patterns.length-1; idx++)
+        {
+            if (song.patternEqual(idx, song.patterns.length-1))
+            {
+                song.sequence.push(idx);
+                song.patterns.pop()
+                added = true;
+            }
+        }
+        if (!added)
+            song.sequence.push(song.patterns.length-1);
     }
     
     //TODO: Remove unused instruments, unused waves, and deduplicate patterns.
+    for(var idx=0; idx<song.duty_instruments.length; )
+    {
+        if (!song.usesInstrument("duty", idx))
+            song.removeInstrument("duty", idx);
+        else
+            idx += 1;
+    }
+    for(var idx=0; idx<song.wave_instruments.length; )
+    {
+        if (!song.usesInstrument("wave", idx))
+            song.removeInstrument("wave", idx);
+        else
+            idx += 1;
+    }
+    for(var idx=0; idx<song.noise_instruments.length; )
+    {
+        if (!song.usesInstrument("noise", idx))
+            song.removeInstrument("noise", idx);
+        else
+            idx += 1;
+    }
     
     return song;
 }
