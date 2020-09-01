@@ -56,15 +56,17 @@ function exportSongAsAssembly(song)
     for(var instr of song.duty_instruments)
     {
         var nr10 = (instr.frequency_sweep_time << 4) | (instr.frequency_sweep_shift < 0 ? 0x08 : 0x00) | Math.abs(instr.frequency_sweep_shift);
-        var nr11 = (instr.duty_cycle << 6) | (instr.length !== null ? instr.length : 0);
-        var nr12 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00) | Math.abs(instr.volume_sweep_change);
+        var nr11 = (instr.duty_cycle << 6) | ((instr.length !== null ? 64 - instr.length : 0) & 0x3f);
+        var nr12 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
+        if (instr.volume_sweep_change != 0)
+            nr12 |= 8 - Math.abs(instr.volume_sweep_change);
         var nr14 = 0x80 | (instr.length !== null ? 0x40 : 0);
         data += `db ${asmHex2(nr10)}, ${asmHex2(nr11)}, ${asmHex2(nr12)}, ${asmHex2(nr14)}\n`;
     }
     data += "wave_instruments:\n";
     for(var instr of song.wave_instruments)
     {
-        var nr31 = (instr.length !== null ? instr.length : 0);
+        var nr31 = (instr.length !== null ? instr.length : 0) & 0xff;
         var nr32 = (instr.volume << 5);
         var wave_nr = instr.wave_index;
         var nr34 = 0x80 | (instr.length !== null ? 0x40 : 0);
@@ -73,8 +75,10 @@ function exportSongAsAssembly(song)
     data += "noise_instruments:\n";
     for(var instr of song.noise_instruments)
     {
-        var nr41 = (instr.length !== null ? instr.length : 0);
-        var nr42 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00) | Math.abs(instr.volume_sweep_change);
+        var nr41 = (instr.length !== null ? 64 - instr.length : 0) & 0x3f;
+        var nr42 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
+        if (instr.volume_sweep_change != 0)
+            nr42 |= 8 - Math.abs(instr.volume_sweep_change);
         var nr43 = (instr.shift_clock_mask << 4) | ((instr.bit_count == 7) ? 0x08 : 0) | (instr.dividing_ratio);
         var nr44 = 0x80 | (instr.length !== null ? 0x40 : 0);
         data += `db ${asmHex2(nr41)}, ${asmHex2(nr42)}, ${asmHex2(nr43)}, ${asmHex2(nr44)}\n`;

@@ -7,7 +7,7 @@ function loadUGESong(data)
     //TODO: Sanity checks on data.
     var offset = 0;
     var version = new Uint32Array(data.slice(offset, offset + 4))[0];
-    
+    console.log("uge version: " + version);
     if (version < 0 || version > 3) return null;
     
     var uint8data = new Uint8Array(data);
@@ -37,12 +37,14 @@ function loadUGESong(data)
         var length_enabled = uint8data[offset];
         offset += 1;
         var initial_volume = uint8data[offset];
-        if (initial_volume > 15) initial_volume = 15; //???
+        if (initial_volume > 15) initial_volume = 15; //??? bug in the song files?
         offset += 1;
         var volume_direction = uint8data[offset];
         offset += 4;
         var volume_sweep_amount = uint8data[offset];
         offset += 1;
+        if (volume_sweep_amount != 0)
+            volume_sweep_amount = 8 - volume_sweep_amount
         if (volume_direction)
             volume_sweep_amount = -volume_sweep_amount;
 
@@ -68,8 +70,12 @@ function loadUGESong(data)
         offset += 4;
         var noise_dividing_ratio = new Uint32Array(data.slice(offset, offset + 4))[0];
         offset += 4;
+        // TODO: Unreleased V4 format has some kind of "noise macro" after this data, most likely 6 bytes or integers.
         
         if (type == 0) {
+            length = 64 - length;
+            if (length == 64) length = 0;
+
             var instr = new DutyInstrument(name);
             if (length_enabled)
                 instr.length = length;
@@ -84,6 +90,9 @@ function loadUGESong(data)
             duty_instrument_mapping[(n % 15) + 1] = song.duty_instruments.length;
             song.duty_instruments.push(instr);
         } else if (type == 1) {
+            length = 256 - length;
+            if (length == 256) length = 0;
+
             var instr = new WaveInstrument(name);
             if (length_enabled)
                 instr.length = length;
@@ -94,6 +103,9 @@ function loadUGESong(data)
             wave_instrument_mapping[(n % 15) + 1] = song.wave_instruments.length;
             song.wave_instruments.push(instr);
         } else if (type == 2) {
+            length = 64 - length;
+            if (length == 64) length = 0;
+
             var instr = new NoiseInstrument(name);
             if (length_enabled)
                 instr.length = length;
@@ -115,7 +127,7 @@ function loadUGESong(data)
     {
         song.waves.push(Uint8Array.from(uint8data.slice(offset, offset+32)));
         offset += 32;
-        if (version < 2)
+        if (version < 3)
             offset += 1; // older versions have an off-by-one error
     }
 
@@ -123,6 +135,7 @@ function loadUGESong(data)
     offset += 4;
 
     var pattern_count = new Uint32Array(data.slice(offset, offset + 4))[0];
+    if (offset + pattern_count * 13 * 64 > data.length) return null;
     offset += 4;
     var patterns = []
     for(var n=0; n<pattern_count; n++)

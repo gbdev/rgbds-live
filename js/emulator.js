@@ -181,6 +181,10 @@ this.emulator = new Object();
         if (!emulator.isAvailable()) return 0xFF;
         return Module._emulator_read_mem(e, addr);
     }
+    emulator.writeMem = function(addr, data) {
+        if (!emulator.isAvailable()) return;
+        return Module._emulator_write_mem(e, addr, data);
+    }
 
     emulator.setBreakpoint = function(pc) {
         if (!emulator.isAvailable()) return;

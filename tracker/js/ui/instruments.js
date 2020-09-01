@@ -6,7 +6,69 @@ class InstrumentUI
     {
         this.updateInstrumentList();
         
-        document.getElementById("instrumentSelector").onchange = (e) => { this.showSelectedInstrument() };
+        document.getElementById("instrumentSelector").onchange = (e) => { this.showSelectedInstrument(); };
+
+        document.getElementById("instrumentName").oninput = (e) => {
+            this.getSelectedInstrument().name = e.target.value;
+            var tmp = document.getElementById("instrumentSelector").selectedIndex;
+            this.updateInstrumentList();
+            document.getElementById("instrumentSelector").selectedIndex = tmp;
+            this.showSelectedInstrument();
+        };
+        document.getElementById("instrumentLengthEnabled").onchange = (e) => {
+            if (e.target.checked) {
+                this.getSelectedInstrument().length = 32;
+                document.getElementById("instrumentLength").value = this.getSelectedInstrument().length;
+            } else {
+                this.getSelectedInstrument().length = null;
+                document.getElementById("instrumentLength").value = 0;
+            }
+            this.updateDrawings();
+        };
+        document.getElementById("instrumentLength").oninput = (e) => {
+            this.getSelectedInstrument().length = e.target.value;
+            document.getElementById("instrumentLengthEnabled").checked = true;
+            this.updateDrawings();
+        };
+
+        document.getElementById("instrumentInitialVolume").oninput = (e) => {
+            this.getSelectedInstrument().initial_volume = e.target.value;
+            this.updateDrawings();
+        };
+        document.getElementById("instrumentVolumeChange").oninput = (e) => {
+            this.getSelectedInstrument().volume_sweep_change = e.target.value;
+            this.updateDrawings();
+        };
+
+        document.getElementById("instrumentSweepTime").onchange = (e) => {
+            this.getSelectedInstrument().frequency_sweep_time = e.target.selectedIndex;
+            this.updateDrawings();
+        };
+        document.getElementById("instrumentSweepChange").oninput = (e) => {
+            this.getSelectedInstrument().frequency_sweep_shift = e.target.value;
+            this.updateDrawings();
+        };
+
+        document.getElementById("instrumentDuty").onchange = (e) => {
+            this.getSelectedInstrument().duty_cycle = e.target.selectedIndex;
+        };
+
+        document.getElementById("instrumentWaveVolume").onchange = (e) => {
+            this.getSelectedInstrument().volume = e.target.selectedIndex;
+        };
+        document.getElementById("instrumentWaveIndex").onchange = (e) => {
+            this.getSelectedInstrument().wave_index = e.target.selectedIndex;
+        };
+
+        document.getElementById("instrumentNoiseShiftClockMask").oninput = (e) => {
+            this.getSelectedInstrument().shift_clock_mask = e.target.value;
+        };
+        document.getElementById("instrumentNoiseDividingRatio").oninput = (e) => {
+            this.getSelectedInstrument().dividing_ratio = e.target.value;
+        };
+        document.getElementById("instrumentNoise7bit").onchange = (e) => {
+            this.getSelectedInstrument().bit_count = e.target.checked ? 7 : 15;
+        };
     }
 
     updateInstrumentList()
@@ -37,6 +99,21 @@ class InstrumentUI
             node.innerText = `${idx+1}: ${i.name}`;
             node.value = idx;
             select.children[2].appendChild(node);
+        }
+
+        var select = document.getElementById("instrumentWaveIndex");
+        while(select.options.length > 0)
+            select.options.remove(0);
+        for(var idx=0; idx<song.waves.length; idx++)
+        {
+            var node = document.createElement("option");
+            var name = `${idx+1}`
+            for(var i=0; i<song.wave_instruments.length; i++)
+                if (song.wave_instruments[i].wave_index == idx)
+                    name += ` ${song.wave_instruments[i].name}`
+            node.innerText = name;
+            node.value = idx;
+            select.options.add(node);
         }
         
         this.showSelectedInstrument();
@@ -96,6 +173,73 @@ class InstrumentUI
             document.getElementById("instrumentNoiseDividingRatio").value = i.dividing_ratio;
             document.getElementById("instrumentNoise7bit").checked = i.bit_count == 7;
         }
+        this.updateDrawings();
+    }
+    
+    updateDrawings()
+    {
+        var i = this.getSelectedInstrument();
+        
+        if (i instanceof DutyInstrument || i instanceof NoiseInstrument)
+        {
+            var points = [];
+            var value = i.initial_volume / 15.0;
+            var change = (i.volume_sweep_change == 0) ? 0 : (Math.sign(i.volume_sweep_change) / (8 - Math.abs(i.volume_sweep_change))) / 32;
+            for(var n=0; n<128; n++)
+            {
+                points.push(value);
+                value += change;
+                if (i.length !== null && n > i.length)
+                    value = 0;
+            }
+            this.renderCanvas("instrumentVolumeCanvas", points)
+        }
+
+        if (i instanceof DutyInstrument)
+        {
+            var points = [];
+            var value = 1024;
+            for(var n=0; n<128; n++)
+            {
+                var diff = value >> Math.abs(i.frequency_sweep_shift);
+                if (i.frequency_sweep_time > 0)
+                {
+                    if (i.frequency_sweep_shift < 0)
+                        value -= diff / i.frequency_sweep_time;
+                    else
+                        value += diff / i.frequency_sweep_time;
+                }
+                points.push(value / 2048);
+            }
+            this.renderCanvas("instrumentSweepCanvas", points)
+        }
+
+        if (i instanceof WaveInstrument)
+        {
+            var points = [];
+            for(var value of song.waves[i.wave_index])
+                points.push(value / 15);
+            this.renderCanvas("instrumentWaveCanvas", points)
+        }
+    }
+    
+    renderCanvas(id, points)
+    {
+        var canvas = document.getElementById(id);
+        var w = canvas.width;
+        var h = canvas.height - 6;
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, w, h + 6);
+        
+        ctx.beginPath();
+        ctx.strokeStyle = "#3030ee";
+        ctx.lineWidth = 3
+        ctx.moveTo(0, 3 + h - Math.max(0.0, Math.min(1.0, points[0])) * h);
+        for(var idx=1; idx<points.length; idx++)
+        {
+            ctx.lineTo(w*idx/(points.length-1), 3 + h - Math.max(0.0, Math.min(1.0, points[idx])) * h);
+        }
+        ctx.stroke();
     }
     
     getSelectedInstrument()
