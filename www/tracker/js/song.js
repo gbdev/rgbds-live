@@ -56,6 +56,43 @@ class Song
         this.waves.push([0xf,0xe,0xd,0xd,0xc,0xc,0xb,0xb,0xa,0xa,0x9,0x9,0x8,0x8,0x7,0x7,0x8,0xa,0xb,0xd,0xf,0x1,0x2,0x4,0x5,0x7,0x8,0xa,0xb,0xd,0xe,0xe]);
         this.waves.push([0x8,0x4,0x1,0x1,0x6,0x1,0xe,0xd,0x5,0x7,0x4,0x7,0x5,0xa,0xa,0xd,0xc,0xe,0xa,0x3,0x1,0x7,0x7,0x9,0xd,0xd,0x2,0x0,0x0,0x3,0x4,0x7]);
     }
+    
+    usesInstrument(type, index)
+    {
+        var list = null;
+        var cols = []
+        if (type == "duty") { list = this.duty_instruments; cols = [0, 1]; }
+        if (type == "wave") { list = this.wave_instruments; cols = [2]; }
+        if (type == "noise") { list = this.noise_instruments; cols = [3]; }
+
+        for(var pattern of this.patterns) {
+            for(var row of pattern) {
+                for(var col of cols) {
+                    if (row[col].instrument == index) return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    removeInstrument(type, index)
+    {
+        var list = null;
+        var cols = []
+        if (type == "duty") { list = this.duty_instruments; cols = [0, 1]; }
+        if (type == "wave") { list = this.wave_instruments; cols = [2]; }
+        if (type == "noise") { list = this.noise_instruments; cols = [3]; }
+
+        for(var pattern of this.patterns) {
+            for(var row of pattern) {
+                for(var col of cols) {
+                    if (row[col].instrument == index) row[col].instrument = null;
+                    if (row[col].instrument > index) row[col].instrument -= 1;
+                }
+            }
+        }
+        list.splice(index, 1);
+    }
 }
 class DutyInstrument
 {

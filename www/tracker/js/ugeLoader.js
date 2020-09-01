@@ -199,6 +199,27 @@ function loadUGESong(data)
     }
     
     //TODO: Remove unused instruments, unused waves, and deduplicate patterns.
+    for(var idx=0; idx<song.duty_instruments.length; )
+    {
+        if (!song.usesInstrument("duty", idx))
+            song.removeInstrument("duty", idx);
+        else
+            idx += 1;
+    }
+    for(var idx=0; idx<song.wave_instruments.length; )
+    {
+        if (!song.usesInstrument("wave", idx))
+            song.removeInstrument("wave", idx);
+        else
+            idx += 1;
+    }
+    for(var idx=0; idx<song.noise_instruments.length; )
+    {
+        if (!song.usesInstrument("noise", idx))
+            song.removeInstrument("noise", idx);
+        else
+            idx += 1;
+    }
     
     return song;
 }
