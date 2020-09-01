@@ -96,6 +96,45 @@ class InstrumentUI
             document.getElementById("instrumentNoiseDividingRatio").value = i.dividing_ratio;
             document.getElementById("instrumentNoise7bit").checked = i.bit_count == 7;
         }
+        this.updateDrawings()
+    }
+    
+    updateDrawings()
+    {
+        var i = this.getSelectedInstrument();
+        
+        if (i instanceof DutyInstrument || i instanceof NoiseInstrument)
+        {
+            var points = [];
+            var value = i.initial_volume / 15.0;
+            for(var n=0; n<64; n++)
+            {
+                points.push(value);
+                value += i.volume_sweep_change / 15.0;
+                if (i.length !== null && n > i.length)
+                    value = 0;
+            }
+            this.renderCanvas("instrumentVolumeCanvas", points)
+        }
+    }
+    
+    renderCanvas(id, points)
+    {
+        var canvas = document.getElementById(id);
+        var w = canvas.width;
+        var h = canvas.height;
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, w, h);
+        
+        ctx.beginPath();
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 3
+        ctx.moveTo(0, h - Math.max(0.0, Math.min(1.0, points[0])) * h);
+        for(var idx=1; idx<points.length; idx++)
+        {
+            ctx.lineTo(w*idx/(points.length-1), h - Math.max(0.0, Math.min(1.0, points[idx])) * h);
+        }
+        ctx.stroke();
     }
     
     getSelectedInstrument()

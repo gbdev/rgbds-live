@@ -7,7 +7,7 @@ function loadUGESong(data)
     //TODO: Sanity checks on data.
     var offset = 0;
     var version = new Uint32Array(data.slice(offset, offset + 4))[0];
-    
+    console.log("uge version: " + version);
     if (version < 0 || version > 3) return null;
     
     var uint8data = new Uint8Array(data);
@@ -43,6 +43,8 @@ function loadUGESong(data)
         offset += 4;
         var volume_sweep_amount = uint8data[offset];
         offset += 1;
+        if (volume_sweep_amount != 0)
+            volume_sweep_amount = 8 - volume_sweep_amount
         if (volume_direction)
             volume_sweep_amount = -volume_sweep_amount;
 
@@ -68,6 +70,7 @@ function loadUGESong(data)
         offset += 4;
         var noise_dividing_ratio = new Uint32Array(data.slice(offset, offset + 4))[0];
         offset += 4;
+        // TODO: Unreleased V4 format has some kind of "noise macro" after this data, most likely 6 bytes or integers.
         
         if (type == 0) {
             var instr = new DutyInstrument(name);
@@ -115,7 +118,7 @@ function loadUGESong(data)
     {
         song.waves.push(Uint8Array.from(uint8data.slice(offset, offset+32)));
         offset += 32;
-        if (version < 2)
+        if (version < 3)
             offset += 1; // older versions have an off-by-one error
     }
 
@@ -123,6 +126,7 @@ function loadUGESong(data)
     offset += 4;
 
     var pattern_count = new Uint32Array(data.slice(offset, offset + 4))[0];
+    if (offset + pattern_count * 13 * 64 > data.length) return null;
     offset += 4;
     var patterns = []
     for(var n=0; n<pattern_count; n++)
