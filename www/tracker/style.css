@@ -76,8 +76,8 @@ body {
 .tracker tr:nth-child(16n+2) td {
     background-color: #60a0e0;
 }
-.tracker tr.active td {
-    background-color: #4090d0;
+.tracker .active {
+    background-color: #608080;
 }
 
 

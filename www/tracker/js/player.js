@@ -34,10 +34,10 @@ class Player {
                 emulator.step("run");
 
                 var current_pattern = emulator.readMem(current_order_addr) / 2;
-                showPattern(current_pattern);
+                ui.tracker.loadPattern(current_pattern);
 
                 var row = emulator.readMem(row_addr);
-                tracker.children[row+1].focus();
+                ui.tracker.setSelectedRow(row);
             }, 10);
         });
     }
