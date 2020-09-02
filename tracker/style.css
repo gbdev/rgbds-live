@@ -41,6 +41,7 @@ body {
 .sequence tr td {
     background-color: #80c0ff;
     border-style: none;
+    width: 50%;
 }
 .sequence tr:nth-child(2n+2) td {
     background-color: #70b0f0;

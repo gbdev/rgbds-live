@@ -167,6 +167,10 @@ class TrackerUI
                 if (e.code == "Digit0") this.setInstrument(9);
                 if (this.selected_type == "instrument" && e.code == "Delete") this.setInstrument(null);
             }
+            if (this.selected_type == "effect")
+            {
+                if (e.code == "Delete") this.setEffectType(null);
+            }
 
             console.log(e.code);
         }
@@ -290,7 +294,7 @@ class TrackerUI
             document.getElementById("trackerEffectDutyCycle").style.display = [9].includes(c.effectcode) ? "" : "none";
             this.updateEffectInfo();
 
-            if (cell.getBoundingClientRect().y < document.getElementById("tracker").getBoundingClientRect().height * 0.5 - document.getElementById("tracker").parentElement.scrollTop)
+            if (cell.getBoundingClientRect().y < effectpopup.getBoundingClientRect().height + 16 - document.getElementById("tracker").parentElement.scrollTop)
             {
                 effectpopup.style.top = cell.getBoundingClientRect().y + cell.getBoundingClientRect().height + 5 + document.getElementById("tracker").parentElement.scrollTop;
             } else {
@@ -341,6 +345,11 @@ class TrackerUI
             return tracker.children[row+1].children[col].children[1];
         if (type == "effect")
             return tracker.children[row+1].children[col].children[2];
+    }
+    
+    getPatternIndex()
+    {
+        return this.pattern_index;
     }
     
     loadPattern(index)

@@ -43,6 +43,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
     document.getElementById("stopButton").onclick = (event) => {
         player.stop();
     };
+    document.getElementById("downloadHttButton").onclick = (event) => {
+        new AssemblyExporter().downloadHttZip();
+    };
     
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         document.body.addEventListener(eventName, (e) => {
@@ -177,6 +180,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     <div class="controls">
         <button id="playButton">PLAY</button>
         <button id="stopButton">STOP</button>
+        <button id="downloadHttButton">Download .htt files</button>
     </div>
 </div>
 </body>

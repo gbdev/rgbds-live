@@ -12,7 +12,7 @@ class SequenceUI
             var idx = e.target.parentElement.index;
             if (typeof(idx) == "undefined") return;
 
-            this.setCurrentPatternIndex(idx);
+            this.setCurrentSequenceIndex(idx);
             ui.tracker.loadPattern(song.sequence[idx]);
             ui.tracker.setSelectedRow(0);
         }
@@ -32,6 +32,16 @@ class SequenceUI
             row_node.appendChild(cell_node);
             cell_node = document.createElement("td");
             cell_node.innerText = song.sequence[idx];
+            cell_node.contentEditable = true;
+            cell_node.oninput = (e) => {
+                var new_text = e.target.innerText.replace(/[^\d]/, '');
+                if (e.target.innerText != new_text) e.target.innerText = new_text;
+                var value = parseInt(new_text) || 0;
+                song.sequence[e.target.parentElement.index] = value;
+                this.updatePatternHighlight();
+                ui.tracker.loadPattern(value);
+                ui.tracker.setSelectedRow(0);
+            }
             row_node.appendChild(cell_node);
             sequence.appendChild(row_node);
         }
@@ -39,7 +49,7 @@ class SequenceUI
         this.updatePatternHighlight();
     }
     
-    setCurrentPatternIndex(index)
+    setCurrentSequenceIndex(index)
     {
         this.current_index = index;
         this.updatePatternHighlight();
