@@ -347,6 +347,11 @@ class TrackerUI
             return tracker.children[row+1].children[col].children[2];
     }
     
+    getPatternIndex()
+    {
+        return this.pattern_index;
+    }
+    
     loadPattern(index)
     {
         this.pattern_index = index;

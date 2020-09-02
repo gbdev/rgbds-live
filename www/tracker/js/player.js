@@ -33,9 +33,10 @@ class Player {
             this.interval_handle = setInterval(() => {
                 emulator.step("run");
 
-                var current_pattern = emulator.readMem(current_order_addr) / 2;
-                ui.tracker.loadPattern(song.sequence[current_pattern]);
-                ui.sequence.setCurrentPatternIndex(current_pattern);
+                var current_sequence = emulator.readMem(current_order_addr) / 2;
+                if (ui.tracker.getPatternIndex() != song.sequence[current_sequence])
+                    ui.tracker.loadPattern(song.sequence[current_sequence]);
+                ui.sequence.setCurrentSequenceIndex(current_sequence);
 
                 var row = emulator.readMem(row_addr);
                 ui.tracker.setSelectedRow(row);
