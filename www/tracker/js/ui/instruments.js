@@ -1,5 +1,6 @@
 "use strict";
 
+
 class InstrumentUI
 {
     constructor()
@@ -58,6 +59,16 @@ class InstrumentUI
         };
         document.getElementById("instrumentWaveIndex").onchange = (e) => {
             this.getSelectedInstrument().wave_index = e.target.selectedIndex;
+            this.updateDrawings();
+        };
+        document.getElementById("instrumentWaveCanvas").onmousemove = (e) => {
+            if (e.buttons == 0) return;
+            var x = e.offsetX / e.target.width;
+            var y = 1.0 - (e.offsetY / e.target.height);
+            var value = Math.round(y * 15);
+            var index = Math.round(x * 32);
+            song.waves[this.getSelectedInstrument().wave_index][index] = value;
+            this.updateDrawings();
         };
 
         document.getElementById("instrumentNoiseShiftClockMask").oninput = (e) => {
@@ -219,17 +230,30 @@ class InstrumentUI
             var points = [];
             for(var value of song.waves[i.wave_index])
                 points.push(value / 15);
-            this.renderCanvas("instrumentWaveCanvas", points)
+            this.renderCanvas("instrumentWaveCanvas", points, [32, 15])
         }
     }
     
-    renderCanvas(id, points)
+    renderCanvas(id, points, grid_size)
     {
         var canvas = document.getElementById(id);
         var w = canvas.width;
         var h = canvas.height - 6;
         var ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, w, h + 6);
+
+        if (grid_size)
+        {
+            ctx.beginPath();
+            ctx.strokeStyle = "#eeeeee";
+            ctx.lineWidth = 1;
+            for(var x=0; x<grid_size[0]; x++)
+            {
+                ctx.moveTo(w/grid_size[0]*x, 0);
+                ctx.lineTo(w/grid_size[0]*x, h + 6);
+            }
+            ctx.stroke();
+        }
         
         ctx.beginPath();
         ctx.strokeStyle = "#3030ee";
