@@ -64,16 +64,14 @@ order_cnt: db ${song.sequence.length * 2}
         
         zip.file("constants.htt", `TICKS equ ${song.ticks_per_row}`);
         
-        var data = "";
+        var data = `order_cnt: db ${song.sequence.length * 2}\n`;
         for(var track=0; track<4; track++)
             data += `_order${track+1}: ${this.getSequenceMappingFor(track)}\n`;
         zip.file("order.htt", data);
         
         data = "";
         for(var idx=0; idx<this.patterns.length; idx++)
-        {
-            data += `song_pattern_${idx}:\n` + this.patterns[idx].map((cell) => this.formatPatternCell(cell)).join("\n");
-        }
+            data += `song_pattern_${idx}:\n` + this.patterns[idx].map((cell) => this.formatPatternCell(cell)).join("\n") + "\n";
         zip.file("pattern.htt", data);
 
         zip.file("duty_instrument.htt", song.duty_instruments.map((instr) => this.formatInstrument(instr)).join("\n"));
