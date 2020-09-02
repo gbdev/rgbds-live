@@ -26,14 +26,14 @@ class AssemblyExporter
 _song_descriptor::
 db ${song.ticks_per_row}
 dw order_cnt
-dw _order1, _order2, _order3, _order4
+dw order1, order2, order3, order4
 dw duty_instruments, wave_instruments, noise_instruments
 dw routines
 dw waves
 order_cnt: db ${song.sequence.length * 2}
 `
         for(var track=0; track<4; track++)
-            data += `_order${track+1}: ${this.getSequenceMappingFor(track)}\n`;
+            data += `order${track+1}: ${this.getSequenceMappingFor(track)}\n`;
         for(var idx=0; idx<this.patterns.length; idx++)
         {
             data += `song_pattern_${idx}:\n`
@@ -66,7 +66,7 @@ order_cnt: db ${song.sequence.length * 2}
         
         var data = `order_cnt: db ${song.sequence.length * 2}\n`;
         for(var track=0; track<4; track++)
-            data += `_order${track+1}: ${this.getSequenceMappingFor(track)}\n`;
+            data += `order${track+1}: ${this.getSequenceMappingFor(track)}\n`;
         zip.file("order.htt", data);
         
         data = "";
