@@ -213,11 +213,13 @@ class TrackerUI
     {
         song.patterns[this.pattern_index][this.selected_row][this.selected_col].note = value;
         this.getCell(this.selected_row, this.selected_col, "note").innerText = noteToText(value);
+        player.updateRom();
     }
     setInstrument(value)
     {
         song.patterns[this.pattern_index][this.selected_row][this.selected_col].instrument = value;
         this.getCell(this.selected_row, this.selected_col, "instrument").innerText = instrumentNumberToText(value);
+        player.updateRom();
     }
     setEffectType(value)
     {
@@ -229,6 +231,7 @@ class TrackerUI
             c.effectparam = 0;
         this.getCell(this.selected_row, this.selected_col, "effect").innerText = effectToText(c.effectcode, c.effectparam);
         this.setSelection(this.selected_row, this.selected_col, "effect");
+        player.updateRom();
     }
     setEffectParam(value, mask)
     {
@@ -236,6 +239,7 @@ class TrackerUI
         c.effectparam = (c.effectparam & ~mask) | (value & mask);
         this.getCell(this.selected_row, this.selected_col, "effect").innerText = effectToText(c.effectcode, c.effectparam);
         this.updateEffectInfo();
+        player.updateRom();
     }
     
     setSelection(row, col, type)

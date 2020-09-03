@@ -25,41 +25,50 @@ class InstrumentUI
                 document.getElementById("instrumentLength").value = 0;
             }
             this.updateDrawings();
+            player.updateRom();
         };
         document.getElementById("instrumentLength").oninput = (e) => {
             this.getSelectedInstrument().length = e.target.value;
             document.getElementById("instrumentLengthEnabled").checked = true;
             this.updateDrawings();
+            player.updateRom();
         };
 
         document.getElementById("instrumentInitialVolume").oninput = (e) => {
             this.getSelectedInstrument().initial_volume = e.target.value;
             this.updateDrawings();
+            player.updateRom();
         };
         document.getElementById("instrumentVolumeChange").oninput = (e) => {
             this.getSelectedInstrument().volume_sweep_change = e.target.value;
             this.updateDrawings();
+            player.updateRom();
         };
 
         document.getElementById("instrumentSweepTime").onchange = (e) => {
             this.getSelectedInstrument().frequency_sweep_time = e.target.selectedIndex;
             this.updateDrawings();
+            player.updateRom();
         };
         document.getElementById("instrumentSweepChange").oninput = (e) => {
             this.getSelectedInstrument().frequency_sweep_shift = e.target.value;
             this.updateDrawings();
+            player.updateRom();
         };
 
         document.getElementById("instrumentDuty").onchange = (e) => {
             this.getSelectedInstrument().duty_cycle = e.target.selectedIndex;
+            player.updateRom();
         };
 
         document.getElementById("instrumentWaveVolume").onchange = (e) => {
             this.getSelectedInstrument().volume = e.target.selectedIndex;
+            player.updateRom();
         };
         document.getElementById("instrumentWaveIndex").onchange = (e) => {
             this.getSelectedInstrument().wave_index = e.target.selectedIndex;
             this.updateDrawings();
+            player.updateRom();
         };
         document.getElementById("instrumentWaveCanvas").onmousemove = (e) => {
             if (e.buttons == 0) return;
@@ -69,16 +78,20 @@ class InstrumentUI
             var index = Math.round(x * 32);
             song.waves[this.getSelectedInstrument().wave_index][index] = value;
             this.updateDrawings();
+            player.updateRom();
         };
 
         document.getElementById("instrumentNoiseShiftClockMask").oninput = (e) => {
             this.getSelectedInstrument().shift_clock_mask = e.target.value;
+            player.updateRom();
         };
         document.getElementById("instrumentNoiseDividingRatio").oninput = (e) => {
             this.getSelectedInstrument().dividing_ratio = e.target.value;
+            player.updateRom();
         };
         document.getElementById("instrumentNoise7bit").onchange = (e) => {
             this.getSelectedInstrument().bit_count = e.target.checked ? 7 : 15;
+            player.updateRom();
         };
     }
 
