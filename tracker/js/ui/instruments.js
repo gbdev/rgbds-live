@@ -1,5 +1,6 @@
 "use strict";
 
+
 class InstrumentUI
 {
     constructor()
@@ -24,50 +25,73 @@ class InstrumentUI
                 document.getElementById("instrumentLength").value = 0;
             }
             this.updateDrawings();
+            player.updateRom();
         };
         document.getElementById("instrumentLength").oninput = (e) => {
             this.getSelectedInstrument().length = e.target.value;
             document.getElementById("instrumentLengthEnabled").checked = true;
             this.updateDrawings();
+            player.updateRom();
         };
 
         document.getElementById("instrumentInitialVolume").oninput = (e) => {
             this.getSelectedInstrument().initial_volume = e.target.value;
             this.updateDrawings();
+            player.updateRom();
         };
         document.getElementById("instrumentVolumeChange").oninput = (e) => {
             this.getSelectedInstrument().volume_sweep_change = e.target.value;
             this.updateDrawings();
+            player.updateRom();
         };
 
         document.getElementById("instrumentSweepTime").onchange = (e) => {
             this.getSelectedInstrument().frequency_sweep_time = e.target.selectedIndex;
             this.updateDrawings();
+            player.updateRom();
         };
         document.getElementById("instrumentSweepChange").oninput = (e) => {
             this.getSelectedInstrument().frequency_sweep_shift = e.target.value;
             this.updateDrawings();
+            player.updateRom();
         };
 
         document.getElementById("instrumentDuty").onchange = (e) => {
             this.getSelectedInstrument().duty_cycle = e.target.selectedIndex;
+            player.updateRom();
         };
 
         document.getElementById("instrumentWaveVolume").onchange = (e) => {
             this.getSelectedInstrument().volume = e.target.selectedIndex;
+            player.updateRom();
         };
         document.getElementById("instrumentWaveIndex").onchange = (e) => {
             this.getSelectedInstrument().wave_index = e.target.selectedIndex;
+            this.updateDrawings();
+            player.updateRom();
+        };
+        document.getElementById("instrumentWaveCanvas").onmousemove = (e) => {
+            if (e.buttons == 0) return;
+            var x = e.offsetX / e.target.width;
+            var y = 1.0 - (e.offsetY / e.target.height);
+            var value = Math.round(y * 15);
+            var index = Math.round(x * 32);
+            song.waves[this.getSelectedInstrument().wave_index][index] = value;
+            this.updateDrawings();
+            player.updateRom();
         };
 
         document.getElementById("instrumentNoiseShiftClockMask").oninput = (e) => {
             this.getSelectedInstrument().shift_clock_mask = e.target.value;
+            player.updateRom();
         };
         document.getElementById("instrumentNoiseDividingRatio").oninput = (e) => {
             this.getSelectedInstrument().dividing_ratio = e.target.value;
+            player.updateRom();
         };
         document.getElementById("instrumentNoise7bit").onchange = (e) => {
             this.getSelectedInstrument().bit_count = e.target.checked ? 7 : 15;
+            player.updateRom();
         };
     }
 
@@ -219,17 +243,30 @@ class InstrumentUI
             var points = [];
             for(var value of song.waves[i.wave_index])
                 points.push(value / 15);
-            this.renderCanvas("instrumentWaveCanvas", points)
+            this.renderCanvas("instrumentWaveCanvas", points, [32, 15])
         }
     }
     
-    renderCanvas(id, points)
+    renderCanvas(id, points, grid_size)
     {
         var canvas = document.getElementById(id);
         var w = canvas.width;
         var h = canvas.height - 6;
         var ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, w, h + 6);
+
+        if (grid_size)
+        {
+            ctx.beginPath();
+            ctx.strokeStyle = "#eeeeee";
+            ctx.lineWidth = 1;
+            for(var x=0; x<grid_size[0]; x++)
+            {
+                ctx.moveTo(w/grid_size[0]*x, 0);
+                ctx.lineTo(w/grid_size[0]*x, h + 6);
+            }
+            ctx.stroke();
+        }
         
         ctx.beginPath();
         ctx.strokeStyle = "#3030ee";

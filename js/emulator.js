@@ -56,7 +56,7 @@ this.emulator = new Object();
             return false;
         for(var n=0; n<rom_size; n++)
             Module.HEAP8[rom_ptr + n] = 0
-        for(var n=0; n<rom.length; n++)
+        for(var n=0; n<rom_data.length; n++)
             Module.HEAP8[rom_ptr + n] = rom_data[n];
         return true;
     }

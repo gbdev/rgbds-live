@@ -1,12 +1,14 @@
 "use strict";
 
 class Player {
+    interval_handle = null;
+    rom_file = null;
+
     constructor()
     {
-        this.interval_handle = null;
-    
         compiler.setLogCallback(console.log);
         compiler.setLinkOptions(['-t', '-w']);
+
         function getFile(url, name)
         {
             var req = new XMLHttpRequest();
@@ -18,29 +20,32 @@ class Player {
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/driver_lite.z80", "driver_lite.asm");
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/constants.inc", "constants.inc");
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/music.inc", "music.inc");
+        storage.update("song.asm", "SECTION \"song\", ROM0[$1000]\n_song_descriptor:: ds $8000 - @")
+        
+        compiler.compile((rom_file, start_address, addr_to_line) => {
+            this.rom_file = rom_file;
+        });
     }
     
     play() {
         this.stop();
+        this.updateRom();
 
-        storage.update("song.asm", exportSongAsAssembly(song));
+        var current_order_addr = compiler.getRamSymbols().findIndex((v) => {return v == "current_order"});
+        var row_addr = compiler.getRamSymbols().findIndex((v) => {return v == "row"});
 
-        compiler.compile((rom_file, start_address, addr_to_line) => {
-            var current_order_addr = compiler.getRamSymbols().findIndex((v) => {return v == "current_order"});
-            var row_addr = compiler.getRamSymbols().findIndex((v) => {return v == "row"});
+        emulator.init(null, this.rom_file);
+        this.interval_handle = setInterval(() => {
+            emulator.step("run");
 
-            emulator.init(null, rom_file);
-            this.interval_handle = setInterval(() => {
-                emulator.step("run");
+            var current_sequence = emulator.readMem(current_order_addr) / 2;
+            if (ui.tracker.getPatternIndex() != song.sequence[current_sequence])
+                ui.tracker.loadPattern(song.sequence[current_sequence]);
+            ui.sequence.setCurrentSequenceIndex(current_sequence);
 
-                var current_pattern = emulator.readMem(current_order_addr) / 2;
-                ui.tracker.loadPattern(song.sequence[current_pattern]);
-                ui.sequence.setCurrentPatternIndex(current_pattern);
-
-                var row = emulator.readMem(row_addr);
-                ui.tracker.setSelectedRow(row);
-            }, 10);
-        });
+            var row = emulator.readMem(row_addr);
+            ui.tracker.setSelectedRow(row);
+        }, 10);
     }
     
     stop()
@@ -49,5 +54,114 @@ class Player {
             return;
         clearInterval(this.interval_handle);
         this.interval_handle = null;
+    }
+    
+    updateRom()
+    {
+        var addr = compiler.getRomSymbols().indexOf("_song_descriptor");
+        var buf = new Uint8Array(this.rom_file.buffer);
+        
+        buf[addr] = song.ticks_per_row;
+        var header_idx = addr + 1;
+        addr += 21;
+
+        buf[addr] = song.sequence.length * 2;
+        function addAddr(size) {
+            buf[header_idx+0] = addr & 0xFF;
+            buf[header_idx+1] = addr >> 8;
+            header_idx += 2;
+            addr += size;
+        }
+        addAddr(1);
+
+        var orders_addr = []
+        for(var n=0; n<4; n++)
+        {
+            orders_addr.push(addr);
+            addAddr(64*2);
+        }
+        for(var n=0; n<song.duty_instruments.length; n++)
+        {
+            var instr = song.duty_instruments[n];
+
+            var nr10 = (instr.frequency_sweep_time << 4) | (instr.frequency_sweep_shift < 0 ? 0x08 : 0x00) | Math.abs(instr.frequency_sweep_shift);
+            var nr11 = (instr.duty_cycle << 6) | ((instr.length !== null ? 64 - instr.length : 0) & 0x3f);
+            var nr12 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
+            if (instr.volume_sweep_change != 0)
+                nr12 |= 8 - Math.abs(instr.volume_sweep_change);
+            var nr14 = 0x80 | (instr.length !== null ? 0x40 : 0);
+
+            buf[addr + n * 4 + 0] = nr10;
+            buf[addr + n * 4 + 1] = nr11;
+            buf[addr + n * 4 + 2] = nr12;
+            buf[addr + n * 4 + 3] = nr14;
+        }
+        addAddr(16 * 4);
+        for(var n=0; n<song.wave_instruments.length; n++)
+        {
+            var instr = song.wave_instruments[n];
+
+            var nr31 = (instr.length !== null ? instr.length : 0) & 0xff;
+            var nr32 = (instr.volume << 5);
+            var wave_nr = instr.wave_index;
+            var nr34 = 0x80 | (instr.length !== null ? 0x40 : 0);
+
+            buf[addr + n * 4 + 0] = nr31;
+            buf[addr + n * 4 + 1] = nr32;
+            buf[addr + n * 4 + 2] = wave_nr;
+            buf[addr + n * 4 + 3] = nr34;
+        }
+        addAddr(16 * 4);
+        for(var n=0; n<song.noise_instruments.length; n++)
+        {
+            var instr = song.noise_instruments[n];
+
+            var nr41 = (instr.length !== null ? 64 - instr.length : 0) & 0x3f;
+            var nr42 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
+            if (instr.volume_sweep_change != 0)
+                nr42 |= 8 - Math.abs(instr.volume_sweep_change);
+            var nr43 = (instr.shift_clock_mask << 4) | ((instr.bit_count == 7) ? 0x08 : 0) | (instr.dividing_ratio);
+            var nr44 = 0x80 | (instr.length !== null ? 0x40 : 0);
+
+            buf[addr + n * 4 + 0] = nr41;
+            buf[addr + n * 4 + 1] = nr42;
+            buf[addr + n * 4 + 2] = nr43;
+            buf[addr + n * 4 + 3] = nr44;
+        }
+        addAddr(16 * 4);
+        addAddr(0);
+        for(var n=0; n<song.waves.length; n++)
+        {
+            for(var idx=0; idx<16; idx++)
+                buf[addr + n * 16 + idx] = (song.waves[n][idx*2] << 4) | (song.waves[n][idx*2 + 1]);
+        }
+        addAddr(16 * 16);
+        
+        for(var track=0; track<4; track++)
+        {
+            var pattern_addr = []
+            for(var n=0; n<song.patterns.length; n++)
+            {
+                var pattern = song.patterns[n];
+                pattern_addr.push(addr);
+                
+                for(var idx=0; idx<pattern.length; idx++)
+                {
+                    var cell = pattern[idx][track];
+                    buf[addr++] = cell.note !== null ? cell.note : 90;
+                    buf[addr++] = ((cell.instrument !== null ? (cell.instrument + 1) : 0) << 4) | (cell.effectcode !== null ? cell.effectcode : 0);
+                    buf[addr++] = cell.effectparam !== null ? cell.effectparam : 0;
+                }
+            }
+            
+            var order_addr = orders_addr[track];
+            for(var n=0;n<song.sequence.length; n++)
+            {
+                buf[order_addr++] = pattern_addr[song.sequence[n]] & 0xFF;
+                buf[order_addr++] = pattern_addr[song.sequence[n]] >> 8;
+            }
+        }
+        
+        emulator.updateRom(this.rom_file);
     }
 };
