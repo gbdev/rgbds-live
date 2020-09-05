@@ -20,6 +20,7 @@
 <script src="js/song.js"></script>
 <script src="js/ugeLoader.js"></script>
 <script src="js/assemblyExport.js"></script>
+<script src="js/sdccExport.js"></script>
 <script src="js/player.js"></script>
 
 <script src="js/ui/instruments.js"></script>
@@ -45,6 +46,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
     };
     document.getElementById("downloadHttButton").onclick = (event) => {
         new AssemblyExporter().downloadHttZip();
+    };
+    document.getElementById("downloadSdccButton").onclick = (event) => {
+        var code = new SdccExporter().getCCode();
+        
+        var element = document.createElement('a');
+        var url = window.URL.createObjectURL(new Blob([code], {type: 'application/octet-stream'}));
+        element.setAttribute('href', url);
+        element.setAttribute('download', "song.c");
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+        window.URL.revokeObjectURL(url);
     };
     
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -181,6 +196,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         <button id="playButton">PLAY</button>
         <button id="stopButton">STOP</button>
         <button id="downloadHttButton">Download .htt files</button>
+        <button id="downloadSdccButton">Download .c file for sdcc</button>
     </div>
 </div>
 </body>

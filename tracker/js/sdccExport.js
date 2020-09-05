@@ -2,17 +2,12 @@
 
 //TODO: Merge this code with assemblyExport, currently lots of duplication
 
-function asmHex2(n)
+function cHex2(n)
 {
-    return "$" + ("00" + n.toString(16).toUpperCase()).slice(-2)
+    return "0x" + ("00" + n.toString(16).toUpperCase()).slice(-2)
 }
 
-function exportSongAsAssembly(song)
-{
-    return new AssemblyExporter().getCompactAssembly();
-}
-
-class AssemblyExporter
+class SdccExporter
 {
     constructor()
     {
@@ -22,84 +17,61 @@ class AssemblyExporter
         this.buildPatterns();
     }
     
-    getCompactAssembly()
+    getCCode()
     {
-        var data = `SECTION "Song Data", ROM0
-_song_descriptor::
-db ${song.ticks_per_row}
-dw order_cnt
-dw order1, order2, order3, order4
-dw duty_instruments, wave_instruments, noise_instruments
-dw routines
-dw waves
-order_cnt: db ${song.sequence.length * 2}
+        var data = `#include "hUGEDriver.h"
+
+#ifndef SONG_VAR_NAME
+#define SONG_VAR_NAME song
+#endif
+
+static const unsigned char order_cnt = ${song.sequence.length * 2};
 `
-        for(var track=0; track<4; track++)
-            data += `order${track+1}: ${this.getSequenceMappingFor(track)}\n`;
         for(var idx=0; idx<this.patterns.length; idx++)
         {
-            data += `song_pattern_${idx}:\n`
+            data += `static const unsigned char song_pattern_${idx}[] = {\n`
             for(var cell of this.patterns[idx])
-                data += `${this.formatPatternCell(cell)}\n`
+                data += `    ${this.formatPatternCell(cell)},\n`
+            data += '};\n'
         }
-        data += "duty_instruments:\n";
-        for(var instr of song.duty_instruments)
-            data += `${this.formatInstrument(instr)}\n`;
-        data += "wave_instruments:\n";
-        for(var instr of song.wave_instruments)
-            data += `${this.formatInstrument(instr)}\n`;
-        data += "noise_instruments:\n";
-        for(var instr of song.noise_instruments)
-            data += `${this.formatInstrument(instr)}\n`;
-        data += "routines:\n";
-        //TODO
-        data += "waves:\n";
-        for(var wave of song.waves)
-            data += `${this.formatWave(wave)}\n`;
-        console.log(data);
-        return data;
-    }
-    
-    downloadHttZip()
-    {
-        var zip = new JSZip();
-        
-        zip.file("constants.htt", `TICKS equ ${song.ticks_per_row}`);
-        
-        var data = `order_cnt: db ${song.sequence.length * 2}\n`;
         for(var track=0; track<4; track++)
-            data += `order${track+1}: ${this.getSequenceMappingFor(track)}\n`;
-        zip.file("order.htt", data);
-        
-        data = "";
-        for(var idx=0; idx<this.patterns.length; idx++)
-            data += `song_pattern_${idx}:\n` + this.patterns[idx].map((cell) => this.formatPatternCell(cell)).join("\n") + "\n";
-        zip.file("pattern.htt", data);
+            data += `static unsigned char* order${track+1}[] = {${this.getSequenceMappingFor(track)}};\n`;
+        data += "static const unsigned char duty_instruments[] = {\n";
+        for(var instr of song.duty_instruments)
+            data += `    ${this.formatInstrument(instr)},\n`;
+        data += "};\n";
+        data += "static const unsigned char wave_instruments[] = {\n";
+        for(var instr of song.wave_instruments)
+            data += `    ${this.formatInstrument(instr)},\n`;
+        data += "};\n";
+        data += "static const unsigned char noise_instruments[] = {\n";
+        for(var instr of song.noise_instruments)
+            data += `    ${this.formatInstrument(instr)},\n`;
+        data += "};\n";
+        data += "static const unsigned char routines[] = {\n";
+        //TODO
+        data += "};\n";
+        data += "static const unsigned char waves[] = {\n";
+        for(var wave of song.waves)
+            data += `    ${this.formatWave(wave)},\n`;
+        data += "};\n";
 
-        zip.file("duty_instrument.htt", song.duty_instruments.map((instr) => this.formatInstrument(instr)).join("\n"));
-        zip.file("wave_instrument.htt", song.wave_instruments.map((instr) => this.formatInstrument(instr)).join("\n"));
-        zip.file("noise_instrument.htt", song.noise_instruments.map((instr) => this.formatInstrument(instr)).join("\n"));
-        zip.file("wave.htt", song.waves.map((wave) => this.formatWave(wave)).join("\n"));
-        for(var idx=0; idx<16; idx++)
-            zip.file(`routine${idx}.htt`, "");
-
-        zip.generateAsync({type:"blob"}).then((content) => {
-            var element = document.createElement('a');
-            var url = window.URL.createObjectURL(content, {type: 'application/octet-stream'});
-            element.setAttribute('href', url);
-            element.setAttribute('download', "assembly.zip");
-
-            element.style.display = 'none';
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-            window.URL.revokeObjectURL(url);
-        });
+        data += `
+const hUGESong_t SONG_VAR_NAME = {
+    ${song.ticks_per_row},
+    &order_cnt,
+    order1, order2, order3, order4,
+    duty_instruments, wave_instruments, noise_instruments,
+    routines,
+    waves
+};
+`
+        return data;
     }
     
     getSequenceMappingFor(track)
     {
-        return "dw " + song.sequence.map((n) => `song_pattern_${this.pattern_map[[n, track]]}`).join(", ")
+        return song.sequence.map((n) => `song_pattern_${this.pattern_map[[n, track]]}`).join(", ")
     }
     
     formatPatternCell(cell)
@@ -115,7 +87,7 @@ order_cnt: db ${song.sequence.length * 2}
             effect_code = cell.effectcode;
             effect_param = cell.effectparam;
         }
-        return `db ${note}, ${asmHex2((instrument << 4) | effect_code)}, ${asmHex2(effect_param)}`;
+        return `${note}, ${cHex2((instrument << 4) | effect_code)}, ${cHex2(effect_param)}`;
     }
     
     formatInstrument(instr)
@@ -128,7 +100,7 @@ order_cnt: db ${song.sequence.length * 2}
             if (instr.volume_sweep_change != 0)
                 nr12 |= 8 - Math.abs(instr.volume_sweep_change);
             var nr14 = 0x80 | (instr.length !== null ? 0x40 : 0);
-            return `db ${asmHex2(nr10)}, ${asmHex2(nr11)}, ${asmHex2(nr12)}, ${asmHex2(nr14)}`;
+            return `${cHex2(nr10)}, ${cHex2(nr11)}, ${cHex2(nr12)}, ${cHex2(nr14)}`;
         }
         if (instr instanceof WaveInstrument)
         {
@@ -136,7 +108,7 @@ order_cnt: db ${song.sequence.length * 2}
             var nr32 = (instr.volume << 5);
             var wave_nr = instr.wave_index;
             var nr34 = 0x80 | (instr.length !== null ? 0x40 : 0);
-            return `db ${asmHex2(nr31)}, ${asmHex2(nr32)}, ${asmHex2(wave_nr)}, ${asmHex2(nr34)}`;
+            return `${cHex2(nr31)}, ${cHex2(nr32)}, ${cHex2(wave_nr)}, ${cHex2(nr34)}`;
         }
         if (instr instanceof NoiseInstrument)
         {
@@ -146,13 +118,13 @@ order_cnt: db ${song.sequence.length * 2}
                 nr42 |= 8 - Math.abs(instr.volume_sweep_change);
             var nr43 = (instr.shift_clock_mask << 4) | ((instr.bit_count == 7) ? 0x08 : 0) | (instr.dividing_ratio);
             var nr44 = 0x80 | (instr.length !== null ? 0x40 : 0);
-            return `db ${asmHex2(nr41)}, ${asmHex2(nr42)}, ${asmHex2(nr43)}, ${asmHex2(nr44)}`;
+            return `${cHex2(nr41)}, ${cHex2(nr42)}, ${cHex2(nr43)}, ${cHex2(nr44)}`;
         }
     }
     
     formatWave(wave)
     {
-        return "db " + Array.from(Array(16).keys(), (n) => asmHex2((wave[n*2] << 4) | (wave[n*2+1]))).join(", ");
+        return Array.from(Array(16).keys(), (n) => cHex2((wave[n*2] << 4) | (wave[n*2+1]))).join(", ");
     }
     
     buildPatterns()
