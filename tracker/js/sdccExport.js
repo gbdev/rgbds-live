@@ -20,6 +20,7 @@ class SdccExporter
     getCCode()
     {
         var data = `#include "hUGEDriver.h"
+#include <stddef.h>
 
 #ifndef SONG_VAR_NAME
 #define SONG_VAR_NAME song
@@ -35,7 +36,7 @@ static const unsigned char order_cnt = ${song.sequence.length * 2};
             data += '};\n'
         }
         for(var track=0; track<4; track++)
-            data += `static unsigned char* order${track+1}[] = {${this.getSequenceMappingFor(track)}};\n`;
+            data += `static const unsigned char* const order${track+1}[] = {${this.getSequenceMappingFor(track)}};\n`;
         data += "static const unsigned char duty_instruments[] = {\n";
         for(var instr of song.duty_instruments)
             data += `    ${this.formatInstrument(instr)},\n`;
@@ -48,9 +49,9 @@ static const unsigned char order_cnt = ${song.sequence.length * 2};
         for(var instr of song.noise_instruments)
             data += `    ${this.formatInstrument(instr)},\n`;
         data += "};\n";
-        data += "static const unsigned char routines[] = {\n";
+        //data += "static const unsigned char routines[] = {\n";
         //TODO
-        data += "};\n";
+        //data += "};\n";
         data += "static const unsigned char waves[] = {\n";
         for(var wave of song.waves)
             data += `    ${this.formatWave(wave)},\n`;
@@ -62,7 +63,7 @@ const hUGESong_t SONG_VAR_NAME = {
     &order_cnt,
     order1, order2, order3, order4,
     duty_instruments, wave_instruments, noise_instruments,
-    routines,
+    NULL,
     waves
 };
 `
