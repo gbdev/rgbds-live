@@ -377,7 +377,7 @@ class TrackerUI
             var row_node = tracker.children[index+1];
             for(var track=0; track<4; track++)
             {
-                var cell_node = row_node.children[track];
+                var cell_node = row_node.children[track+1];
                 var cell = pattern[index][track];
                 cell_node.children[0].innerText = noteToText(cell.note);
                 cell_node.children[1].innerText = instrumentNumberToText(cell.instrument);
