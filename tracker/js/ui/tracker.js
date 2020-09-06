@@ -30,10 +30,19 @@ class TrackerUI
     {
         var tracker = document.getElementById("tracker");
         var header_row = document.createElement("tr");
+        var th_node = document.createElement("th");
+        header_row.appendChild(th_node);
         for(var col=0; col<4; col++)
         {
             var th_node = document.createElement("th");
-            th_node.innerText = col;
+            if (col == 0)
+                th_node.innerText = "Duty 1";
+            if (col == 1)
+                th_node.innerText = "Duty 2";
+            if (col == 2)
+                th_node.innerText = "Wave";
+            if (col == 3)
+                th_node.innerText = "Noise";
             header_row.appendChild(th_node);
         }
         tracker.appendChild(header_row);
@@ -41,7 +50,9 @@ class TrackerUI
         for(var row=0; row<64; row++)
         {
             var row_node = document.createElement("tr");
-            //row_node.tabIndex = -1;
+            var cell_node = document.createElement("td");
+            cell_node.innerText = row;
+            row_node.appendChild(cell_node);
             for(var col=0; col<4; col++)
             {
                 var cell_node = document.createElement("td");
@@ -344,11 +355,11 @@ class TrackerUI
     {
         var tracker = document.getElementById("tracker");
         if (type == "note")
-            return tracker.children[row+1].children[col].children[0];
+            return tracker.children[row+1].children[col+1].children[0];
         if (type == "instrument")
-            return tracker.children[row+1].children[col].children[1];
+            return tracker.children[row+1].children[col+1].children[1];
         if (type == "effect")
-            return tracker.children[row+1].children[col].children[2];
+            return tracker.children[row+1].children[col+1].children[2];
     }
     
     getPatternIndex()
