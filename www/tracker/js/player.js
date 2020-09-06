@@ -129,7 +129,9 @@ class Player {
             buf[addr + n * 4 + 3] = nr44;
         }
         addAddr(16 * 4);
-        addAddr(0);
+        buf[header_idx+0] = 0;
+        buf[header_idx+1] = 0;
+        header_idx += 2;
         for(var n=0; n<song.waves.length; n++)
         {
             for(var idx=0; idx<16; idx++)

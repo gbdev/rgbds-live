@@ -30,7 +30,7 @@ db ${song.ticks_per_row}
 dw order_cnt
 dw order1, order2, order3, order4
 dw duty_instruments, wave_instruments, noise_instruments
-dw routines
+dw $0000 ; routines
 dw waves
 order_cnt: db ${song.sequence.length * 2}
 `
@@ -51,7 +51,7 @@ order_cnt: db ${song.sequence.length * 2}
         data += "noise_instruments:\n";
         for(var instr of song.noise_instruments)
             data += `${this.formatInstrument(instr)}\n`;
-        data += "routines:\n";
+        //data += "routines:\n";
         //TODO
         data += "waves:\n";
         for(var wave of song.waves)
