@@ -43,6 +43,13 @@ class TrackerUI
                 th_node.innerText = "Wave";
             if (col == 3)
                 th_node.innerText = "Noise";
+            th_node.col = col;
+            th_node.onclick = (e) => {
+                if (player.toggleMute(e.target.col))
+                    e.target.classList.add("muted");
+                else
+                    e.target.classList.remove("muted");
+            };
             header_row.appendChild(th_node);
         }
         tracker.appendChild(header_row);

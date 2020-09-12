@@ -3,6 +3,7 @@
 class Player {
     interval_handle = null;
     rom_file = null;
+    muted_channels_mask = 0;
 
     constructor()
     {
@@ -27,15 +28,30 @@ class Player {
         });
     }
     
+    toggleMute(channel)
+    {
+        var mask = 1 << channel;
+        if (this.muted_channels_mask & mask)
+        {
+            this.muted_channels_mask &=~mask;
+            return false;
+        }
+        this.muted_channels_mask |= mask;
+        emulator.writeMem(0xFF12 + channel * 5, 0)
+        return true;
+    }
+    
     play() {
         this.stop();
         this.updateRom();
 
         var current_order_addr = compiler.getRamSymbols().findIndex((v) => {return v == "current_order"});
         var row_addr = compiler.getRamSymbols().findIndex((v) => {return v == "row"});
+        var mute_addr = compiler.getRamSymbols().findIndex((v) => {return v == "mute_channels"});
 
         emulator.init(null, this.rom_file);
         this.interval_handle = setInterval(() => {
+            emulator.writeMem(mute_addr, this.muted_channels_mask)
             emulator.step("run");
 
             var current_sequence = emulator.readMem(current_order_addr) / 2;
