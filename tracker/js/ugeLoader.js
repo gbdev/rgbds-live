@@ -5,6 +5,7 @@ function loadUGESong(data)
     var song = new Song();
 
     //TODO: Sanity checks on data.
+    //TODO: Use `DataView` object instead of loads of Uint32Arrays
     var offset = 0;
     var version = new Uint32Array(data.slice(offset, offset + 4))[0];
     console.log("uge version: " + version);

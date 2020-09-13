@@ -14,11 +14,13 @@
 <script src="../js/compiler.js"></script>
 <script src="../js/emulator.js"></script>
 <script src="../js/storage.js"></script>
+<script src="../js/download.js"></script>
 
 <script src="../wasm/binjgb.js"></script>
 
 <script src="js/song.js"></script>
 <script src="js/ugeLoader.js"></script>
+<script src="js/ugeSaver.js"></script>
 <script src="js/assemblyExport.js"></script>
 <script src="js/sdccExport.js"></script>
 <script src="js/player.js"></script>
@@ -60,6 +62,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
         element.click();
         document.body.removeChild(element);
         window.URL.revokeObjectURL(url);
+    };
+    document.getElementById("downloadUgeButton").onclick = (event) => {
+        saveUge(song);
     };
     
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -195,6 +200,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     <div class="controls">
         <button id="playButton">PLAY</button>
         <button id="stopButton">STOP</button>
+        <button id="downloadUgeButton">Save</button>
         <button id="downloadHttButton">Download .htt files</button>
         <button id="downloadSdccButton">Download .c file for sdcc</button>
     </div>
