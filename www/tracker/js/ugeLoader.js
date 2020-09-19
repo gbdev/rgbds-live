@@ -5,6 +5,7 @@ function loadUGESong(data)
     var song = new Song();
 
     //TODO: Sanity checks on data.
+    //TODO: Use `DataView` object instead of loads of Uint32Arrays
     var offset = 0;
     var version = new Uint32Array(data.slice(offset, offset + 4))[0];
     console.log("uge version: " + version);
@@ -88,7 +89,7 @@ function loadUGESong(data)
             instr.frequency_sweep_shift = freq_sweep_shift;
 
             duty_instrument_mapping[(n % 15) + 1] = song.duty_instruments.length;
-            song.duty_instruments.push(instr);
+            song.addInstrument(instr);
         } else if (type == 1) {
             length = 256 - length;
             if (length == 256) length = 0;
@@ -101,7 +102,7 @@ function loadUGESong(data)
             instr.wave_index = wave_waveform_index;
 
             wave_instrument_mapping[(n % 15) + 1] = song.wave_instruments.length;
-            song.wave_instruments.push(instr);
+            song.addInstrument(instr);
         } else if (type == 2) {
             length = 64 - length;
             if (length == 64) length = 0;
@@ -118,7 +119,7 @@ function loadUGESong(data)
             instr.bit_count = noise_counter_step ? 7 : 15;
 
             noise_instrument_mapping[(n % 15) + 1] = song.noise_instruments.length;
-            song.noise_instruments.push(instr);
+            song.addInstrument(instr);
         } else {
             console.log(n, name, type);
         }

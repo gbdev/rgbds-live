@@ -130,45 +130,46 @@ class TrackerUI
             if (e.code == "ArrowDown" || e.code == "Numpad2") this.moveDown();
             if (e.code == "ArrowLeft" || e.code == "Numpad4") this.moveLeft();
             if (e.code == "ArrowRight" || e.code == "Numpad6") this.moveRight();
+            if (e.code == "Tab") { this.moveRight(); this.moveRight(); this.moveRight(); }
             
             if (this.selected_type == "note")
             {
-                if (e.code == "KeyQ") this.setNote(0);
-                if (e.code == "KeyW") this.setNote(1);
-                if (e.code == "KeyE") this.setNote(2);
-                if (e.code == "KeyR") this.setNote(3);
-                if (e.code == "KeyT") this.setNote(4);
-                if (e.code == "KeyY") this.setNote(5);
-                if (e.code == "KeyU") this.setNote(6);
-                if (e.code == "KeyI") this.setNote(7);
-                if (e.code == "KeyO") this.setNote(8);
-                if (e.code == "KeyP") this.setNote(9);
-                if (e.code == "BracketLeft") this.setNote(10);
-                if (e.code == "BracketRight") this.setNote(11);
-                if (e.code == "KeyA") this.setNote(12);
-                if (e.code == "KeyS") this.setNote(13);
-                if (e.code == "KeyD") this.setNote(14);
-                if (e.code == "KeyF") this.setNote(15);
-                if (e.code == "KeyG") this.setNote(16);
-                if (e.code == "KeyH") this.setNote(17);
-                if (e.code == "KeyJ") this.setNote(18);
-                if (e.code == "KeyK") this.setNote(19);
-                if (e.code == "KeyL") this.setNote(20);
-                if (e.code == "Semicolon") this.setNote(21);
-                if (e.code == "Quote") this.setNote(22);
-                //if (e.code == "??") this.setNote(23);
-                if (e.code == "KeyZ") this.setNote(24);
-                if (e.code == "KeyX") this.setNote(25);
-                if (e.code == "KeyC") this.setNote(26);
-                if (e.code == "KeyV") this.setNote(27);
-                if (e.code == "KeyB") this.setNote(28);
-                if (e.code == "KeyN") this.setNote(29);
-                if (e.code == "KeyM") this.setNote(30);
-                if (e.code == "Comma") this.setNote(31);
-                if (e.code == "Period") this.setNote(32);
-                if (e.code == "Slash") this.setNote(33);
-                //if (e.code == "??") this.setNote(34);
-                //if (e.code == "??") this.setNote(35);
+                if (e.code == "KeyQ") { this.setNote(0); this.moveDown(); }
+                if (e.code == "KeyW") { this.setNote(1); this.moveDown(); }
+                if (e.code == "KeyE") { this.setNote(2); this.moveDown(); }
+                if (e.code == "KeyR") { this.setNote(3); this.moveDown(); }
+                if (e.code == "KeyT") { this.setNote(4); this.moveDown(); }
+                if (e.code == "KeyY") { this.setNote(5); this.moveDown(); }
+                if (e.code == "KeyU") { this.setNote(6); this.moveDown(); }
+                if (e.code == "KeyI") { this.setNote(7); this.moveDown(); }
+                if (e.code == "KeyO") { this.setNote(8); this.moveDown(); }
+                if (e.code == "KeyP") { this.setNote(9); this.moveDown(); }
+                if (e.code == "BracketLeft") { this.setNote(10); this.moveDown(); }
+                if (e.code == "BracketRight") { this.setNote(11); this.moveDown(); }
+                if (e.code == "KeyA") { this.setNote(12); this.moveDown(); }
+                if (e.code == "KeyS") { this.setNote(13); this.moveDown(); }
+                if (e.code == "KeyD") { this.setNote(14); this.moveDown(); }
+                if (e.code == "KeyF") { this.setNote(15); this.moveDown(); }
+                if (e.code == "KeyG") { this.setNote(16); this.moveDown(); }
+                if (e.code == "KeyH") { this.setNote(17); this.moveDown(); }
+                if (e.code == "KeyJ") { this.setNote(18); this.moveDown(); }
+                if (e.code == "KeyK") { this.setNote(19); this.moveDown(); }
+                if (e.code == "KeyL") { this.setNote(20); this.moveDown(); }
+                if (e.code == "Semicolon") { this.setNote(21); this.moveDown(); }
+                if (e.code == "Quote") { this.setNote(22); this.moveDown(); }
+                //if (e.code == "??") { this.setNote(23); this.moveDown(); }
+                if (e.code == "KeyZ") { this.setNote(24); this.moveDown(); }
+                if (e.code == "KeyX") { this.setNote(25); this.moveDown(); }
+                if (e.code == "KeyC") { this.setNote(26); this.moveDown(); }
+                if (e.code == "KeyV") { this.setNote(27); this.moveDown(); }
+                if (e.code == "KeyB") { this.setNote(28); this.moveDown(); }
+                if (e.code == "KeyN") { this.setNote(29); this.moveDown(); }
+                if (e.code == "KeyM") { this.setNote(30); this.moveDown(); }
+                if (e.code == "Comma") { this.setNote(31); this.moveDown(); }
+                if (e.code == "Period") { this.setNote(32); this.moveDown(); }
+                if (e.code == "Slash") { this.setNote(33); this.moveDown(); }
+                //if (e.code == "??") this.setNote(34); this.moveDown(); }
+                //if (e.code == "??") this.setNote(35); this.moveDown(); }
                 if (e.code == "Delete") this.setNote(null);
             }
             if (this.selected_type == "note" || this.selected_type == "instrument")
@@ -229,8 +230,19 @@ class TrackerUI
     
     setNote(value)
     {
-        song.patterns[this.pattern_index][this.selected_row][this.selected_col].note = value;
+        var cell = song.patterns[this.pattern_index][this.selected_row][this.selected_col]
+        cell.note = value;
         this.getCell(this.selected_row, this.selected_col, "note").innerText = noteToText(value);
+        
+        if (cell.instrument === null && value !== null)
+        {
+            var instrument = ui.instruments.getSelectedInstrument();
+            if (instrument.fitsTrack(this.selected_col))
+            {
+                this.setInstrument(instrument.index);
+            }
+        }
+        
         player.updateRom();
     }
     setInstrument(value)
