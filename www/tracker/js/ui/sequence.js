@@ -35,8 +35,12 @@ class SequenceUI
             cell_node.contentEditable = true;
             cell_node.oninput = (e) => {
                 var new_text = e.target.innerText.replace(/[^\d]/, '');
-                if (e.target.innerText != new_text) e.target.innerText = new_text;
                 var value = parseInt(new_text) || 0;
+                if (value < 0) { value = 0; new_text = value; }
+                if (value >= 32) { value = 31; new_text = value; }
+                while (value >= song.patterns.length)
+                    song.addNewPattern();
+                if (e.target.innerText != new_text) e.target.innerText = new_text;
                 song.sequence[e.target.parentElement.index] = value;
                 this.updatePatternHighlight();
                 ui.tracker.loadPattern(value);

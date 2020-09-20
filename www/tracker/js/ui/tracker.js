@@ -131,6 +131,15 @@ class TrackerUI
             if (e.code == "ArrowLeft" || e.code == "Numpad4") this.moveLeft();
             if (e.code == "ArrowRight" || e.code == "Numpad6") this.moveRight();
             if (e.code == "Tab") { this.moveRight(); this.moveRight(); this.moveRight(); }
+            if (e.code == "PageUp" || e.code == "Numpad9") { for(var n=0; n<16; n++) this.moveUp(); }
+            if (e.code == "PageDown" || e.code == "Numpad3") { for(var n=0; n<16; n++) this.moveDown(); }
+            if (e.code == "Home" || e.code == "Numpad7") { this.setSelection(0, this.selected_col, this.selected_type); }
+            if (e.code == "End" || e.code == "Numpad1") { this.setSelection(63, this.selected_col, this.selected_type); }
+            if (e.code == "Insert" || e.code == "Numpad0") {
+                song.patterns[this.pattern_index].splice(this.selected_row, 0, [new PatternCell(), new PatternCell(), new PatternCell(), new PatternCell()]);
+                song.patterns[this.pattern_index].pop();
+                this.loadPattern(this.pattern_index);
+            }
             
             if (this.selected_type == "note")
             {

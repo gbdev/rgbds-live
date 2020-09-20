@@ -20,10 +20,7 @@ class Song
     
     createDefaults()
     {
-        var pattern = [];
-        for(var n=0; n<64; n++)
-            pattern.push([new PatternCell(), new PatternCell(), new PatternCell(), new PatternCell()]);
-        this.patterns.push(pattern);
+        this.addNewPattern();
         this.sequence = [0];
     
         for(var [sweep_value, sweep_name] of [[0, ""], [-7, " plink"]])
@@ -107,6 +104,14 @@ class Song
         list.splice(index, 1);
         for(var idx=0; idx<list.length; idx++)
             list[idx].index = idx;
+    }
+    
+    addNewPattern()
+    {
+        var pattern = [];
+        for(var n=0; n<64; n++)
+            pattern.push([new PatternCell(), new PatternCell(), new PatternCell(), new PatternCell()]);
+        this.patterns.push(pattern);
     }
 
     patternEqual(idx0, idx1)
