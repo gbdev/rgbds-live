@@ -20,10 +20,7 @@ class Song
     
     createDefaults()
     {
-        var pattern = [];
-        for(var n=0; n<64; n++)
-            pattern.push([new PatternCell(), new PatternCell(), new PatternCell(), new PatternCell()]);
-        this.patterns.push(pattern);
+        this.addNewPattern();
         this.sequence = [0];
     
         for(var [sweep_value, sweep_name] of [[0, ""], [-7, " plink"]])
@@ -33,16 +30,16 @@ class Song
                 var i = new DutyInstrument(`Duty ${duty_name}${sweep_name}`);
                 i.duty_cycle = duty_value;
                 i.volume_sweep_change = sweep_value;
-                this.duty_instruments.push(i);
+                this.addInstrument(i);
             }
         }
         for(var [wave_index, wave_name] of [[0, "Square wave 12.5%"], [1, "Square wave 25%"], [2, "Square wave 50%"], [3, "Square wave 75%"], [4, "Sawtooth wave"], [5, "Triangle wave"], [6, "Sine wave"], [7, "Toothy"], [8, "Triangle Toothy"], [9, "Pointy"], [10, "Strange"]])
         {
             var i = new WaveInstrument(`${wave_name}`);
             i.wave_index = wave_index;
-            this.wave_instruments.push(i);
+            this.addInstrument(i);
         }
-        this.noise_instruments.push(new NoiseInstrument("Noise"));
+        this.addInstrument(new NoiseInstrument("Noise"));
         
         this.waves.push([0x0,0x0,0x0,0x0,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf]);
         this.waves.push([0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf]);
@@ -55,6 +52,19 @@ class Song
         this.waves.push([0xf,0xe,0xf,0xc,0xf,0xa,0xf,0x8,0xf,0x6,0xf,0x4,0xf,0x2,0xf,0x0,0xf,0x2,0xf,0x4,0xf,0x6,0xf,0x8,0xf,0xa,0xf,0xc,0xf,0xe,0xf,0xf]);
         this.waves.push([0xf,0xe,0xd,0xd,0xc,0xc,0xb,0xb,0xa,0xa,0x9,0x9,0x8,0x8,0x7,0x7,0x8,0xa,0xb,0xd,0xf,0x1,0x2,0x4,0x5,0x7,0x8,0xa,0xb,0xd,0xe,0xe]);
         this.waves.push([0x8,0x4,0x1,0x1,0x6,0x1,0xe,0xd,0x5,0x7,0x4,0x7,0x5,0xa,0xa,0xd,0xc,0xe,0xa,0x3,0x1,0x7,0x7,0x9,0xd,0xd,0x2,0x0,0x0,0x3,0x4,0x7]);
+    }
+    
+    addInstrument(instrument)
+    {
+        var list = null;
+        if (instrument instanceof DutyInstrument)
+            list = this.duty_instruments;
+        if (instrument instanceof WaveInstrument)
+            list = this.wave_instruments;
+        if (instrument instanceof NoiseInstrument)
+            list = this.noise_instruments;
+        instrument.index = list.length;
+        list.push(instrument);
     }
     
     usesInstrument(type, index)
@@ -92,6 +102,16 @@ class Song
             }
         }
         list.splice(index, 1);
+        for(var idx=0; idx<list.length; idx++)
+            list[idx].index = idx;
+    }
+    
+    addNewPattern()
+    {
+        var pattern = [];
+        for(var n=0; n<64; n++)
+            pattern.push([new PatternCell(), new PatternCell(), new PatternCell(), new PatternCell()]);
+        this.patterns.push(pattern);
     }
 
     patternEqual(idx0, idx1)
@@ -128,6 +148,11 @@ class DutyInstrument
         this.frequency_sweep_time = 0;
         this.frequency_sweep_shift = 0;
     }
+    
+    fitsTrack(track)
+    {
+        return track == 0 || track == 1;
+    }
 }
 class WaveInstrument
 {
@@ -138,6 +163,11 @@ class WaveInstrument
 
         this.volume = 1;
         this.wave_index = 0;
+    }
+
+    fitsTrack(track)
+    {
+        return track == 2;
     }
 }
 class NoiseInstrument
@@ -153,6 +183,11 @@ class NoiseInstrument
         this.shift_clock_mask = 0;
         this.dividing_ratio = 0;
         this.bit_count = 15;
+    }
+
+    fitsTrack(track)
+    {
+        return track == 3;
     }
 }
 class PatternCell

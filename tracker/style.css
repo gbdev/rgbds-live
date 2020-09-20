@@ -105,6 +105,9 @@ body {
     text-align: center;
 }
 
+.controls button {
+    display: block;
+}
 
 .container {
     display: grid;
