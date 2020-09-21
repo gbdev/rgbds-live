@@ -107,6 +107,10 @@ body {
     display: none;
     text-align: center;
 }
+.effectpopup input {
+    display: block;
+    margin: 0 auto;
+}
 
 .controls button {
     display: block;
