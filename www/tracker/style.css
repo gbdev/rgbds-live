@@ -52,6 +52,9 @@ body {
 .sequence tr.active td {
     background-color: #e0e0ff;
 }
+.sequence tr.new td {
+    text-align: center;
+}
 
 .tracker {
     overflow: auto;

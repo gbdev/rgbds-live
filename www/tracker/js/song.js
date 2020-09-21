@@ -112,6 +112,7 @@ class Song
         for(var n=0; n<64; n++)
             pattern.push([new PatternCell(), new PatternCell(), new PatternCell(), new PatternCell()]);
         this.patterns.push(pattern);
+        return this.patterns.length - 1;
     }
 
     patternEqual(idx0, idx1)
