@@ -136,6 +136,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
         <table id="sequence">
             <tr><th colspan="2">Sequence</th></tr>
         </table>
+        <button id="sequence_add">Add</button>
+        <button id="sequence_del">Del</button>
     </div>
     <div class="tracker">
         <div class="effectpopup" id="effectpopup">
@@ -160,9 +162,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 <option>Set Speed</option>
             </select>
             <div id="trackerEffectInfo">-</div>
-            <input type="range" id="trackerEffectNibbleHigh" min="0" max="15"/><br/>
-            <input type="range" id="trackerEffectNibbleLow" min="0" max="15"/><br/>
-            <input type="range" id="trackerEffectByte" min="0" max="255"/><br/>
+            <input type="range" id="trackerEffectNibbleHigh" min="0" max="15"/>
+            <input type="range" id="trackerEffectNibbleLow" min="0" max="15"/>
+            <input type="range" id="trackerEffectByte" min="0" max="255"/>
             <select id="trackerEffectWaveform" style="font-family: monospace">
                 <option>_________________________</option>
                 <option>_-_-_-_-_-_-_-_-_-_-_-_-_</option>

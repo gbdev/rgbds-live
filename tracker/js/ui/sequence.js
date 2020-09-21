@@ -16,6 +16,30 @@ class SequenceUI
             ui.tracker.loadPattern(song.sequence[idx]);
             ui.tracker.setSelectedRow(0);
         }
+        
+        document.getElementById("sequence_add").onclick = (e) => {
+            song.sequence.push(song.addNewPattern());
+            this.update();
+            
+            var idx = song.sequence.length - 1;
+            this.setCurrentSequenceIndex(idx);
+            ui.tracker.loadPattern(song.sequence[idx]);
+            ui.tracker.setSelectedRow(0);
+        }
+
+        document.getElementById("sequence_del").onclick = (e) => {
+            if (song.sequence.length == 1)
+                return;
+            song.sequence.splice(this.current_index, 1);
+            this.update();
+            
+            var idx = this.current_index;
+            if (idx == song.sequence.length)
+                idx -= 1;
+            this.setCurrentSequenceIndex(idx);
+            ui.tracker.loadPattern(song.sequence[idx]);
+            ui.tracker.setSelectedRow(0);
+        }
     }
 
     update()
@@ -49,7 +73,7 @@ class SequenceUI
             row_node.appendChild(cell_node);
             sequence.appendChild(row_node);
         }
-        
+
         this.updatePatternHighlight();
     }
     
