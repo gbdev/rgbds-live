@@ -179,6 +179,7 @@ class Player {
                 buf[order_addr++] = pattern_addr[song.sequence[n]] >> 8;
             }
         }
+        console.log(addr - compiler.getRomSymbols().indexOf("_song_descriptor"));
         
         emulator.updateRom(this.rom_file);
     }

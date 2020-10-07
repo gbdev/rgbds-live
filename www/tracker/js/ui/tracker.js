@@ -140,6 +140,11 @@ class TrackerUI
                 song.patterns[this.pattern_index].pop();
                 this.loadPattern(this.pattern_index);
             }
+            if (e.code == "Backspace") {
+                song.patterns[this.pattern_index].splice(this.selected_row, 1);
+                song.patterns[this.pattern_index].push([new PatternCell(), new PatternCell(), new PatternCell(), new PatternCell()]);
+                this.loadPattern(this.pattern_index);
+            }
             
             if (this.selected_type == "note")
             {

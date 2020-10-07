@@ -115,6 +115,9 @@ body {
 .controls button {
     display: block;
 }
+.controls input {
+    display: block;
+}
 
 .container {
     display: grid;

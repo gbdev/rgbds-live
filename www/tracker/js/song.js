@@ -7,6 +7,7 @@ class Song
         this.name = "";
         this.artist = "";
         this.comment = "";
+        this.filename = "song";
         
         this.duty_instruments = [];
         this.wave_instruments = [];
