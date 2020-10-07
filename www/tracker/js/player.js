@@ -139,12 +139,16 @@ class Player {
             var nr43 = (instr.shift_clock_mask << 4) | ((instr.bit_count == 7) ? 0x08 : 0) | (instr.dividing_ratio);
             var nr44 = 0x80 | (instr.length !== null ? 0x40 : 0);
 
-            buf[addr + n * 4 + 0] = nr41;
-            buf[addr + n * 4 + 1] = nr42;
-            buf[addr + n * 4 + 2] = nr43;
-            buf[addr + n * 4 + 3] = nr44;
+            buf[addr + n * 8 + 0] = nr41;
+            buf[addr + n * 8 + 1] = nr42;
+            buf[addr + n * 8 + 2] = nr43;
+            buf[addr + n * 8 + 3] = nr44;
+            buf[addr + n * 8 + 4] = 0;
+            buf[addr + n * 8 + 5] = 0;
+            buf[addr + n * 8 + 6] = 0;
+            buf[addr + n * 8 + 7] = 0;
         }
-        addAddr(16 * 4);
+        addAddr(16 * 8);
         buf[header_idx+0] = 0;
         buf[header_idx+1] = 0;
         header_idx += 2;
