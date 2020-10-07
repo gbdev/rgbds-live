@@ -18,7 +18,7 @@ class Player {
             storage.update(name, req.response.replace(/include\//g, ""));
         }
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/player-rgbds/rgbds_player.z80", "main.asm");
-        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/driver_lite.z80", "driver_lite.asm");
+        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/driver.z80", "driver.asm");
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/constants.inc", "constants.inc");
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/music.inc", "music.inc");
         storage.update("song.asm", "SECTION \"song\", ROM0[$1000]\n_song_descriptor:: ds $8000 - @")
@@ -139,12 +139,16 @@ class Player {
             var nr43 = (instr.shift_clock_mask << 4) | ((instr.bit_count == 7) ? 0x08 : 0) | (instr.dividing_ratio);
             var nr44 = 0x80 | (instr.length !== null ? 0x40 : 0);
 
-            buf[addr + n * 4 + 0] = nr41;
-            buf[addr + n * 4 + 1] = nr42;
-            buf[addr + n * 4 + 2] = nr43;
-            buf[addr + n * 4 + 3] = nr44;
+            buf[addr + n * 8 + 0] = nr41;
+            buf[addr + n * 8 + 1] = nr42;
+            buf[addr + n * 8 + 2] = nr43;
+            buf[addr + n * 8 + 3] = nr44;
+            buf[addr + n * 8 + 4] = 0;
+            buf[addr + n * 8 + 5] = 0;
+            buf[addr + n * 8 + 6] = 0;
+            buf[addr + n * 8 + 7] = 0;
         }
-        addAddr(16 * 4);
+        addAddr(16 * 8);
         buf[header_idx+0] = 0;
         buf[header_idx+1] = 0;
         header_idx += 2;
@@ -179,6 +183,7 @@ class Player {
                 buf[order_addr++] = pattern_addr[song.sequence[n]] >> 8;
             }
         }
+        console.log(addr - compiler.getRomSymbols().indexOf("_song_descriptor"));
         
         emulator.updateRom(this.rom_file);
     }

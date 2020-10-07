@@ -119,7 +119,7 @@ const hUGESong_t SONG_VAR_NAME = {
                 nr42 |= 8 - Math.abs(instr.volume_sweep_change);
             var nr43 = (instr.shift_clock_mask << 4) | ((instr.bit_count == 7) ? 0x08 : 0) | (instr.dividing_ratio);
             var nr44 = 0x80 | (instr.length !== null ? 0x40 : 0);
-            return `${cHex2(nr41)}, ${cHex2(nr42)}, ${cHex2(nr43)}, ${cHex2(nr44)}`;
+            return `${cHex2(nr41)}, ${cHex2(nr42)}, ${cHex2(nr43)}, ${cHex2(nr44)}, 0, 0, 0, 0`;
         }
     }
     
