@@ -18,7 +18,7 @@ class Player {
             storage.update(name, req.response.replace(/include\//g, ""));
         }
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/player-rgbds/rgbds_player.z80", "main.asm");
-        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/driver_lite.z80", "driver_lite.asm");
+        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/driver.z80", "driver.asm");
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/constants.inc", "constants.inc");
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/music.inc", "music.inc");
         storage.update("song.asm", "SECTION \"song\", ROM0[$1000]\n_song_descriptor:: ds $8000 - @")
