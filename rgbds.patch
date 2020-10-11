@@ -1,29 +1,29 @@
 diff --git a/include/asm/symbol.h b/include/asm/symbol.h
-index e1a420e..4df87e6 100644
+index fa02a82..3135c50 100644
 --- a/include/asm/symbol.h
 +++ b/include/asm/symbol.h
-@@ -109,6 +109,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
+@@ -113,6 +113,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
  
  int32_t sym_GetValue(struct Symbol const *sym);
  void sym_SetExportAll(bool set);
 +struct Symbol *sym_AddSecret();
- struct Symbol *sym_AddLocalReloc(char const *symName);
- struct Symbol *sym_AddReloc(char const *symName);
+ struct Symbol *sym_AddLocalLabel(char const *symName);
+ struct Symbol *sym_AddLabel(char const *symName);
  void sym_Export(char const *symName);
 diff --git a/src/asm/asmy.y b/src/asm/asmy.y
-index 4b687f3..3e04ba4 100644
+index 653c001..409f84f 100644
 --- a/src/asm/asmy.y
 +++ b/src/asm/asmy.y
-@@ -663,7 +663,7 @@ lines		: /* empty */
+@@ -338,7 +338,7 @@ lines		: /* empty */
  ;
  
- line		: label
--		| label cpu_command
-+		| label { sym_AddSecret(); } cpu_command
- 		| label macro
- 		| label simple_pseudoop
- 		| pseudoop
-@@ -1507,7 +1507,7 @@ sectattrs	: /* empty */ {
+ line		: label '\n'
+-		| label cpu_command '\n'
++		| label  { sym_AddSecret(); } cpu_command '\n'
+ 		| label macro '\n'
+ 		| label simple_pseudoop '\n'
+ 		| pseudoop '\n'
+@@ -1101,7 +1101,7 @@ sectattrs	: /* empty */ {
  ;
  
  
@@ -33,11 +33,11 @@ index 4b687f3..3e04ba4 100644
  		| { nPCOffset = 1; } z80_and
  		| { nPCOffset = 1; } z80_bit
 diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index 4887b36..85fac88 100644
+index 59c7754..c327ee0 100644
 --- a/src/asm/symbol.c
 +++ b/src/asm/symbol.c
-@@ -361,6 +361,28 @@ struct Symbol *sym_AddSet(char const *symName, int32_t value)
- 	return sym;
+@@ -369,6 +369,26 @@ static struct Symbol *createNonrelocSymbol(char const *symbolName)
+ 	return symbol;
  }
  
 +static uint32_t secret_counter = 0;
@@ -46,15 +46,13 @@ index 4887b36..85fac88 100644
 +    struct Symbol *sym;
 +    char name[MAXSYMLEN + 1];
 +    secret_counter += 1;
-+    sprintf(name, "__SEC_%x_%x_%s", secret_counter, nLineNo, tzCurrentFileName);
++    sprintf(name, "__SEC_%x_%x_%s", secret_counter, lexer_GetLineNo(), fstk_GetFileName());
 +
 +    sym = createsymbol(name);
 +	sym->type = SYM_LABEL;
-+	sym->callback = NULL;
-+	sym->value = curOffset;
++    sym->value = sect_GetSymbolOffset();
 +    sym->isExported = true;
 +
-+	sym->scope = NULL;
 +	sym->section = sect_GetSymbolSection();
 +
 +	updateSymbolFilename(sym);
@@ -63,27 +61,27 @@ index 4887b36..85fac88 100644
 +
 +
  /*
-  * Add a local (.name) relocatable symbol
+  * Add an equated symbol
   */
 diff --git a/src/asm/warning.c b/src/asm/warning.c
-index 8e3474b..9e92836 100644
+index f8ea7cb..5eb5fe4 100644
 --- a/src/asm/warning.c
 +++ b/src/asm/warning.c
-@@ -199,7 +199,7 @@ void verror(const char *fmt, va_list args, char const *flag)
- {
- 	fputs("ERROR: ", stderr);
- 	fstk_Dump();
--	fprintf(stderr, flag ? ": [-Werror=%s]\n    " : ":\n    ", flag);
-+	fprintf(stderr, flag ? ": [-Werror=%s]: " : ": ", flag);
- 	vfprintf(stderr, fmt, args);
- 	fputc('\n', stderr);
- 	fstk_DumpStringExpansions();
-@@ -252,7 +252,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+@@ -241,7 +241,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+ 		return;
  
- 	fputs("warning: ", stderr);
- 	fstk_Dump();
--	fprintf(stderr, ": [-W%s]\n    ", flag);
-+	fprintf(stderr, ": [-W%s]: ", flag);
- 	vfprintf(stderr, fmt, args);
- 	fputc('\n', stderr);
- 	fstk_DumpStringExpansions();
+ 	case WARNING_ERROR:
+-		printDiag(fmt, args, "ERROR: ", ": [-Werror=%s]\n    ", flag);
++		printDiag(fmt, args, "ERROR: ", ": [-Werror=%s]    ", flag);
+ 		va_end(args);
+ 		return;
+ 
+@@ -253,7 +253,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+ 		break;
+ 	}
+ 
+-	printDiag(fmt, args, "warning: ", ": [-W%s]\n    ", flag);
++	printDiag(fmt, args, "warning: ", ": [-W%s]    ", flag);
+ 
+ 	va_end(args);
+ }
