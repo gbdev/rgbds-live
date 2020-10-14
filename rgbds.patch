@@ -1,5 +1,5 @@
 diff --git a/include/asm/symbol.h b/include/asm/symbol.h
-index fa02a82..3135c50 100644
+index 7bcc140..c2f2cfa 100644
 --- a/include/asm/symbol.h
 +++ b/include/asm/symbol.h
 @@ -113,6 +113,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
@@ -10,11 +10,11 @@ index fa02a82..3135c50 100644
  struct Symbol *sym_AddLocalLabel(char const *symName);
  struct Symbol *sym_AddLabel(char const *symName);
  void sym_Export(char const *symName);
-diff --git a/src/asm/asmy.y b/src/asm/asmy.y
-index 653c001..409f84f 100644
---- a/src/asm/asmy.y
-+++ b/src/asm/asmy.y
-@@ -338,7 +338,7 @@ lines		: /* empty */
+diff --git a/src/asm/parser.y b/src/asm/parser.y
+index 9e57462..8857051 100644
+--- a/src/asm/parser.y
++++ b/src/asm/parser.y
+@@ -336,7 +336,7 @@ lines		: /* empty */
  ;
  
  line		: label '\n'
@@ -23,7 +23,7 @@ index 653c001..409f84f 100644
  		| label macro '\n'
  		| label simple_pseudoop '\n'
  		| pseudoop '\n'
-@@ -1101,7 +1101,7 @@ sectattrs	: /* empty */ {
+@@ -1094,7 +1094,7 @@ sectattrs	: /* empty */ {
  ;
  
  
@@ -33,10 +33,10 @@ index 653c001..409f84f 100644
  		| { nPCOffset = 1; } z80_and
  		| { nPCOffset = 1; } z80_bit
 diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index 59c7754..c327ee0 100644
+index 0070462..01a0ffc 100644
 --- a/src/asm/symbol.c
 +++ b/src/asm/symbol.c
-@@ -369,6 +369,26 @@ static struct Symbol *createNonrelocSymbol(char const *symbolName)
+@@ -352,6 +352,26 @@ static struct Symbol *createNonrelocSymbol(char const *symbolName)
  	return symbol;
  }
  

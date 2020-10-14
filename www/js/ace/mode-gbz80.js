@@ -5,10 +5,20 @@ var oop = require("../lib/oop");
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
 var GBZ80HighlightRules = function() {
+    var constants_re = '\\b(?:' + Object.keys(gameboy_hardware_constants).join("|") + ')\\b';
 
     this.$rules = { start:
        [ { token: 'keyword.control.assembly',
            regex: '\\b(?:ADC|ADD|AND|CP|DEC|INC|OR|SBC|SUB|XOR|BIT|RES|SET|SWAP|RL|RLA|RLC|RLCA|RR|RRA|RRC|RRCA|SLA|SRA|SRL|LD|LDH|CALL|JP|JR|RET|RETI|RST|POP|PUSH|CCF|CPL|DAA|DI|EI|HALT|NOP|SCF|STOP)\\b',
+           caseInsensitive: true },
+         { token: 'keyword.control.sections',
+           regex: '\\b(?:ROM0|ROMX|VRAM|WRAM0|WRAMX|OAM|HRAM)\\b',
+           caseInsensitive: true },
+         { token: 'keyword.control.reserved',
+           regex: '\\b(?:SECTION|INCLUDE|BANK|ALIGN|PURGE|INCBIN|CHARMAP|NEWCHARMAP|SETCHARMAP|PUSHC|POPC|FAIL|WARN|FATAL|ASSERT|STATIC_ASSERT|MACRO|ENDM|SHIFT|REPT|ENDR|LOAD|ENDL|IF|ELSE|ELIF|ENDC|UNION|NEXTU|EQU|EQUS|PUSHS|POPS|PUSHO|POPO|OPT)\\b',
+           caseInsensitive: true },
+         { token: 'variable.constant',
+           regex: constants_re,
            caseInsensitive: true },
          { token: 'variable.parameter.register.assembly',
            regex: '\\b(?:A|B|C|D|E|H|L|AF|BC|DE|HL)\\b',
@@ -27,7 +37,7 @@ var GBZ80HighlightRules = function() {
          { token: 'entity.name.function.assembly', regex: '^\\s*%%[\\w.]+?:$' },
          { token: 'entity.name.function.assembly', regex: '^\\s*%\\$[\\w.]+?:$' },
          { token: 'entity.name.function.assembly', regex: '^[\\w.]+?:' },
-         { token: 'entity.name.function.assembly', regex: '^[\\w.]+?\\b' },
+         //{ token: 'entity.name.function.assembly', regex: '^[\\w.]+?\\b' },
          { token: 'comment.assembly', regex: ';.*$' } ]
     };
 
