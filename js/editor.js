@@ -14,6 +14,7 @@ this.editor = new Object();
     editor.register = function(div_id)
     {
         var e = ace.edit(div_id);
+        new TokenTooltip(e);
         e.setTheme("ace/theme/tomorrow");
         e.session.setMode("ace/mode/gbz80");
         e.setOptions({
