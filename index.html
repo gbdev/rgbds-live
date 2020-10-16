@@ -395,19 +395,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
     document.getElementById("cpu_frame_step").onclick = function() { stepEmulator("frame"); };
     document.getElementById("cpu_reset").onclick = function() { initEmulator(true); };
     document.getElementById("cpu_run_check").onclick = function() {
-        clearInterval(cpu_step_interval_id);
         if (document.getElementById("cpu_run_check").checked)
         {
-            cpu_step_interval_id = setInterval(function() {
+            function runFunction() {
                 if (!document.hidden)
                 {
                     if (stepEmulator("run"))
-                    {
-                        clearInterval(cpu_step_interval_id);
                         document.getElementById("cpu_run_check").checked = false;
-                    }
                 }
-            }, 10);
+                if (document.getElementById("cpu_run_check").checked)
+                    requestAnimationFrame(runFunction);
+            }
+            requestAnimationFrame(runFunction);
         }
     }
     var canvas = document.getElementById("emulator_screen_canvas");

@@ -10,6 +10,7 @@ this.emulator = new Object();
     var audio_ctx;
     var audio_time;
     var serial_callback = null;
+    var audio_buffer_size = 2048;
     
     emulator.init = function(canvas, rom_data) {
         if (emulator.isAvailable()) emulator.destroy();
@@ -30,7 +31,7 @@ this.emulator = new Object();
         for(var n=0; n<rom_data.length; n++)
             Module.HEAP8[rom_ptr + n] = rom_data[n];
         
-        e = Module._emulator_new_simple(rom_ptr, rom_size, audio_ctx.sampleRate, 4096);
+        e = Module._emulator_new_simple(rom_ptr, rom_size, audio_ctx.sampleRate, audio_buffer_size);
         Module._emulator_set_bw_palette_simple(e, 0, 0xFFC2F0C4, 0xFFA8B95A, 0xFF6E601E, 0xFF001B2D);
         Module._emulator_set_bw_palette_simple(e, 1, 0xFFC2F0C4, 0xFFA8B95A, 0xFF6E601E, 0xFF001B2D);
         Module._emulator_set_bw_palette_simple(e, 2, 0xFFC2F0C4, 0xFFA8B95A, 0xFF6E601E, 0xFF001B2D);
@@ -223,11 +224,11 @@ this.emulator = new Object();
 
         var input_buffer = new Uint8Array(Module.HEAP8.buffer, Module._get_audio_buffer_ptr(e), Module._get_audio_buffer_capacity(e));
         const volume = 0.5;
-        const buffer = audio_ctx.createBuffer(2, 4096, audio_ctx.sampleRate);
+        const buffer = audio_ctx.createBuffer(2, audio_buffer_size, audio_ctx.sampleRate);
         const channel0 = buffer.getChannelData(0);
         const channel1 = buffer.getChannelData(1);
         
-        for (let i = 0; i < 4096; i++) {
+        for (let i = 0; i < audio_buffer_size; i++) {
             channel0[i] = input_buffer[2 * i] * volume / 255;
             channel1[i] = input_buffer[2 * i + 1] * volume / 255;
         }
@@ -235,7 +236,7 @@ this.emulator = new Object();
         bufferSource.buffer = buffer;
         bufferSource.connect(audio_ctx.destination);
         bufferSource.start(audio_time);
-        const buffer_sec = 4096 / audio_ctx.sampleRate;
+        const buffer_sec = audio_buffer_size / audio_ctx.sampleRate;
         audio_time += buffer_sec;
     }
 })(this.emulator);
