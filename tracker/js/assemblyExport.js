@@ -140,13 +140,16 @@ order_cnt: db ${song.sequence.length * 2}
         }
         if (instr instanceof NoiseInstrument)
         {
-            var nr41 = (instr.length !== null ? 64 - instr.length : 0) & 0x3f;
-            var nr42 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
+            var param0 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
             if (instr.volume_sweep_change != 0)
-                nr42 |= 8 - Math.abs(instr.volume_sweep_change);
-            var nr43 = (instr.shift_clock_mask << 4) | ((instr.bit_count == 7) ? 0x08 : 0) | (instr.dividing_ratio);
-            var nr44 = 0x80 | (instr.length !== null ? 0x40 : 0);
-            return `db ${asmHex2(nr41)}, ${asmHex2(nr42)}, ${asmHex2(nr43)}, ${asmHex2(nr44)}, 0, 0, 0, 0`;
+                param0 |= 8 - Math.abs(instr.volume_sweep_change);
+            var param1 = (instr.length !== null ? 64 - instr.length : 0) & 0x3f;
+            if (instr.length !== null)
+                param1 |= 0x40;
+            if (instr.bit_count == 7)
+                param1 |= 0x80;
+            
+            return `db ${asmHex2(param0)}, ${asmHex2(param1)}, 0, 0, 0, 0, 0, 0`;
         }
     }
     
