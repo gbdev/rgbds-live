@@ -1,5 +1,5 @@
 diff --git a/include/asm/symbol.h b/include/asm/symbol.h
-index 7bcc140..c2f2cfa 100644
+index 4974a98..ebde2e1 100644
 --- a/include/asm/symbol.h
 +++ b/include/asm/symbol.h
 @@ -113,6 +113,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
@@ -11,19 +11,19 @@ index 7bcc140..c2f2cfa 100644
  struct Symbol *sym_AddLabel(char const *symName);
  void sym_Export(char const *symName);
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index 9e57462..8857051 100644
+index 34e10fa..ce3d5af 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
-@@ -336,7 +336,7 @@ lines		: /* empty */
+@@ -362,7 +362,7 @@ lines		: /* empty */
  ;
  
- line		: label '\n'
--		| label cpu_command '\n'
-+		| label  { sym_AddSecret(); } cpu_command '\n'
- 		| label macro '\n'
- 		| label simple_pseudoop '\n'
- 		| pseudoop '\n'
-@@ -1094,7 +1094,7 @@ sectattrs	: /* empty */ {
+ line		: label T_NEWLINE
+-		| label cpu_command T_NEWLINE
++		| label { sym_AddSecret(); } cpu_command T_NEWLINE
+ 		| label macro T_NEWLINE
+ 		| label simple_pseudoop T_NEWLINE
+ 		| pseudoop T_NEWLINE
+@@ -1155,7 +1155,7 @@ sectattrs	: /* empty */ {
  ;
  
  
@@ -33,10 +33,10 @@ index 9e57462..8857051 100644
  		| { nPCOffset = 1; } z80_and
  		| { nPCOffset = 1; } z80_bit
 diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index 0070462..01a0ffc 100644
+index 21e73b6..758de3b 100644
 --- a/src/asm/symbol.c
 +++ b/src/asm/symbol.c
-@@ -352,6 +352,26 @@ static struct Symbol *createNonrelocSymbol(char const *symbolName)
+@@ -362,6 +362,26 @@ static struct Symbol *createNonrelocSymbol(char const *symbolName)
  	return symbol;
  }
  
@@ -64,10 +64,10 @@ index 0070462..01a0ffc 100644
   * Add an equated symbol
   */
 diff --git a/src/asm/warning.c b/src/asm/warning.c
-index f8ea7cb..5eb5fe4 100644
+index b764fa6..0ceb377 100644
 --- a/src/asm/warning.c
 +++ b/src/asm/warning.c
-@@ -241,7 +241,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+@@ -245,7 +245,7 @@ void warning(enum WarningID id, char const *fmt, ...)
  		return;
  
  	case WARNING_ERROR:
@@ -76,7 +76,7 @@ index f8ea7cb..5eb5fe4 100644
  		va_end(args);
  		return;
  
-@@ -253,7 +253,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+@@ -257,7 +257,7 @@ void warning(enum WarningID id, char const *fmt, ...)
  		break;
  	}
  
