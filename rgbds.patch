@@ -1,20 +1,20 @@
 diff --git a/include/asm/symbol.h b/include/asm/symbol.h
-index 4974a98..ebde2e1 100644
+index 6357823..c30f49b 100644
 --- a/include/asm/symbol.h
 +++ b/include/asm/symbol.h
-@@ -113,6 +113,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
+@@ -114,6 +114,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
  
  int32_t sym_GetValue(struct Symbol const *sym);
  void sym_SetExportAll(bool set);
 +struct Symbol *sym_AddSecret();
  struct Symbol *sym_AddLocalLabel(char const *symName);
  struct Symbol *sym_AddLabel(char const *symName);
- void sym_Export(char const *symName);
+ struct Symbol *sym_AddAnonLabel(void);
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index 34e10fa..ce3d5af 100644
+index ab39178..a428430 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
-@@ -362,7 +362,7 @@ lines		: /* empty */
+@@ -491,7 +491,7 @@ lines		: /* empty */
  ;
  
  line		: label T_NEWLINE
@@ -23,7 +23,7 @@ index 34e10fa..ce3d5af 100644
  		| label macro T_NEWLINE
  		| label simple_pseudoop T_NEWLINE
  		| pseudoop T_NEWLINE
-@@ -1155,7 +1155,7 @@ sectattrs	: /* empty */ {
+@@ -1353,7 +1353,7 @@ sectattrs	: /* empty */ {
  ;
  
  
@@ -33,7 +33,7 @@ index 34e10fa..ce3d5af 100644
  		| { nPCOffset = 1; } z80_and
  		| { nPCOffset = 1; } z80_bit
 diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index 21e73b6..758de3b 100644
+index 699bbb4..0b65c5d 100644
 --- a/src/asm/symbol.c
 +++ b/src/asm/symbol.c
 @@ -362,6 +362,26 @@ static struct Symbol *createNonrelocSymbol(char const *symbolName)
@@ -64,15 +64,33 @@ index 21e73b6..758de3b 100644
   * Add an equated symbol
   */
 diff --git a/src/asm/warning.c b/src/asm/warning.c
-index b764fa6..0ceb377 100644
+index b764fa6..0ea29b7 100644
 --- a/src/asm/warning.c
 +++ b/src/asm/warning.c
+@@ -217,7 +217,7 @@ void error(const char *fmt, ...)
+ 	va_list args;
+ 
+ 	va_start(args, fmt);
+-	printDiag(fmt, args, "ERROR: ", ":\n    ", NULL);
++	printDiag(fmt, args, "ERROR: ", ": ", NULL);
+ 	va_end(args);
+ 	nbErrors++;
+ }
+@@ -227,7 +227,7 @@ _Noreturn void fatalerror(const char *fmt, ...)
+ 	va_list args;
+ 
+ 	va_start(args, fmt);
+-	printDiag(fmt, args, "FATAL: ", ":\n    ", NULL);
++	printDiag(fmt, args, "FATAL: ", ": ", NULL);
+ 	va_end(args);
+ 
+ 	exit(1);
 @@ -245,7 +245,7 @@ void warning(enum WarningID id, char const *fmt, ...)
  		return;
  
  	case WARNING_ERROR:
 -		printDiag(fmt, args, "ERROR: ", ": [-Werror=%s]\n    ", flag);
-+		printDiag(fmt, args, "ERROR: ", ": [-Werror=%s]    ", flag);
++		printDiag(fmt, args, "ERROR: ", ": [-Werror=%s] ", flag);
  		va_end(args);
  		return;
  
@@ -81,7 +99,7 @@ index b764fa6..0ceb377 100644
  	}
  
 -	printDiag(fmt, args, "warning: ", ": [-W%s]\n    ", flag);
-+	printDiag(fmt, args, "warning: ", ": [-W%s]    ", flag);
++	printDiag(fmt, args, "warning: ", ": [-W%s] ", flag);
  
  	va_end(args);
  }

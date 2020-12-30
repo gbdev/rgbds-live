@@ -12,7 +12,7 @@ this.compiler = new Object();
     var ram_symbols = [];
     var link_options = [];
 
-    var line_nr_regex = /([\w\.]+)[\w\.\:]*\(([0-9]+)\)/gi;
+    var line_nr_regex = /([\w\.]+)[\w\.\:~]*\(([0-9]+)\)/gi;
 
     function logFunction(str) {
         if (log_callback)
