@@ -17,10 +17,10 @@ class Player {
             req.send();
             storage.update(name, req.response.replace(/include\//g, ""));
         }
-        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/player-rgbds/rgbds_player.z80", "main.asm");
-        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/driver.z80", "driver.asm");
-        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/constants.inc", "constants.inc");
-        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/music.inc", "music.inc");
+        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/player-rgbds/rgbds_player.asm", "main.asm");
+        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/driver.asm", "driver.asm");
+        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/hUGE.inc", "hUGE.inc");
+        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/hUGE_note_table.inc", "hUGE_note_table.inc");
         storage.update("song.asm", "SECTION \"song\", ROM0[$1000]\n_song_descriptor:: ds $8000 - @")
         
         compiler.compile((rom_file, start_address, addr_to_line) => {
