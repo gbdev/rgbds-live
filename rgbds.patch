@@ -1,8 +1,8 @@
 diff --git a/include/asm/symbol.h b/include/asm/symbol.h
-index 6357823..c30f49b 100644
+index edef323..65052f7 100644
 --- a/include/asm/symbol.h
 +++ b/include/asm/symbol.h
-@@ -114,6 +114,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
+@@ -115,6 +115,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
  
  int32_t sym_GetValue(struct Symbol const *sym);
  void sym_SetExportAll(bool set);
@@ -11,32 +11,23 @@ index 6357823..c30f49b 100644
  struct Symbol *sym_AddLabel(char const *symName);
  struct Symbol *sym_AddAnonLabel(void);
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index ab39178..a428430 100644
+index 287b0e3..3d7c24a 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
-@@ -491,7 +491,7 @@ lines		: /* empty */
+@@ -625,7 +625,7 @@ lines		: %empty
  ;
  
- line		: label T_NEWLINE
--		| label cpu_command T_NEWLINE
-+		| label { sym_AddSecret(); } cpu_command T_NEWLINE
- 		| label macro T_NEWLINE
- 		| label simple_pseudoop T_NEWLINE
- 		| pseudoop T_NEWLINE
-@@ -1353,7 +1353,7 @@ sectattrs	: /* empty */ {
- ;
- 
- 
--cpu_command	: { nPCOffset = 1; } z80_adc
-+cpu_command : { nPCOffset = 1; } z80_adc
- 		| { nPCOffset = 1; } z80_add
- 		| { nPCOffset = 1; } z80_and
- 		| { nPCOffset = 1; } z80_bit
+ last_line	: label
+-		| label cpu_command
++		| label { sym_AddSecret(); } cpu_command
+ 		| label macro
+ 		| label directive
+ 		| assignment_directive
 diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index 699bbb4..0b65c5d 100644
+index d59b266..0176deb 100644
 --- a/src/asm/symbol.c
 +++ b/src/asm/symbol.c
-@@ -362,6 +362,26 @@ static struct Symbol *createNonrelocSymbol(char const *symbolName)
+@@ -381,6 +381,26 @@ static struct Symbol *createNonrelocSymbol(char const *symbolName)
  	return symbol;
  }
  
@@ -64,10 +55,10 @@ index 699bbb4..0b65c5d 100644
   * Add an equated symbol
   */
 diff --git a/src/asm/warning.c b/src/asm/warning.c
-index b764fa6..0ea29b7 100644
+index c7ceda5..71d10f2 100644
 --- a/src/asm/warning.c
 +++ b/src/asm/warning.c
-@@ -217,7 +217,7 @@ void error(const char *fmt, ...)
+@@ -226,7 +226,7 @@ void error(const char *fmt, ...)
  	va_list args;
  
  	va_start(args, fmt);
@@ -76,7 +67,7 @@ index b764fa6..0ea29b7 100644
  	va_end(args);
  	nbErrors++;
  }
-@@ -227,7 +227,7 @@ _Noreturn void fatalerror(const char *fmt, ...)
+@@ -236,7 +236,7 @@ _Noreturn void fatalerror(const char *fmt, ...)
  	va_list args;
  
  	va_start(args, fmt);
@@ -85,7 +76,7 @@ index b764fa6..0ea29b7 100644
  	va_end(args);
  
  	exit(1);
-@@ -245,7 +245,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+@@ -254,7 +254,7 @@ void warning(enum WarningID id, char const *fmt, ...)
  		return;
  
  	case WARNING_ERROR:
@@ -94,7 +85,7 @@ index b764fa6..0ea29b7 100644
  		va_end(args);
  		return;
  
-@@ -257,7 +257,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+@@ -266,7 +266,7 @@ void warning(enum WarningID id, char const *fmt, ...)
  		break;
  	}
  
