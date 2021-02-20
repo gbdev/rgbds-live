@@ -218,7 +218,7 @@ haltLoop:
     }
     
     function postLoadUIUpdate() {
-        editor.setCurrentFile(Object.keys(files)[0]);
+        editors.setCurrentFile(Object.keys(files)[0]);
         updateFileList();
     }
 })(storage);
