@@ -50,6 +50,8 @@ haltLoop:
         } else if ("rgbds_storage" in localStorage) {
             files = {"hardware.inc": hardware_inc};
             for(var [filename, data] of Object.entries(JSON.parse(localStorage["rgbds_storage"]))) {
+                if (data instanceof Object)
+                    data = Uint8Array.from(Object.values(data));
                 files[filename] = data;
             }
             storage.autoLocalStorage = true;
@@ -65,6 +67,8 @@ haltLoop:
     {
         if (typeof(name) !== "undefined")
         {
+            if (code instanceof ArrayBuffer)
+                code = new Uint8Array(code);
             if (code === null)
                 delete files[name]
             else
@@ -193,7 +197,8 @@ haltLoop:
                 if (entries.length < 1)
                     return;
                 var entry = entries.pop();
-                entry.async("string").then(function(contents) {
+                var type = editors.getFileType(entry.name) == 'binary' ? "string" : "uint8array";
+                entry.async(type).then(function(contents) {
                     files[entry.name] = contents;
                     loadNextFile();
                     postLoadUIUpdate();

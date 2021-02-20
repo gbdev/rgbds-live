@@ -1,6 +1,6 @@
 "use strict";
 
-this.editor = new Object();
+this.textEditor = new Object();
 (function(editor) {
     var editors = []
     var current_file = null;
@@ -144,4 +144,16 @@ this.editor = new Object();
     {
         return breakpoints;
     }
-})(this.editor);
+    
+    editor.hide = function()
+    {
+        editors[0].renderer.getContainerElement().style.display = "none"
+    }
+    
+    editor.show = function()
+    {
+        editors[0].renderer.getContainerElement().style.display = ""
+        editors[0].resize()
+        editors[0].renderer.updateFull()
+    }
+})(this.textEditor);

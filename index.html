@@ -23,7 +23,8 @@
 <script src="js/compiler.js"></script>
 <script src="js/emulator.js"></script>
 <script src="js/storage.js"></script>
-<script src="js/editor.js"></script>
+<script src="js/editors.js"></script>
+<script src="js/textEditor.js"></script>
 <script src="js/download.js"></script>
 
 <script>
@@ -60,12 +61,12 @@ emulator.setSerialCallback(function(value) {
 function compileCode()
 {
     compiler.compile(function(_rom_file, _start_address, _addr_to_line) {
-        editor.updateErrors();
+        textEditor.updateErrors();
         updateFileList();
 
         var pc_line;
-        if (live_patch && editor.session.getMarkers()[cpu_line_marker]) {
-            pc_line = editor.session.getMarkers()[cpu_line_marker].range.start.row + 1;
+        if (live_patch && textEditor.session.getMarkers()[cpu_line_marker]) {
+            pc_line = textEditor.session.getMarkers()[cpu_line_marker].range.start.row + 1;
         } else {
             destroyEmulator();
         }
@@ -106,7 +107,7 @@ function destroyEmulator()
     line_to_addr = {}
     rom = undefined;
 
-    editor.setCpuLine(null, null);
+    textEditor.setCpuLine(null, null);
 }
 
 function initEmulator(jump_to_pc)
@@ -134,7 +135,7 @@ function stepEmulator(step_type)
 function updateBreakpoints()
 {
     emulator.clearBreakpoints();
-    var breakpoints = editor.getBreakpoints();
+    var breakpoints = textEditor.getBreakpoints();
     for(var data of breakpoints)
     {
         var [filename, line_nr, valid] = data;
@@ -185,9 +186,9 @@ function updateCpuState(afterSingleStep)
     if (typeof(file_line_nr) == "undefined")
         file_line_nr = addr_to_line[pc - 1];
     if (typeof(file_line_nr) != "undefined")
-        editor.setCpuLine(file_line_nr[0], file_line_nr[1], afterSingleStep);
+        textEditor.setCpuLine(file_line_nr[0], file_line_nr[1], afterSingleStep);
     else
-        editor.setCpuLine(null, null);
+        textEditor.setCpuLine(null, null);
     updateVRamCanvas();
     updateTextView();
 }
@@ -325,7 +326,7 @@ function updateFileList()
         entry.textContent = name;
         filelist.appendChild(entry);
         
-        if (name == editor.getCurrentFilename())
+        if (name == editors.getCurrentFilename())
             entry.classList.add("active");
         for(var [type, filename, line_nr, message] of compiler.getErrors())
         {
@@ -346,46 +347,66 @@ function deleteFile(name)
     if (Object.keys(storage.getFiles()).length < 2)
         return;
     storage.update(name, null);
-    if (editor.getCurrentFilename() == name)
-        editor.setCurrentFile(Object.keys(storage.getFiles()).sort()[0]);
+    if (editors.getCurrentFilename() == name)
+        editors.setCurrentFile(Object.keys(storage.getFiles()).sort()[0]);
     updateFileList();
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
-    editor.register("input");
+    textEditor.register("textEditorDiv");
     storage.autoLoad();
-    editor.setCurrentFile(Object.keys(storage.getFiles()).pop());
+    editors.setCurrentFile(Object.keys(storage.getFiles()).pop());
     updateFileList();
 
     document.getElementById("filelist").onclick = function(e)
     {
         if (!e.target.childNodes[0].wholeText) return;
-        editor.setCurrentFile(e.target.childNodes[0].wholeText);
+        editors.setCurrentFile(e.target.childNodes[0].wholeText);
         
         updateFileList();
         updateCpuState();
     }
     document.getElementById("newfile").onclick = function()
     {
-        var result = prompt("Name of new file?");
+        document.getElementById("newfiledialog").style.display = "block";
+    }
+    document.getElementById("newfiledialogclose").onclick = function() { document.getElementById("newfiledialog").style.display = "none"; }
+    document.getElementById("newfile_empty_create").onclick = function() {
+        var result = document.getElementById("newfile_name").value;
         if (!result) return;
         if (result.indexOf(".") < 0) result += ".asm";
         if (result in storage.getFiles()) return;
         storage.update(result, "");
-        editor.setCurrentFile(result);
+        editors.setCurrentFile(result);
         updateFileList();
+        document.getElementById("newfiledialog").style.display = "none";
     }
+    document.getElementById("newfile_upload").onchange = function(e) {
+        if (e.target.files.length > 0) {
+            var name = e.target.files[0].name;
+            var p = editors.getFileType(name) == 'text' ? e.target.files[0].text() : e.target.files[0].arrayBuffer();
+            p.then(function(data)
+            {
+                storage.update(name, data);
+                editors.setCurrentFile(name);
+                updateFileList();
+            });
+            e.target.value = "";
+            document.getElementById("newfiledialog").style.display = "none";
+        }
+    }
+    
     document.getElementById("delfile").onclick = function()
     {
-        if (confirm("Are you sure you want to delete: " + editor.getCurrentFilename() + "?"))
-            deleteFile(editor.getCurrentFilename());
+        if (confirm("Are you sure you want to delete: " + editors.getCurrentFilename() + "?"))
+            deleteFile(editors.getCurrentFilename());
     }
     document.getElementById("newproject").onclick = function()
     {
         if (!confirm("Are you sure to clear the current project?"))
             return;
         storage.reset();
-        editor.setCurrentFile("main.asm");
+        editors.setCurrentFile("main.asm");
         updateFileList();
     }
 
@@ -495,7 +516,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
     };
     
     document.getElementById("importmenu").onclick = function() {
-        //storage.load();
         document.getElementById("importdialog").style.display = "block";
     };
     document.getElementById("importdialog").onclick = function(e) { if (e.target == document.getElementById("importdialog")) document.getElementById("importdialog").style.display = "none"; }
@@ -595,7 +615,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             </ul>
         </div>
     </div>
-    <div class="editor" id="input"></div>
+    <div class="editor" id="textEditorDiv" style="display: none"></div>
+    <div class="editor" id="nullEditorDiv" style="display: none">Cannot edit selected file.</div>
     <div class="emulator">
         <table><tr><td colspan="4">
             <div class="tabs">
@@ -628,6 +649,25 @@ window.addEventListener('DOMContentLoaded', (event) => {
             <p>rgbds-live is a Gameboy programming environment. Allowing for realtime assembly programming for the gameboy.</p>
             <p>The environment runs 100% in your browser. Your source code does not leave your browser, unless you export it.</p>
             <p>It is powered by the excelent binjgb emulator, the ace javascript sourcecode editor and rgbds compiled for webassembly.</p>
+        </div>
+    </div>
+    
+    <div id="newfiledialog" class="modal">
+        <div class="content">
+            <span id="newfiledialogclose" class="close">&times;</span>
+            <div class="tabs">
+                <input type="radio" name="newfile_mode" id="newfile_mode_empty" checked /><label for="newfile_mode_empty">Empty file</label>
+                <div>
+                    <p>Create a new empty file.</p>
+                    <p>Name: <input id="newfile_name"/></p>
+                    <p><button id="newfile_empty_create">Create</button></p>
+                </div>
+                <input type="radio" name="newfile_mode" id="newfile_mode_upload" /><label for="newfile_mode_upload">Existing file</label>
+                <div>
+                    <p>Load a file from your local harddisk</p>
+                    <p><input type="file" id="newfile_upload" /></p>
+                </div>
+            </div>
         </div>
     </div>
     
