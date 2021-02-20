@@ -384,13 +384,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
     document.getElementById("newfile_upload").onchange = function(e) {
         if (e.target.files.length > 0) {
             var name = e.target.files[0].name;
-            e.target.files[0].text().then(function(text)
+            var p = editors.getFileType(name) == 'text' ? e.target.files[0].text() : e.target.files[0].arrayBuffer();
+            p.then(function(data)
             {
-                storage.update(name, text);
+                storage.update(name, data);
                 editors.setCurrentFile(name);
                 updateFileList();
             });
-            //Binary: e.target.files[0].arrayBuffer().then(function(buffer) {});                
             e.target.value = "";
             document.getElementById("newfiledialog").style.display = "none";
         }
@@ -615,7 +615,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             </ul>
         </div>
     </div>
-    <div class="editor" id="textEditorDiv"></div>
+    <div class="editor" id="textEditorDiv" style="display: none"></div>
+    <div class="editor" id="nullEditorDiv" style="display: none">Cannot edit selected file.</div>
     <div class="emulator">
         <table><tr><td colspan="4">
             <div class="tabs">
