@@ -11,7 +11,7 @@ index edef323..65052f7 100644
  struct Symbol *sym_AddLabel(char const *symName);
  struct Symbol *sym_AddAnonLabel(void);
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index 287b0e3..3d7c24a 100644
+index e2a9602..55aa1ed 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
 @@ -625,7 +625,7 @@ lines		: %empty
