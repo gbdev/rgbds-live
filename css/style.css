@@ -156,6 +156,11 @@ canvas {
 .modal .close:hover, .modal .close:focus {
     color: black;
 }
+.close {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYAgMAAACdGdVrAAAACVBMVEUAAAAAAAD///+D3c/SAAAAAXRSTlMAQObYZgAAAE9JREFUeNpVzosJwCAMhGGX6GY1QEZwn4wQoDdlr/Ij9AA/kLzGNZ17zJ2Rcvpg24RUpqQwvZ40fpZRlD4qNp1wPimhgXaGMZpF/+2cxIEvFUVJj9IiGXQAAAAASUVORK5CYII=) no-repeat center;
+    width: 24px;
+    height: 24px;
+}
 
 .container {
     display: grid;
