@@ -370,6 +370,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     {
         document.getElementById("newfiledialog").style.display = "block";
     }
+    document.getElementById("newfiledialog").onclick = function(e) { if (e.target == document.getElementById("newfiledialog")) document.getElementById("newfiledialog").style.display = "none"; }
     document.getElementById("newfiledialogclose").onclick = function() { document.getElementById("newfiledialog").style.display = "none"; }
     document.getElementById("newfile_empty_create").onclick = function() {
         var result = document.getElementById("newfile_name").value;
@@ -616,7 +617,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         </div>
     </div>
     <div class="editor" id="textEditorDiv" style="display: none"></div>
-    <div class="editor" id="nullEditorDiv" style="display: none">Cannot edit selected file.</div>
+    <div class="editor" id="nullEditorDiv">Cannot edit selected file.</div>
     <div class="emulator">
         <table><tr><td colspan="4">
             <div class="tabs">
@@ -645,7 +646,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     <div id="infodialog" class="modal">
         <div class="content">
-            <span id="infodialogclose" class="close">&times;</span>
+            <span id="infodialogclose" class="close"></span>
             <p>rgbds-live is a Gameboy programming environment. Allowing for realtime assembly programming for the gameboy.</p>
             <p>The environment runs 100% in your browser. Your source code does not leave your browser, unless you export it.</p>
             <p>It is powered by the excelent binjgb emulator, the ace javascript sourcecode editor and rgbds compiled for webassembly.</p>
@@ -654,7 +655,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     
     <div id="newfiledialog" class="modal">
         <div class="content">
-            <span id="newfiledialogclose" class="close">&times;</span>
+            <span id="newfiledialogclose" class="close"></span>
             <div class="tabs">
                 <input type="radio" name="newfile_mode" id="newfile_mode_empty" checked /><label for="newfile_mode_empty">Empty file</label>
                 <div>
@@ -673,7 +674,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     
     <div id="importdialog" class="modal">
         <div class="content">
-            <span id="importdialogclose" class="close">&times;</span>
+            <span id="importdialogclose" class="close"></span>
             <div class="tabs">
                 <input type="radio" name="import_mode" id="import_mode_gist" checked /><label for="import_mode_gist">GitHub Gist</label>
                 <div>
@@ -695,7 +696,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     </div>
     <div id="exportdialog" class="modal">
         <div class="content">
-            <span id="exportdialogclose" class="close">&times;</span>
+            <span id="exportdialogclose" class="close"></span>
             <div class="tabs">
                 <input type="radio" name="export_mode" id="export_mode_url" checked /><label for="export_mode_url">URL</label>
                 <div>

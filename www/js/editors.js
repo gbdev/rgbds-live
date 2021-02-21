@@ -25,8 +25,7 @@ this.editors = new Object();
             currentEditor = nullEditor;
         if (prevEditor != currentEditor)
         {
-            if (prevEditor)
-                prevEditor.hide();
+            prevEditor.hide();
             currentEditor.show();
         }
         return currentEditor.setCurrentFile(filename);
