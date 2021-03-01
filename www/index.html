@@ -25,6 +25,7 @@
 <script src="js/storage.js"></script>
 <script src="js/editors.js"></script>
 <script src="js/textEditor.js"></script>
+<script src="js/gfxEditor.js"></script>
 <script src="js/download.js"></script>
 
 <script>
@@ -354,6 +355,7 @@ function deleteFile(name)
 
 window.addEventListener('DOMContentLoaded', (event) => {
     textEditor.register("textEditorDiv");
+    gfxEditor.register("gfxEditorDiv");
     storage.autoLoad();
     editors.setCurrentFile(Object.keys(storage.getFiles()).pop());
     updateFileList();
@@ -617,6 +619,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
         </div>
     </div>
     <div class="editor" id="textEditorDiv" style="display: none"></div>
+    <div class="editor" id="gfxEditorDiv">
+        <canvas id="gfxEditorDrawCanvas" width="8" height="8" style="width: 256px;"></canvas>
+        <div width="100%" style="overflow: scroll; display: None;"><canvas id="gfxEditorTilesCanvas"></canvas></div>
+    </div>
     <div class="editor" id="nullEditorDiv">Cannot edit selected file.</div>
     <div class="emulator">
         <table><tr><td colspan="4">
