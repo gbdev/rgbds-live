@@ -45,6 +45,14 @@ this.gfxEditor = new Object();
             updatePalette();
         }
         updatePalette();
+
+        tile_canvas.onmousedown = function(e) {
+            var rect = e.target.getBoundingClientRect();
+            var x = ~~((e.clientX - rect.left) / rect.width * e.target.width / 8);
+            var y = ~~((e.clientY - rect.top) / rect.height * e.target.height / 8);
+            e.preventDefault();
+            editor.setTileIndex(x + y * 16);
+        }
     }
 
     editor.setCurrentFile = function(filename)
@@ -87,8 +95,10 @@ this.gfxEditor = new Object();
 
     editor.setTileIndex = function(index)
     {
-        current_tile_index = index;
         var data = storage.getFiles()[current_file];
+        if (index >= data.length / 16)
+            index = data.length / 16 - 1;
+        current_tile_index = index;
 
         var ctx = draw_canvas.getContext('2d');
         var image_data = ctx.getImageData(0, 0, draw_canvas.width, draw_canvas.height);
