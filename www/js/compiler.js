@@ -78,13 +78,149 @@ this.compiler = new Object();
         rom_symbols = [];
         ram_symbols = [];
         
-        var targets = [];
+        var asm_targets = [];
+        var c_targets = [];
         for (const name of Object.keys(storage.getFiles()))
+        {
             if (name.endsWith(".asm"))
-                targets.push(name);
-        runRgbAsm(targets, {});
+                asm_targets.push(name);
+            if (name.endsWith(".c"))
+                c_targets.push(name);
+        }
+        if (asm_targets.length > 0)
+            runRgbAsm(asm_targets, {});
+        if (c_targets.length > 0)
+            runSdcc(c_targets, {});
     }
-    
+
+    function runSdcc(targets, obj_files) {
+        var target = targets.pop();
+        var code = storage.getFiles()[target];
+        var preproc = ""
+        logFunction("Running: sdcpp " + target);
+        createSDCPP({
+            'arguments': ['-nostdinc', '-Wall', '-std=c11', '-D__SDCC_STACK_AUTO', '-D__SDCC_CHAR_UNSIGNED', '-D__SDCC_INT_LONG_REENT', '-D__SDCC_FLOAT_REENT', '-D__SDCC=4_0_7', '-D__SDCC_VERSION_MAJOR=4', '-D__SDCC_VERSION_MINOR=0', '-D__SDCC_VERSION_PATCH=7', '-D__SDCC_REVISION=12060', '-D__SDCC_gbz80', '-D__STDC_NO_COMPLEX__=1', '-D__STDC_NO_THREADS__=1', '-D__STDC_NO_ATOMICS__=1', '-D__STDC_NO_VLA__=1', '-D__STDC_ISO_10646__=201409L', '-D__STDC_UTF_16__=1', '-D__STDC_UTF_32__=1', '-isystem', '/usr/local/share/sdcc/include/gbz80', '-isystem', '/usr/local/share/sdcc/include'],
+            'stdin': function()
+            {
+                if (code == "") return null;
+                var result = code.charCodeAt(0);
+                code = code.substr(1);
+                return result;
+            },
+            'print': function(output)
+            {
+                preproc += output + "\n";
+            },
+            'printErr': logFunction,
+        }).then(function(sdcpp_module)
+        {
+            if (repeat) { buildFailed(); return; }
+            logFunction("Running sdcc " + target);
+            createSDCC({
+                'arguments': ['--c1mode', '-o', 'out.asm'],
+                'stdin': function()
+                {
+                    if (preproc == "") return null;
+                    var result = preproc.charCodeAt(0);
+                    preproc = preproc.substr(1);
+                    return result;
+                },
+                'print': logFunction, 'printErr': logFunction,
+            }).then(function(sdcc_module)
+            {
+                if (repeat) { buildFailed(); return; }
+                var asm;
+                try { asm = sdcc_module.FS.readFile("out.asm", {'encoding': 'utf8'}); } catch { buildFailed(); return; }
+
+                //Parse the output asm
+                var data = [];
+                var line_nr = null;
+                for(var line of (asm + "\n;<stdin>:-1").split("\n"))
+                {
+                    if (line.startsWith(";<stdin>:"))
+                    {
+                        if (line_nr !== null)
+                        {
+                            error_list.push(["info", target, line_nr, data.join("\n")]);
+                        }
+                        line_nr = parseInt(line.split(":")[1]);
+                        data = [];
+                    } else {
+                        data.push(line.trim());
+                    }
+                }
+
+                logFunction("Running sdas " + target);
+                createSDAS({
+                    'arguments': ['-plosgffw', 'main.rel', 'in.asm'],
+                    'preRun': function(m) {
+                        m.FS.writeFile("in.asm", asm);
+                    },
+                    'print': logFunction, 'printErr': logFunction,
+                }).then(function(sdas_module)
+                {
+                    try { obj_files[target] = sdas_module.FS.readFile("main.rel"); } catch { buildFailed(); return; }
+                    if (targets.length > 0)
+                        runSdcc(targets, obj_files);
+                    else
+                        runSdccLink(obj_files);
+                });
+            });
+        });
+    }
+
+    function runSdccLink(obj_files) {
+        logFunction("Running sdldgb");
+        var args = ['-nmjwx', '-i', 'main.ihx', '-b', '_CODE=0x0200', '-b', '_DATA=0xc000', '-k', '/usr/local/share/sdcc/lib/gbz80', '-l', 'gbz80', '/usr/local/share/sdcc/lib/gbz80/crt0.rel'];
+        for(var name in obj_files)
+            args.push(name + ".rel");
+        createSDLD({
+            'arguments': args,
+            'preRun': [function(m) {
+                for(var name in obj_files)
+                    m.FS.writeFile(name + ".rel", obj_files[name]);
+            }],
+            'print': logFunction, 'printErr': logFunction,
+        }).then(function(ld_module)
+        {
+            logFunction("Running makebin");
+            try{ var hex = ld_module.FS.readFile("main.ihx", {'encoding': 'utf8'}); } catch { buildFailed(); return; }
+            try{ var map = ld_module.FS.readFile("main.map", {'encoding': 'utf8'}); } catch { buildFailed(); return; }
+            createMAKEBIN({
+                'arguments': ['-yo', 'A', '-Z', 'main.ihx', 'main.gb'],
+                'preRun': function(m) {
+                    m.FS.writeFile('main.ihx', hex);
+                }
+            }).then(function(makebin_module) {
+                var rom_file = makebin_module.FS.readFile('main.gb');
+                buildDone(rom_file, "");
+
+                var section_re = /([a-zA-Z0-9_]+) +([0-9A-F]+) +([0-9A-F]+) =/
+                var symbol_re = /      ([0-9A-F]+)  ([a-zA-Z0-9_]+) +.+/
+                var section_end = null;
+                var symbols = rom_symbols;
+                for(var line of map.split("\n"))
+                {
+                    var section_match = section_re.exec(line);
+                    if (section_match)
+                    {
+                        section_end = parseInt(section_match[2], 16) + parseInt(section_match[3], 16)
+                        symbols = rom_symbols;
+                        if (section_match[1] == "_DATA")
+                            symbols = ram_symbols;
+                        if (!(section_end in symbols))
+                            symbols[section_end] = null;
+                    }
+                    var symbol_match = symbol_re.exec(line);
+                    if (symbol_match && section_end)
+                    {
+                        symbols[parseInt(symbol_match[1], 16)] = symbol_match[2];
+                    }
+                }
+            });
+        });
+    }
+
     function runRgbAsm(targets, obj_files) {
         var target = targets.pop();
         logFunction("Running: rgbasm " + target + ' -o ' + target + '.o -Wall');
@@ -127,7 +263,7 @@ this.compiler = new Object();
             var FS = m.FS;
             try { var rom_file = FS.readFile("output.gb"); } catch { buildFailed(); return; }
             try { var map_file = FS.readFile("output.map", {'encoding': 'utf8'}); } catch { buildFailed(); return; }
-            
+
             runRgbFix(rom_file, map_file);
             //buildDone(rom_file, map_file);
         });

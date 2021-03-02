@@ -1,0 +1,3309 @@
+#ifndef __SDCC_STDATOMIC_H
+#define __SDCC_STDATOMIC_H 1
+
+typedef struct {unsigned char flag;} atomic_flag;
+
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n) || defined(__SDCC_gbz80) || defined(__SDCC_tlcs90) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_stm8) || defined(__SDCC_hc08) || defined(__SDCC_s08)
+
+#define ATOMIC_FLAG_INIT {1}
+_Bool atomic_flag_test_and_set(volatile atomic_flag *object);
+
+void atomic_flag_clear(volatile atomic_flag *object);
+
+#elif defined(__SDCC_mcs51)
+
+#define ATOMIC_FLAG_INIT {0}
+_Bool atomic_flag_test_and_set(volatile atomic_flag __idata *object) __nonbanked;
+
+void atomic_flag_clear(volatile atomic_flag __idata *object) __nonbanked;
+
+#elif defined(__SDCC_ds390)
+
+#define ATOMIC_FLAG_INIT {0}
+_Bool atomic_flag_test_and_set(volatile atomic_flag __idata *object);
+
+void atomic_flag_clear(volatile atomic_flag __idata *object);
+
+#else
+
+#error Support for atomic_flag not implemented
+
+#endif
+
+#endif
+
+/*-------------------------------------------------------------------------
+   stdint.h - ISO C99 7.14 Signal handing <signal.h>
+
+   Copyright (C) 2019, Philipp Klaus Krause, krauseph@informatik.uni-freiburg.de
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef _SIGNAL_H
+#define _SIGNAL_H 1
+
+typedef unsigned char sig_atomic_t;
+
+#endif
+
+/*-------------------------------------------------------------------------
+   iso646.h
+
+   Copyright (C) 2011, Philipp Klaus Krause . pkk@spth.de
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_ISO646_H
+#define __SDCC_ISO646_H
+
+#define and &&
+#define and_eq &=
+#define bitand &
+#define bitor |
+#define compl ~
+#define not !
+#define not_eq !=
+#define or ||
+#define or_eq |=
+#define xor ^
+#define xor_eq ^=
+
+#endif
+
+/*-------------------------------------------------------------------------
+   stdlib.h - General utilities (ISO C 11 7.22)
+
+   Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
+   Copyright (c) 2016, Philipp Klaus Krause, pkk@spth.de
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_STDLIB_H
+#define __SDCC_STDLIB_H 1
+
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_ds400) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
+#define __reentrant
+#endif
+
+#ifndef __SIZE_T_DEFINED
+#define __SIZE_T_DEFINED
+  typedef unsigned int size_t;
+#endif
+
+#ifndef __WCHAR_T_DEFINED
+#define __WCHAR_T_DEFINED
+  typedef unsigned long int wchar_t;
+#endif
+
+#ifndef NULL
+#define NULL (void *)0
+#endif
+
+#define RAND_MAX 32767
+
+#define MB_CUR_MAX 4
+
+/* Numeric conversion functions (ISO C11 7.22.1) */
+extern float atof (const char *nptr);
+extern int atoi (const char *nptr);
+extern long int atol (const char *nptr);
+#ifdef __SDCC_LONGLONG
+extern long long int atoll (const char *nptr);
+#endif
+extern long int strtol(const char *nptr, char **endptr, int base);
+extern unsigned long int strtoul(const char *nptr, char **endptr, int base);
+
+/* SDCC extensions */
+extern void __uitoa(unsigned int, char *, unsigned char);
+extern void __itoa(int, char *, unsigned char);
+extern void __ultoa(unsigned long, char *, unsigned char);
+extern void __ltoa(long, char *, unsigned char);
+
+/* Pseudo-random sequence generation functions (ISO C11 7.22.2) */
+int rand(void);
+void srand(unsigned int seed);
+
+/* Memory management functions (ISO C11 7.22.3) */
+#if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
+void __xdata *calloc (size_t nmemb, size_t size);
+void __xdata *malloc (size_t size);
+void __xdata *realloc (void *ptr, size_t size);
+#else
+void *calloc (size_t nmemb, size_t size);
+void *malloc (size_t size);
+void *realloc (void *ptr, size_t size);
+#endif
+#if __STDC_VERSION__ >= 201112L
+inline void *aligned_alloc(size_t alignment, size_t size)
+{
+  (void)alignment;
+  return malloc(size);
+}
+#endif
+extern void free (void * ptr);
+
+/* Searching and sorting utilities (ISO C11 7.22.5) */
+extern void *bsearch(const void *key, const void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *) __reentrant);
+extern void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *) __reentrant);
+
+/* Integer arithmetic functions (ISO C11 7.22.6) */
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90) || defined (__SDCC_ez80_z80) || defined (__SDCC_z80n)
+int abs(int j) __preserves_regs(b, c, iyl, iyh);
+#else
+int abs(int j);
+#endif
+long int labs(long int j);
+
+/* C99 Multibyte/wide character conversion functions (ISO C11 7.22.7) */
+#if __STDC_VERSION__ >= 199901L
+int mblen(const char *s, size_t n);
+int mbtowc(wchar_t *restrict pwc, const char *restrict s, size_t n);
+int wctomb(char *s, wchar_t wc);
+#endif
+
+/* C99 Multibyte/wide string conversion functions (ISO C 11 7.22.8) */
+#if __STDC_VERSION__ >= 199901L
+size_t mbstowcs(wchar_t *restrict pwcs, const char *restrict s, size_t n);
+size_t wcstombs(char *restrict s, const wchar_t *restrict pwcs, size_t n);
+#endif
+
+/* Bounds-checking interfaces from annex K of the C11 standard. */
+#if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__
+
+#ifndef __RSIZE_T_DEFINED
+#define __RSIZE_T_DEFINED
+typedef size_t rsize_t;
+#endif
+
+#ifndef __ERRNO_T_DEFINED
+#define __ERRNO_T_DEFINED
+typedef int errno_t;
+#endif
+
+typedef void (*constraint_handler_t)(const char *restrict msg, void *restrict ptr, errno_t error);
+
+#endif
+
+#endif
+
+/*-------------------------------------------------------------------------
+   time.h
+
+   Copyright (C) 2001, Johan Knol <johan.knol AT iduna.nl>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef TINIBIOS_H
+
+#define TINIBIOS_H
+
+#include <ds80c390.h>
+#include <time.h>
+
+void Serial0Init (unsigned long baud, unsigned char buffered);
+char Serial0GetChar(void);
+void Serial0PutChar(char);
+char Serial0CharArrived(void);
+void Serial0Baud(unsigned long baud);
+void Serial0SendBreak(void);
+void Serial0Flush(void);
+
+void Serial0SwitchToBuffered(void); /* ds400 only. */
+
+void Serial1Init (unsigned long baud, unsigned char buffered);
+char Serial1GetChar(void);
+void Serial1PutChar(char);
+char Serial1CharArrived(void);
+void Serial1Baud(unsigned long baud);
+void Serial1SendBreak(void);
+void Serial1Flush(void);
+
+unsigned long ClockTicks();
+void ClockMilliSecondsDelay(unsigned long ms);
+void ClockMicroSecondsDelay(unsigned int us);
+
+#define SERIAL_0_BAUD 115200L
+#define SERIAL_1_BAUD 9600L
+
+/* these need to be binary numbers */
+#define SERIAL_0_RECEIVE_BUFFER_SIZE 1024
+#define SERIAL_1_RECEIVE_BUFFER_SIZE 64
+
+/* I know someone is fooling with the crystals */
+#if defined(__SDCC_ds400)
+# define OSCILLATOR 14745600L
+#else
+# define OSCILLATOR 18432000L
+#endif
+
+/* Set the cpu speed in clocks per machine cycle, valid values are:
+   1024: Divide-by-1024 (power management) mode (screws ALL timers and serial)
+      4: Standard 8051 divide-by-4 mode
+      2: Use 2x xtal multiplier
+      1: Use 4x xtal multiplier (Don't do this with a TINI at 18.432MHz)
+*/
+#define CPU_SPEED 2
+void CpuSpeed(unsigned int speed);
+
+/* The MOVX stretch cycles, see datasheet */
+#define CPU_MOVX_STRETCH 0x01
+
+/* from rtc390.c */
+#define HAVE_RTC
+unsigned char RtcRead(struct tm *rtcDate);
+void RtcWrite(struct tm *rtcDate);
+
+/* from lcd390.c */
+extern void LcdInit(void);
+extern void LcdOn(void);
+extern void LcdOff(void);
+extern void LcdClear(void);
+extern void LcdHome(void);
+extern void LcdGoto(unsigned int collumnRow);
+extern void LcdPutChar(char c);
+extern void LcdPutString(char *string);
+extern void LcdLPutString(unsigned int collumnRow, char *string);
+extern void LcdPrintf(const char *format, ...) __reentrant;
+extern void LcdLPrintf(unsigned int collumnRow, const char *format, ...) __reentrant;
+
+/* from i2c390.c */
+#define I2C_BUFSIZE 128
+extern char I2CReset(void);
+extern char I2CStart(void);
+extern char I2CStop(void);
+extern char I2CSendStop(char addr, char count,
+			char send_stop);
+extern char I2CReceive(char addr, char count);
+extern char I2CSendReceive(char addr, char tx_count,
+			   char rx_count);
+/*extern char I2CByteOut(char);*/
+/*extern void I2CDumpError(char);*/
+
+/* global transfer buffers */
+extern char i2cTransmitBuffer[I2C_BUFSIZE];
+extern char i2cReceiveBuffer[I2C_BUFSIZE];
+
+/* Macro for normal send transfer ending with a stop condition */
+#define I2CSend(addr, count)   I2CSendStop(addr, count, 1)
+
+
+/* internal functions used by tinibios.c */
+unsigned char _sdcc_external_startup(void);
+void Serial0IrqHandler (void) __interrupt 4;
+void Serial1IrqHandler (void) __interrupt 7;
+
+#if !defined(__SDCC_ds400)
+void ClockInit();
+void ClockIrqHandler (void) __interrupt 1 __naked;
+#endif
+
+#if defined(__SDCC_ds400)
+/* functions for dealing with the ds400 ROM firmware. */
+
+/* A wrapper which calls rom_init allocating all available RAM in CE0
+   to the heap, sets the serial port to SERIAL_0_BAUD, sets up the
+   millisecond timer, and diddles the clock multiplier. */
+
+/* Values for the romInit "speed" parameter. */
+#define SPEED_1X	0 /* no clock multiplier, normal speed. */
+#define SPEED_2X	1 /* 2x clock multiplier. */
+#define SPEED_4X	2 /* 4x clock, DOESN'T WORK ON TINIm400! */
+
+unsigned char romInit(unsigned char noisy,
+		      char speed);
+
+/* Install an interrupt handler. */
+void installInterrupt(void (*isrPtr)(void), unsigned char offset);
+#endif
+
+
+#endif /* TINIBIOS_H */
+/*-------------------------------------------------------------------------
+   ds80c390.h - Register Declarations for the DALLAS DS80C390 Processor
+                 far from complete, e.g. no CAN
+
+   Copyright (C) 2000, Johan Knol <johan.knol AT iduna.nl>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef DS80C390_H
+#define DS80C390_H
+
+__sfr __at 0x80 P4; 		/* ce3..ce0, a19..a16 */
+__sfr __at 0x81 SP; 		/* stack pointer */
+__sfr __at 0x82 DPL; 		/* data pointer 0 lsb */
+__sfr __at 0x83 DPH; 		/* data pointer 0 msb */
+__sfr __at 0x84 DPL1; 		/* data pointer 1 lsb */
+__sfr __at 0x85 DPH1; 		/* data pointer 1 msb */
+__sfr __at 0x86 DPS; 		/* data pointer select */
+__sfr __at 0x87 PCON; 		/* power control */
+__sfr __at 0x88 TCON; 		/* timer/counter control */
+  __sbit __at 0x88 IT0;
+  __sbit __at 0x89 IE0;
+  __sbit __at 0x8a IT1;
+  __sbit __at 0x8b IE1;
+  __sbit __at 0x8c TR0;
+  __sbit __at 0x8d TF0;
+  __sbit __at 0x8e TR1;
+  __sbit __at 0x8f TF1;
+__sfr __at 0x89 TMOD; 		/* timer mode control */
+__sfr __at 0x8a TL0; 		/* timer 0 lsb */
+__sfr __at 0x8b TL1; 		/* timer 1 msb */
+__sfr __at 0x8c TH0; 		/* timer 0 msb */
+__sfr __at 0x8d TH1; 		/* timer 1 msb */
+__sfr __at 0x8e CKCON; 		/* clock control */
+__sfr __at 0x90 P1;
+  __sbit __at 0x90 T2;
+  __sbit __at 0x91 T2EX;
+  __sbit __at 0x92 RXD1;
+  __sbit __at 0x93 TXD1;
+  __sbit __at 0x94 INT2;
+  __sbit __at 0x95 INT3;
+  __sbit __at 0x96 INT4;
+  __sbit __at 0x97 INT5;
+__sfr __at 0x91 EXIF; 		/* external interrupt flag */
+__sfr __at 0x92 P4CNT;
+__sfr __at 0x93 DPX; 		/* extended datapointer 0 */
+__sfr __at 0x95 DPX1; 		/* extended datapointer 1 */
+__sfr __at 0x98 SCON0; 		/* serial 0 control */
+  __sbit __at 0x98 RI_0;
+  __sbit __at 0x99 TI_0;
+  __sbit __at 0x9a RB8_0;
+  __sbit __at 0x9b TB8_0;
+  __sbit __at 0x9c REN_0;
+  __sbit __at 0x9d SM2_0;
+  __sbit __at 0x9e SM1_0;
+  __sbit __at 0x9f SM0_0;
+  __sbit __at 0x9f FE_0;	/* depending on SMOD0 */
+__sfr __at 0x99 SBUF0;		/* serial 0 data buffer */
+__sfr __at 0x9b ESP; 		/* extended stack pointer */
+__sfr __at 0x9c AP; 		/* address page */
+__sfr __at 0x9d ACON; 		/* address control */
+__sfr __at 0xa0 P2; 		/* never mind the sbits */
+__sfr __at 0xa1 P5;
+__sfr __at 0xa2 P5CNT;
+__sfr __at 0xa8 IE; 		/* interrupt enable */
+  __sbit __at 0xa8 EX0;
+  __sbit __at 0xa9 ET0;
+  __sbit __at 0xaa EX1;
+  __sbit __at 0xab ET1;
+  __sbit __at 0xac ES0;
+  __sbit __at 0xad ET2;
+  __sbit __at 0xae ES1;
+  __sbit __at 0xaf EA;
+__sfr __at 0xb0 P3;
+  __sbit __at 0xb0 RXD0;
+  __sbit __at 0xb1 TXD0;
+  __sbit __at 0xb2 INT0;
+  __sbit __at 0xb3 INT1;
+  __sbit __at 0xb4 T0;
+  __sbit __at 0xb5 T1;
+  __sbit __at 0xb6 WR;
+  __sbit __at 0xb7 RD;
+__sfr __at 0xb8 IP; 		/* interupt priority */
+  __sbit __at 0xb8 PX0; 	/* external 0 */
+  __sbit __at 0xb9 PT0; 	/* timer 0 */
+  __sbit __at 0xba PX1; 	/* external 1 */
+  __sbit __at 0xbb PT1; 	/* timer 1 */
+  __sbit __at 0xbc PS0; 	/* serial port 0 */
+  __sbit __at 0xbd PT2; 	/* timer 2 */
+  __sbit __at 0xbe PS1; 	/* serial port 1 */
+__sfr __at 0xc0 SCON1; 		/* serial 1 control */
+  __sbit __at 0xc0 RI_1;
+  __sbit __at 0xc1 TI_1;
+  __sbit __at 0xc2 RB8_1;
+  __sbit __at 0xc3 TB8_1;
+  __sbit __at 0xc4 REN_1;
+  __sbit __at 0xc5 SM2_1;
+  __sbit __at 0xc6 SM1_1;
+  __sbit __at 0xc7 SM0_1;
+  __sbit __at 0xc7 FE_1;	/* depending on SMOD0 */
+__sfr __at 0xc1 SBUF1; 		/* serial 1 data buffer */
+__sfr __at 0xc4 PMR; 		/* power managment */
+__sfr __at 0xc6 MCON; 		/* memory control register */
+__sfr __at 0xc7 TA; 		/* timed access register */
+__sfr __at 0xc8 T2CON; 		/* timer 2 control */
+  __sbit __at 0xc8 CP_RL;	/* capture/reload */
+  __sbit __at 0xc9 C_T; 	/* count/timer */
+  __sbit __at 0xca TR2; 	/* stop/run */
+  __sbit __at 0xcb EXEN2;
+  __sbit __at 0xcc TCLK;
+  __sbit __at 0xcd RCLK;
+  __sbit __at 0xce EXF2;
+  __sbit __at 0xcf TF2; 	/* overflow flag */
+__sfr __at 0xc9 T2MOD; 		/* timer 2 mode */
+__sfr __at 0xca RCAP2L; 	/* timer 2 capture/reload */
+__sfr __at 0xca RTL2; 		/* depends on CP_RL */
+__sfr __at 0xcb RCAP2H;
+__sfr __at 0xcb RTH2;
+__sfr __at 0xcc TL2; 		/* timer 2 lsb */
+__sfr __at 0xcd TH2; 		/* timer 2 msb */
+__sfr __at 0xd0 PSW; 		/* program status word (byte actually) */
+  __sbit __at 0xd0 P; 		/* parity */
+  __sbit __at 0xd1 F1; 		/* user flag 1 */
+  __sbit __at 0xd2 OV; 		/* overflow flag */
+  __sbit __at 0xd3 RS0; 	/* register select l */
+  __sbit __at 0xd4 RS1; 	/* register select h */
+  __sbit __at 0xd5 F0; 		/* user flag 0 */
+  __sbit __at 0xd6 AC; 		/* auxiliary carry flag */
+  __sbit __at 0xd7 CY; 		/* carry flag */
+__sfr __at 0xd1 MCNT0; 		/* arithmetic accellerator */
+__sfr __at 0xd2 MCNT1;
+__sfr __at 0xd3 MA;
+__sfr __at 0xd4 MB;
+__sfr __at 0xd5 MC;
+__sfr __at 0xd8 WDCON; 		/* watch dog */
+  __sbit __at 0xd8 RWT;
+  __sbit __at 0xd9 EWT;
+  __sbit __at 0xda WDRF;
+  __sbit __at 0xdb WDIF;
+  __sbit __at 0xdc PFI;
+  __sbit __at 0xdd EPFI;
+  __sbit __at 0xde POR;
+  __sbit __at 0xdf SMOD_1;
+__sfr __at 0xe0 ACC; 		/* accumulator */
+__sfr __at 0xe8 EIE; 		/* extended interrupt enable */
+  __sbit __at 0xe8 EX2;
+  __sbit __at 0xe9 EX3;
+  __sbit __at 0xea EX4;
+  __sbit __at 0xeb EX5;
+  __sbit __at 0xec EWDI;
+  __sbit __at 0xed C1IE;
+  __sbit __at 0xee C0IE;
+  __sbit __at 0xef CANBIE;
+__sfr __at 0xea MXAX; 		/* extended address register */
+__sfr __at 0xf0 B; 			/* aux accumulator */
+__sfr __at 0xf8 EIP; 		/* extended interrupt priority */
+  __sbit __at 0xf8 PX2;
+  __sbit __at 0xf9 PX3;
+  __sbit __at 0xfa PX4;
+  __sbit __at 0xfb PX5;
+  __sbit __at 0xfc PWDI;
+  __sbit __at 0xfd C1IP;
+  __sbit __at 0xfe C0IP;
+  __sbit __at 0xff CANBIP;
+
+/*  WORD/DWORD Registers  */
+
+__sfr16 __at (0x8C8A) TMR0;  /* TIMER 0 COUNTER   				*/
+__sfr16 __at (0x8D8B) TMR1;  /* TIMER 1 COUNTER                 */
+__sfr16 __at (0xCDCC) TMR2;  /* TIMER 2 COUNTER                 */
+__sfr16 __at (0xCBCA) RCAP2; /* TIMER 2 CAPTURE REGISTER WORD	*/
+
+#endif /* DS80C390_H */
+/*-------------------------------------------------------------------------
+   float.h - ANSI functions forward declarations
+
+   Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDC51_FLOAT_H
+#define __SDC51_FLOAT_H 1
+
+#include <limits.h>
+
+#define FLT_RADIX       2
+#define FLT_MANT_DIG    24
+#define FLT_EPSILON     1.192092896E-07F
+#define FLT_DIG         6
+#define FLT_MIN_EXP     (-125)
+#define FLT_MIN         1.175494351E-38F
+#define FLT_MIN_10_EXP  (-37)
+#define FLT_MAX_EXP     (+128)
+#define FLT_MAX         3.402823466E+38F
+#define FLT_MAX_10_EXP  (+38)
+
+/* the following deal with IEEE single-precision numbers */
+#if defined(__SDCC_FLOAT_LIB)
+#define EXCESS		126
+#define SIGNBIT		((unsigned long)0x80000000)
+#define __INFINITY	((unsigned long)0x7F800000)
+#define HIDDEN		(unsigned long)(1ul << 23)
+#define SIGN(fp)	(((unsigned long)(fp) >> (8*sizeof(fp)-1)) & 1)
+#define EXP(fp)		(((unsigned long)(fp) >> 23) & (unsigned int) 0x00FF)
+#define MANT(fp)	(((fp) & (unsigned long)0x007FFFFF) | HIDDEN)
+#define NORM            0xff000000
+#define PACK(s,e,m)	((s) | ((unsigned long)(e) << 23) | (m))
+#endif
+
+float __uchar2fs (unsigned char);
+float __schar2fs (signed char);
+float __uint2fs (unsigned int);
+float __sint2fs (signed int);
+float __ulong2fs (unsigned long);
+float __slong2fs (signed long);
+unsigned char __fs2uchar (float);
+signed char __fs2schar (float);
+unsigned int __fs2uint (float);
+signed int __fs2sint (float);
+unsigned long __fs2ulong (float);
+signed long __fs2slong (float);
+
+float __fsadd (float, float);
+float __fssub (float, float);
+float __fsmul (float, float);
+float __fsdiv (float, float);
+
+char __fslt (float, float);
+char __fseq (float, float);
+char __fsgt (float, float);
+
+
+#if defined(__SDCC_FLOAT_LIB) && defined(__SDCC_mcs51) && !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
+
+#define FLOAT_ASM_MCS51
+
+/* This adds extra code for proper round-off, in
+   an attempt to match the results from gcc. */
+#define FLOAT_FULL_ACCURACY
+
+/* This adds about 66 bytes to the code size and
+   significantly speeds up shift operations more
+   than 8 bits (common when subtracting numbers
+   of significantly different magnitude and scaling
+   to fixed point) */
+#define FLOAT_SHIFT_SPEEDUP
+
+#define sign_a  psw.1
+#define sign_b  psw.5
+#define exp_a dpl
+#define exp_b dph
+#endif	/* using mcs51 assembly */
+
+
+#endif	/* __SDC51_FLOAT_H */
+
+/*-------------------------------------------------------------------------
+   sdcc-lib.h - Top level header file for the sdcc libraries that enables
+                target specific features.
+
+   Copyright (C) 2004, Maarten Brock, sourceforge.brock@dse.nl
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDC51_SDCC_LIB_H
+#define __SDC51_SDCC_LIB_H	1
+
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n)
+#include <asm/z80/features.h>
+
+#elif defined(__SDCC_r2k) || defined(__SDCC_r2ka)
+#include <asm/r2k/features.h>
+
+#elif defined(__SDCC_r3ka)
+#include <asm/r3ka/features.h>
+
+#elif defined(__SDCC_tlcs90)
+#include <asm/tlcs90/features.h>
+
+#elif defined(__SDCC_gbz80)
+#include <asm/gbz80/features.h>
+
+#elif defined(__SDCC_mcs51)
+#include <asm/mcs51/features.h>
+
+#elif defined(__SDCC_ds390)
+#include <asm/ds390/features.h>
+
+#elif defined(__SDCC_stm8)
+#include <asm/stm8/features.h>
+
+#else
+/* PENDING */
+#include <asm/default/features.h>
+
+#endif
+
+#endif
+
+/*-------------------------------------------------------------------------
+   uchar.h: Unicode utilities  (ISO C 11 7.28)
+
+   Copyright (C) 2015-2016, Philipp Klaus Krause, pkk@spth.de
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_UCHAR_H
+#define __SDCC_UCHAR_H 1
+
+#ifndef __MBSTATE_T_DEFINED
+#define __MBSTATE_T_DEFINED
+  typedef struct {unsigned char c[3];} mbstate_t;
+#endif
+
+#ifndef __SIZE_T_DEFINED
+#define __SIZE_T_DEFINED
+  typedef unsigned int size_t;
+#endif
+
+#ifndef __CHAR16_T_DEFINED
+#define __CHAR16_T_DEFINED
+  typedef unsigned int char16_t;
+#endif
+
+#ifndef __CHAR32_T_DEFINED
+#define __CHAR32_T_DEFINED
+  typedef unsigned long int char32_t;
+#endif
+
+size_t mbrtoc16(char16_t *restrict pc16, const char *restrict s, size_t n, mbstate_t *restrict ps);
+size_t c16rtomb(char *restrict s, char16_t c16, mbstate_t *restrict ps);
+size_t mbrtoc32(char32_t *restrict pc32, const char *restrict s, size_t n, mbstate_t *restrict ps);
+size_t c32rtomb(char *restrict s, char32_t c32, mbstate_t *restrict ps);
+
+size_t __mbstoc16s(char16_t *restrict c16s, const char *restrict s, size_t n);
+size_t __c16stombs(char *restrict s, const char16_t *restrict c16s, size_t n);
+
+#endif
+
+/*-------------------------------------------------------------------------
+   limits.h - ANSI defines constants for sizes of integral types
+
+   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDC51_LIMITS_H
+#define __SDC51_LIMITS_H 1
+
+#define CHAR_BIT    8    /* bits in a char */
+#define SCHAR_MAX   127
+#define SCHAR_MIN  -128
+#define UCHAR_MAX   0xff
+
+#ifdef __SDCC_CHAR_UNSIGNED
+#define CHAR_MAX    UCHAR_MAX
+#define CHAR_MIN    0
+#else
+#define CHAR_MAX    SCHAR_MAX
+#define CHAR_MIN    SCHAR_MIN
+#endif
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L
+#define MB_LEN_MAX  4
+#endif
+
+#define INT_MIN     (-32767 - 1)
+#define INT_MAX     32767
+#define SHRT_MAX    INT_MAX
+#define SHRT_MIN    INT_MIN
+#define UINT_MAX    0xffff
+#define UINT_MIN    0
+#define USHRT_MAX   UINT_MAX
+#define USHRT_MIN   UINT_MIN
+#define LONG_MIN    (-2147483647L-1)
+#define LONG_MAX    2147483647L
+#define ULONG_MAX   0xffffffff
+#define ULONG_MIN   0
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#define LLONG_MIN   (-9223372036854775807LL-1)
+#define LLONG_MAX   9223372036854775807LL
+#define ULLONG_MAX  18446744073709551615ULL
+#endif
+
+#endif
+
+#ifndef __SDCC_STDALIGN_H
+#define __SDCC_STDALIGN_H 1
+
+#ifndef __alignas_is_defined
+#define __alignas_is_defined 1
+
+#define alignas _Alignas
+
+#endif
+
+
+#ifndef __alignof_is_defined
+#define __alignof_is_defined 1
+
+#define alignof _Alignof
+
+#endif
+
+#endif
+
+/*-------------------------------------------------------------------------
+   string.h - ISO header for string library functions
+
+   Copyright (C) 1998, Sandeep Dutta
+   Copyright (C) 2009-2019, Philipp Klaus Krause pkk@spth.de
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_STRING_H
+#define __SDCC_STRING_H 1
+
+#ifndef NULL
+# define NULL (void *)0
+#endif
+
+#ifndef __SIZE_T_DEFINED
+# define __SIZE_T_DEFINED
+  typedef unsigned int size_t;
+#endif
+
+/* Bounds-checking interfaces from annex K of the C11 standard. */
+#if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__
+
+#ifndef __RSIZE_T_DEFINED
+#define __RSIZE_T_DEFINED
+typedef size_t rsize_t;
+#endif
+
+#ifndef __ERRNO_T_DEFINED
+#define __ERRNO_T_DEFINED
+typedef int errno_t;
+#endif
+
+#endif
+
+#if defined(__SDCC_mcs51) || defined(__SDCC_hc08) || defined(__SDCC_ds390) || defined(__SDCC_pic14) || defined(__SDCC_pic16)
+#define __SDCC_BROKEN_STRING_FUNCTIONS
+#endif
+
+/* The function prototypes are ordered as in the ISO C11 standard. */
+
+/* Todo: fix the "restrict" stuff for C99 compliance. */
+
+/* Copying functions: */
+void *memccpy (void */*restrict*/ dst, const void */*restict*/ src, int c, size_t n);
+extern void *memcpy (void * /*restrict */ dest, const void * /*restrict*/ src, size_t n);
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka)
+extern void *memmove (void *dest, const void *src, size_t n) __preserves_regs(iyl, iyh);
+#else
+extern void *memmove (void *dest, const void *src, size_t n);
+#endif
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90) || defined (__SDCC_ez80_z80) || defined (__SDCC_z80n)
+extern char *strcpy (char * /*restrict*/ dest, const char * /*restrict*/ src) __preserves_regs(iyl, iyh);
+#else
+extern char *strcpy (char * /*restrict*/ dest, const char * /*restrict*/ src);
+#endif
+extern char *strncpy (char * /*restrict*/ dest, const char * /*restrict*/ src, size_t n);
+
+/* Concatenation functions: */
+extern char *strcat (char * /*restrict*/ dest, const char * /*restrict*/ src);
+extern char *strncat (char * /*restrict*/ dest, const char * /*restrict*/ src, size_t n);
+
+/* C2X Duplication functions */
+extern char *strdup (const char *s);
+extern char *strndup (const char *s, size_t n);
+
+/* Comparison functions: */
+extern int memcmp (const void *s1, const void *s2, size_t n);
+extern int strcmp (const char *s1, const char *s2);
+#define strcoll(s1, s2) strcmp(s1, s2)
+/*int strcoll(const char *s1, const char *s2) {return strcmp(s1, s2);}*/
+extern int strncmp (const char *s1, const char *s2, size_t n);
+extern size_t strxfrm (char *dest, const char *src, size_t n);
+
+/* Search functions: */
+extern void *memchr (const void *s, int c, size_t n);
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
+extern char *strchr (const char *s, char c); /* c should be int according to standard. */
+#else
+extern char *strchr (const char *s, int c);
+#endif
+extern size_t strcspn(const char *s, const char *reject);
+extern char *strpbrk(const char *s, const char *accept);
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
+extern char *strrchr(const char *s, char c); /* c should be int according to standard. */
+#else
+extern char *strrchr(const char *s, int c);
+#endif
+extern size_t strspn (const char *s, const char *accept);
+extern char *strstr (const char *haystack, const char *needle);
+extern char *strtok (char * /* restrict*/ str, const char * /*restrict*/ delim);
+
+/* Miscanelleous functions: */
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
+extern void *memset (void *s, unsigned char c, size_t n); /* c should be int according to standard. */
+#else
+extern void *memset (void *s, int c, size_t n);
+#endif
+
+/* extern char *strerror(int errnum); */
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_tlcs90) || defined (__SDCC_ez80_z80) || defined (__SDCC_z80n)
+extern size_t strlen (const char *s) __preserves_regs(d, e, iyl, iyh);
+#else
+extern size_t strlen (const char *s);
+#endif
+
+#ifdef __SDCC_ds390
+extern void __xdata * memcpyx(void __xdata *, void __xdata *, int) __naked;
+#endif
+
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined (__SDCC_ez80_z80) || defined (__SDCC_z80n)
+#define memcpy(dst, src, n) __builtin_memcpy(dst, src, n)
+#define strcpy(dst, src) __builtin_strcpy(dst, src)
+#define strncpy(dst, src, n) __builtin_strncpy(dst, src, n)
+#define strchr(s, c) __builtin_strchr(s, c)
+#define memset(dst, c, n) __builtin_memset(dst, c, n)
+#else
+extern void *__memcpy (void * /*restrict */ dest, const void * /*restrict*/ src, size_t n);
+#define memcpy(dst, src, n) __memcpy(dst, src, n)
+#endif
+
+#endif
+
+/*-------------------------------------------------------------------------
+   wchar.h - Extended and multibyte wide character utilitites (ISO C 11 7.29)
+
+   Copyright (c) 2015-2016, Philipp Klaus Krause / pkk@spth.de
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_WCHAR_H
+#define __SDCC_WCHAR_H 1
+
+#ifndef __WCHAR_T_DEFINED
+#define __WCHAR_T_DEFINED
+  typedef unsigned long int wchar_t;
+#endif
+
+#ifndef __SIZE_T_DEFINED
+#define __SIZE_T_DEFINED
+  typedef unsigned int size_t;
+#endif
+
+#ifndef __MBSTATE_T_DEFINED
+#define __MBSTATE_T_DEFINED
+  typedef struct {unsigned char c[3];} mbstate_t;
+#endif
+
+#ifndef __WINT_T_DEFINED
+#define __WINT_T_DEFINED
+  typedef unsigned long int wint_t;
+#endif
+
+struct tm;
+
+#ifndef WEOF
+  #define WEOF 0xfffffffful
+#endif
+
+/* C99 Wide string comparison functions (ISO C11 7.29.4.4) */
+int wcscmp(const wchar_t *s1, const wchar_t *s2);
+
+/* C99 Miscellaneous functions (ISO C11 7.29.4.6) */
+size_t wcslen(const wchar_t *s);
+
+/* C99 Single-byte/wide character conversion functions (ISO C 11 7.29.6.1) */
+wint_t btowc(int c);
+int wctob(wint_t c);
+
+/* C99 Conversion state functions (ISO C 11 7.29.6.2) */
+int mbsinit(const mbstate_t *ps);
+
+/* C99 Restartable multibyte/wide character conversion functions (ISO C 11 7.29.6.3) */
+size_t mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps);
+size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps);
+size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps);
+
+#endif /* __SDCC_WCHAR_H */
+/*-------------------------------------------------------------------------
+   typeof.h - Contains enumerations of values returned by __typeof
+ 
+   Copyright (C) 2001, Sandeep Dutta . sandeep.dutta@usa.net
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDC51_TYPEOF_H
+#define __SDC51_TYPEOF_H 1
+
+#define TYPEOF_INT        1
+#define TYPEOF_SHORT      2
+#define TYPEOF_CHAR       3
+#define TYPEOF_LONG       4
+#define TYPEOF_FLOAT      5
+#define TYPEOF_FIXED16X16 6
+#define TYPEOF_BIT        7
+#define TYPEOF_BITFIELD   8
+#define TYPEOF_SBIT       9
+#define TYPEOF_SFR        10
+#define TYPEOF_VOID       11
+#define TYPEOF_STRUCT     12
+#define TYPEOF_ARRAY      13
+#define TYPEOF_FUNCTION   14
+#define TYPEOF_POINTER    15
+#define TYPEOF_FPOINTER   16
+#define TYPEOF_CPOINTER   17
+#define TYPEOF_GPOINTER   18
+#define TYPEOF_PPOINTER   19
+#define TYPEOF_IPOINTER   20
+#define TYPEOF_EEPPOINTER 21
+
+#endif
+/*-------------------------------------------------------------------------
+   math.h: Floating point math function declarations
+
+   Copyright (C) 2001, Jesus Calvino-Fraga, jesusc@ieee.org
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+/* Version 1.0 - Initial release */
+
+#ifndef _INC_MATH
+#define _INC_MATH
+
+#define HUGE_VALF   3.402823466e+38
+
+#define PI          3.1415926536
+#define TWO_PI      6.2831853071
+#define HALF_PI     1.5707963268
+#define QUART_PI    0.7853981634
+#define iPI         0.3183098862
+#define iTWO_PI     0.1591549431
+#define TWO_O_PI    0.6366197724
+
+/* EPS=B**(-t/2), where B is the radix of the floating-point representation
+   and there are t base-B digits in the significand.  Therefore, for floats
+   EPS=2**(-12).  Also define EPS2=EPS*EPS. */
+#define EPS 244.14062E-6
+#define EPS2 59.6046E-9
+
+union float_long
+{
+    float f;
+    long l;
+};
+
+#if defined(__SDCC_MATH_LIB) && defined(__SDCC_mcs51) && !defined(__SDCC_USE_XSTACK) && !defined(__SDCC_STACK_AUTO) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
+/* Compile the mcs51 assembly version only when all these
+   conditions are met.  Since not all the functions are
+   reentrant, do not compile with --stack-auto is used. */
+#define MATH_ASM_MCS51
+#endif
+
+
+/* Functions on the z80 & gbz80 are always reentrant and so the "reentrant" */
+/* keyword is not defined. */
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90) || defined(__SDCC_gbz80) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n) || defined(__SDCC_stm8)
+#define _FLOAT_FUNC_REENTRANT
+#else
+#define _FLOAT_FUNC_REENTRANT __reentrant
+#endif
+
+/**********************************************
+ * Prototypes for float ANSI C math functions *
+ **********************************************/
+
+/* Trigonometric functions */
+float sinf(float x) _FLOAT_FUNC_REENTRANT;
+float cosf(float x) _FLOAT_FUNC_REENTRANT;
+float tanf(float x) _FLOAT_FUNC_REENTRANT;
+float cotf(float x) _FLOAT_FUNC_REENTRANT;
+float asinf(float x) _FLOAT_FUNC_REENTRANT;
+float acosf(float x) _FLOAT_FUNC_REENTRANT;
+float atanf(float x) _FLOAT_FUNC_REENTRANT;
+float atan2f(float x, float y);
+
+/* Hyperbolic functions */
+float sinhf(float x) _FLOAT_FUNC_REENTRANT;
+float coshf(float x) _FLOAT_FUNC_REENTRANT;
+float tanhf(float x) _FLOAT_FUNC_REENTRANT;
+
+/* Exponential, logarithmic and power functions */
+float expf(float x) _FLOAT_FUNC_REENTRANT;
+float logf(float x) _FLOAT_FUNC_REENTRANT;
+float log10f(float x) _FLOAT_FUNC_REENTRANT;
+float powf(float x, float y);
+float sqrtf(float a) _FLOAT_FUNC_REENTRANT;
+
+/* Nearest integer, absolute value, and remainder functions */
+float fabsf(float x) _FLOAT_FUNC_REENTRANT;
+float frexpf(float x, int *pw2);
+float ldexpf(float x, int pw2);
+float ceilf(float x) _FLOAT_FUNC_REENTRANT;
+float floorf(float x) _FLOAT_FUNC_REENTRANT;
+float modff(float x, float * y);
+
+int isnan(float f);
+int isinf(float f);
+#endif  /* _INC_MATH */
+/*-------------------------------------------------------------------------
+   ctype.h
+
+   Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
+
+   (c) 2013 Goethe-Universität Frankfurt
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_CTYPE_H
+#define __SDCC_CTYPE_H 1
+
+extern int isalnum (int c);
+extern int isalpha (int c);
+extern int iscntrl (int c);
+extern int isgraph (int c);
+extern int isprint (int c);
+extern int ispunct (int c);
+extern int isspace (int c);
+extern int isalnum (int c);
+extern int isalnum (int c);
+extern int isxdigit (int c);
+
+extern int tolower (int c);
+extern int toupper (int c);
+
+/* Provide inline versions for the most used functions for efficiency */
+#if __STDC_VERSION__ >= 199901L
+
+inline int isblank (int c)
+{
+  return ((unsigned char)c == ' ' || (unsigned char)c == '\t');
+}
+
+#ifdef EOF
+_Static_assert(!((unsigned char)EOF == ' ' || (unsigned char)EOF == '\t'), "EOF out of range - ");
+#endif
+
+inline int isdigit (int c)
+{
+  return ((unsigned char)c >= '0' && (unsigned char)c <= '9');
+}
+
+#ifdef EOF
+_Static_assert(!((unsigned char)EOF >= '0' && (unsigned char)EOF <= '9'), "EOF out of range - ");
+#endif
+
+inline int islower (int c)
+{
+  return ((unsigned char)c >= 'a' && (unsigned char)c <= 'z');
+}
+
+#ifdef EOF
+_Static_assert(!((unsigned char)EOF >= 'a' && (unsigned char)EOF <= 'z'), "EOF out of range - ");
+#endif
+
+inline int isupper (int c)
+{
+  return ((unsigned char)c >= 'A' && (unsigned char)c <= 'Z');
+}
+
+#ifdef EOF
+_Static_assert(!((unsigned char)EOF >= 'A' && (unsigned char)EOF <= 'Z'), "EOF out of range - ");
+#endif
+
+#else
+
+extern int isblank (int c);
+extern int isdigit (int c);
+extern int islower (int c);
+extern int isupper (int c);
+
+#endif
+
+#endif
+/*-------------------------------------------------------------------------
+   errno.h: Error codes used in the math functions
+
+   Copyright (C) 2001, Jesus Calvino-Fraga, jesusc@ieee.org 
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+/* Version 1.0 - Initial release */
+
+#ifndef _INC_ERRNO
+#define _INC_ERRNO
+
+extern int errno;
+
+/* Error Codes: */
+
+#define EDOM        33  /* Math argument out of domain of functions */
+#define ERANGE      34  /* Math result not representable */
+#define	EILSEQ		84	/* Illegal byte sequence */
+
+/* Bounds-checking interfaces from annex K of the C11 standard. */
+#if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__
+
+#ifndef __ERRNO_T_DEFINED
+#define __ERRNO_T_DEFINED
+typedef int errno_t;
+#endif
+
+#endif
+
+#endif  /* _INC_ERRNO */
+
+/*-------------------------------------------------------------------------
+   stdbool.h - ANSI functions forward declarations
+
+   Copyright (C) 2004, Maarten Brock, sourceforge.brock@dse.nl
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDC51_STDBOOL_H
+#define __SDC51_STDBOOL_H 1
+
+/* Define true and false of type _Bool in a way compatible with the preprocessor (see N 2229 for details). */
+#define true ((_Bool)+1)
+#define false ((_Bool)+0)
+
+#define bool _Bool
+#define __bool_true_false_are_defined 1
+
+#endif
+
+/*-------------------------------------------------------------------------
+   setjmp.h - header file for setjmp & longjmp ANSI routines
+
+   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_SETJMP_H
+#define __SDCC_SETJMP_H
+
+#define SP_SIZE		1
+
+#ifdef __SDCC_STACK_AUTO
+#define BP_SIZE		SP_SIZE
+#else
+#define BP_SIZE		0
+#endif
+
+#ifdef __SDCC_USE_XSTACK
+#define SPX_SIZE	1
+#else
+#define SPX_SIZE	0
+#endif
+
+#define BPX_SIZE	SPX_SIZE
+
+#ifdef __SDCC_MODEL_HUGE
+#define RET_SIZE	3
+#else
+#define RET_SIZE	2
+#endif
+
+#if defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k) || defined (__SDCC_r2ka) || defined (__SDCC_r3ka) || defined (__SDCC_tlcs90) || defined (__SDCC_ez80_z80) || defined (__SDCC_z80n)
+typedef unsigned char jmp_buf[6]; /* 2 for the stack pointer, 2 for the return address, 2 for the frame pointer. */
+#elif defined (__SDCC_ds390) || defined (__SDCC_stm8) && defined (__SDCC_MODEL_LARGE)
+typedef unsigned char jmp_buf[5]; /* 2 for the stack pointer, 3 for the return address. */
+#elif defined (__SDCC_stm8) || defined (__SDCC_gbz80) || defined (__SDCC_hc08) || defined (__SDCC_s08)
+typedef unsigned char jmp_buf[4]; /* 2 for the stack pointer, 2 for the return address. */
+#elif defined (__SDCC_pdk13) || defined (__SDCC_pdk14) || defined (__SDCC_pdk15)
+typedef unsigned char jmp_buf[3]; /* 1 for the stack pointer, 2 for the return address. */
+#else
+typedef unsigned char jmp_buf[RET_SIZE + SP_SIZE + BP_SIZE + SPX_SIZE + BPX_SIZE];
+#endif
+
+int __setjmp (jmp_buf);
+
+/* C99 might require setjmp to be a macro. The standard seems self-contradicting on this issue. */
+/* However, it is clear that the standards allow setjmp to be a macro. */
+#define setjmp(jump_buf) __setjmp(jump_buf)
+
+#ifndef __SDCC_HIDE_LONGJMP
+_Noreturn void longjmp(jmp_buf, int);
+#endif
+
+#undef RET_SIZE
+#undef SP_SIZE
+#undef BP_SIZE
+#undef SPX_SIZE
+#undef BPX_SIZE
+
+#endif
+
+#ifndef __SDCC_STDNORETURN_H
+#define __SDCC_STDNORETURN_H 1
+
+#define noreturn _Noreturn
+
+#endif
+
+/*-------------------------------------------------------------------------
+   stddef.h - ANSI functions forward declarations
+
+   Copyright (C) 2004, Maarten Brock / sourceforge.brock@dse.nl
+   Copyright (C) 2011, Philipp Klaus Krause / pkk@spth.de
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_STDDEF_H
+#define __SDCC_STDDEF_H 1
+
+#ifndef NULL
+  #define NULL (void *)0
+#endif
+
+#ifndef __PTRDIFF_T_DEFINED
+#define __PTRDIFF_T_DEFINED
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
+  typedef long int ptrdiff_t;
+#else
+  typedef int ptrdiff_t;
+#endif
+#endif
+
+#ifndef __SIZE_T_DEFINED
+#define __SIZE_T_DEFINED
+  typedef unsigned int size_t;
+#endif
+
+#if __STDC_VERSION__ >= 201112L
+  typedef unsigned char max_align_t;
+#endif
+
+#ifndef __WCHAR_T_DEFINED
+#define __WCHAR_T_DEFINED
+  typedef unsigned long int wchar_t;
+#endif
+
+/* Bounds-checking interfaces from annex K of the C11 standard. */
+#if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__
+
+#ifndef __RSIZE_T_DEFINED
+#define __RSIZE_T_DEFINED
+typedef size_t rsize_t;
+#endif
+
+#ifndef __ERRNO_T_DEFINED
+#define __ERRNO_T_DEFINED
+typedef int errno_t;
+#endif
+
+#endif
+
+#define offsetof(s, m) __builtin_offsetof (s, m)
+
+#endif
+
+/*-------------------------------------------------------------------------
+   stdarg.h - ANSI macros for variable parameter list
+
+   Copyright (C) 2000, Michael Hope
+   Copyright (C) 2011, Philipp Klaus Krause pkk@spth.de
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDC51_STDARG_H
+#define __SDC51_STDARG_H 1
+
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90) || defined (__SDCC_ez80_z80) || defined (__SDCC_z80n) || defined(__SDCC_gbz80) || defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_stm8)
+
+typedef unsigned char * va_list;
+#define va_start(marker, last)  { marker = (va_list)&last + sizeof(last); }
+#define va_arg(marker, type)    *((type *)((marker += sizeof(type)) - sizeof(type)))
+
+#elif defined(__SDCC_ds390) || defined(__SDCC_ds400) || defined(__SDCC_pdk13) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
+
+typedef unsigned char * va_list;
+#define va_start(marker, first) { marker = (va_list)&first; }
+#define va_arg(marker, type)    *((type *)(marker -= sizeof(type)))
+
+#elif defined(__SDCC_USE_XSTACK)
+
+typedef unsigned char __pdata * va_list;
+#define va_start(marker, first) { marker = (va_list)&first; }
+#define va_arg(marker, type)    *((type __pdata *)(marker -= sizeof(type)))
+
+#else
+
+typedef unsigned char __data * va_list;
+#define va_start(marker, first) { marker = (va_list)&first; }
+#define va_arg(marker, type)    *((type __data * )(marker -= sizeof(type)))
+
+#endif
+
+#define va_copy(dest, src)      { dest = src; }
+#define va_end(marker)          { marker = (va_list) 0; };
+
+#endif
+
+/*-------------------------------------------------------------------------
+   stdint.h - ISO C99 7.18 Integer types <stdint.h>
+
+   Copyright (C) 2005, Maarten Brock, sourceforge.brock@dse.nl
+   Copyright (C) 2011, Philipp Klaus Krause, pkk@spth.de
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef _STDINT_H
+#define _STDINT_H       1
+
+/* Exact integral types.  */
+
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if __STDC_VERSION__ >= 199901L
+#define __SDCC_LONGLONG
+#endif
+#endif
+
+/* Signed.  */
+
+typedef signed char             int8_t;
+typedef short int               int16_t;
+typedef long int                int32_t;
+#ifdef __SDCC_LONGLONG
+typedef long long int           int64_t;
+#endif
+
+/* Unsigned.  */
+typedef unsigned char           uint8_t;
+typedef unsigned short int      uint16_t;
+typedef unsigned long int       uint32_t;
+#ifdef __SDCC_LONGLONG
+typedef unsigned long long int  uint64_t;
+#endif
+
+/* Small types.  */
+
+/* Signed.  */
+typedef signed char             int_least8_t;
+typedef short int               int_least16_t;
+typedef long int                int_least32_t;
+#ifdef __SDCC_LONGLONG
+typedef long long int           int_least64_t;
+#endif
+
+/* Unsigned.  */
+typedef unsigned char           uint_least8_t;
+typedef unsigned short int      uint_least16_t;
+typedef unsigned long int       uint_least32_t;
+#ifdef __SDCC_LONGLONG
+typedef unsigned long long int  uint_least64_t;
+#endif
+
+/* Fast types.  */
+
+/* Signed.  */
+typedef signed char             int_fast8_t;
+typedef int                     int_fast16_t;
+typedef long int                int_fast32_t;
+#ifdef __SDCC_LONGLONG
+typedef long long int           int_fast64_t;
+#endif
+
+/* Unsigned.  */
+typedef unsigned char           uint_fast8_t;
+typedef unsigned int            uint_fast16_t;
+typedef unsigned long int       uint_fast32_t;
+#ifdef __SDCC_LONGLONG
+typedef unsigned long long int  uint_fast64_t;
+#endif
+
+/* Types for `void *' pointers.  */
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
+  typedef long int              intptr_t;
+  typedef unsigned long int     uintptr_t;
+#else
+  typedef int                   intptr_t;
+  typedef unsigned int          uintptr_t;
+#endif
+
+
+/* Largest integral types.  */
+#ifndef __SDCC_LONGLONG
+typedef long int                intmax_t;
+typedef unsigned long int       uintmax_t;
+#else
+typedef long long int           intmax_t;
+typedef unsigned long long int  uintmax_t;
+#endif
+
+/* Limits of integral types.  */
+
+/* Minimum of signed integral types.  */
+#define INT8_MIN               (-128)
+#define INT16_MIN              (-32767-1)
+#define INT32_MIN              (-2147483647L-1)
+#ifdef __SDCC_LONGLONG
+#define INT64_MIN              (-9223372036854775807LL-1)
+#endif
+
+/* Maximum of signed integral types.  */
+#define INT8_MAX               (127)
+#define INT16_MAX              (32767)
+#define INT32_MAX              (2147483647L)
+#ifdef __SDCC_LONGLONG
+#define INT64_MAX              (9223372036854775807LL)
+#endif
+
+/* Maximum of unsigned integral types.  */
+#define UINT8_MAX              (255)
+#define UINT16_MAX             (65535)
+#define UINT32_MAX             (4294967295UL)
+#ifdef __SDCC_LONGLONG
+#define UINT64_MAX             (18446744073709551615ULL)
+#endif
+
+/* Minimum of signed integral types having a minimum size.  */
+#define INT_LEAST8_MIN         INT8_MIN
+#define INT_LEAST16_MIN        INT16_MIN
+#define INT_LEAST32_MIN        INT32_MIN
+#ifdef __SDCC_LONGLONG
+#define INT_LEAST64_MIN        INT64_MIN
+#endif
+
+/* Maximum of signed integral types having a minimum size.  */
+#define INT_LEAST8_MAX         INT8_MAX
+#define INT_LEAST16_MAX        INT16_MAX
+#define INT_LEAST32_MAX        INT32_MAX
+#ifdef __SDCC_LONGLONG
+#define INT_LEAST64_MAX        INT64_MAX
+#endif
+
+/* Maximum of unsigned integral types having a minimum size.  */
+#define UINT_LEAST8_MAX        UINT8_MAX
+#define UINT_LEAST16_MAX       UINT16_MAX
+#define UINT_LEAST32_MAX       UINT32_MAX
+#ifdef __SDCC_LONGLONG
+#define UINT_LEAST64_MAX       UINT64_MAX
+#endif
+
+/* Minimum of fast signed integral types having a minimum size.  */
+#define INT_FAST8_MIN          INT8_MIN
+#define INT_FAST16_MIN         INT16_MIN
+#define INT_FAST32_MIN         INT32_MIN
+#ifdef __SDCC_LONGLONG
+#define INT_FAST64_MIN         INT64_MIN
+#endif
+
+/* Maximum of fast signed integral types having a minimum size.  */
+#define INT_FAST8_MAX          INT8_MAX
+#define INT_FAST16_MAX         INT16_MAX
+#define INT_FAST32_MAX         INT32_MAX
+#ifdef __SDCC_LONGLONG
+#define INT_FAST64_MAX         INT64_MAX
+#endif
+
+/* Maximum of fast unsigned integral types having a minimum size.  */
+#define UINT_FAST8_MAX         UINT8_MAX
+#define UINT_FAST16_MAX        UINT16_MAX
+#define UINT_FAST32_MAX        UINT32_MAX
+#ifdef __SDCC_LONGLONG
+#define UINT_FAST64_MAX        UINT64_MAX
+#endif
+
+/* Values to test for integral types holding `void *' pointer.  */
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
+#define INTPTR_MIN             (-2147483647L-1)
+#define INTPTR_MAX             (2147483647L)
+#define UINTPTR_MAX            (4294967295UL)
+#else
+#define INTPTR_MIN             (-32767-1)
+#define INTPTR_MAX             (32767)
+#define UINTPTR_MAX            (65535)
+#endif
+
+/* Minimum for largest signed integral type.  */
+#ifndef __SDCC_LONGLONG
+#define INTMAX_MIN             (-2147483647L-1)
+#else
+#define INTMAX_MIN             (-9223372036854775807LL-1)
+#endif
+
+/* Maximum for largest signed integral type.  */
+#ifndef __SDCC_LONGLONG
+#define INTMAX_MAX             (2147483647L)
+#else
+#define INTMAX_MAX             (9223372036854775807LL)
+#endif
+
+/* Maximum for largest unsigned integral type.  */
+#ifndef __SDCC_LONGLONG
+#define UINTMAX_MAX            (4294967295UL)
+#else
+#define UINTMAX_MAX            (18446744073709551615ULL)
+#endif
+
+/* Limits of other integer types.  */
+
+/* Limits of `ptrdiff_t' type.  */
+#if defined (__SDCC_mcs51) || defined (__SDCC_ds390)
+#define PTRDIFF_MIN           (-2147483647L-1)
+#define PTRDIFF_MAX           (2147483647L)
+#else
+#define PTRDIFF_MIN           (-32767-1)
+#define PTRDIFF_MAX           (32767)
+#endif
+
+/* */
+#define SIG_ATOMIC_MIN        (0)
+#define SIG_ATOMIC_MAX        (255)
+
+/* Limit of `size_t' type.  */
+#define SIZE_MAX               (65535u)
+
+/* Signed.  */
+#define INT8_C(c)      c
+#define INT16_C(c)     c
+#define INT32_C(c)     c ## L
+#ifdef __SDCC_LONGLONG
+#define INT64_C(c)     c ## LL
+#endif
+
+/* Unsigned.  */
+#define UINT8_C(c)     c ## U
+#define UINT16_C(c)    c ## U
+#define UINT32_C(c)    c ## UL
+#ifdef __SDCC_LONGLONG
+#define UINT64_C(c)    c ## ULL
+#endif
+
+#define WCHAR_MIN      0
+#define WCHAR_MAX      0xffffffff
+
+#define WINT_MIN       0
+#define WINT_MAX       0xffffffff
+
+/* Maximal type.  */
+#ifdef __SDCC_LONGLONG
+#define INTMAX_C(c)    c ## LL
+#define UINTMAX_C(c)   c ## ULL
+#else
+#define INTMAX_C(c)    c ## L
+#define UINTMAX_C(c)   c ## UL
+#endif
+
+/* Bounds-checking interfaces from annex K of the C11 standard. */
+#if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__
+#define RSIZE_MAX SIZE_MAX
+#endif
+
+#endif /* stdint.h */
+
+/*-------------------------------------------------------------------------
+   assert.h - header file for assert ANSI routine
+
+   Copyright (C) 2018, Philipp Klaus Krause . pkk@spth.de
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#undef assert
+
+#ifdef NDEBUG
+
+/* Debugging disabled -- do not evaluate assertions. */
+#define assert(x) ((void)0)
+
+#else
+
+/* Debugging enabled -- verify assertions at run time. */
+void __assert(const char *expression, const char *functionname, const char *filename, unsigned int linenumber);
+#define assert(x) ((x) ? (void)0 : __assert(#x, __func__, __FILE__, __LINE__))
+
+#if __STDC_VERSION__ >= 201112L
+#define static_assert _Static_assert
+#endif
+
+#endif
+
+/*-------------------------------------------------------------------------
+   stdio.h - ANSI functions forward declarations
+
+   Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDC51_STDIO_H
+#define __SDC51_STDIO_H 1
+
+#include <stdarg.h>
+
+#ifdef __ds390
+#include <tinibios.h>
+#endif
+
+#include <sdcc-lib.h>
+
+#ifndef EOF
+  #define EOF (-1)
+#endif
+
+#ifndef NULL
+  #define NULL (void *)0
+#endif
+
+#ifndef __SIZE_T_DEFINED
+#define __SIZE_T_DEFINED
+  typedef unsigned int size_t;
+#endif
+
+/* Bounds-checking interfaces from annex K of the C11 standard. */
+#if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__
+
+#ifndef __RSIZE_T_DEFINED
+#define __RSIZE_T_DEFINED
+typedef size_t rsize_t;
+#endif
+
+#ifndef __ERRNO_T_DEFINED
+#define __ERRNO_T_DEFINED
+typedef int errno_t;
+#endif
+
+#endif
+
+typedef void (*pfn_outputchar)(char c, void* p) _REENTRANT;
+
+extern int _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list ap);
+
+/*-----------------------------------------------------------------------*/
+
+extern void printf_small (char *,...) _REENTRANT;
+extern int printf (const char *,...);
+extern int vprintf (const char *, va_list);
+extern int sprintf (char *, const char *, ...);
+extern int vsprintf (char *, const char *, va_list);
+extern int puts(const char *);
+
+#if __STDC_VERSION__ < 201112L
+extern char *gets(char *);
+#endif
+
+extern int getchar(void);
+extern int putchar(int);
+
+#if defined(__SDCC_mcs51) && !defined(__SDCC_USE_XSTACK)
+extern void printf_fast(__code const char *fmt, ...) _REENTRANT;
+extern void printf_fast_f(__code const char *fmt, ...) _REENTRANT;
+extern void printf_tiny(__code const char *fmt, ...) _REENTRANT;
+#endif
+
+#endif /* __SDC51_STDIO_H */
+/*-------------------------------------------------------------------------
+   time.h
+
+   Copyright (C) 2001, Johan Knol <johan.knol AT iduna.nl>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef TIME_H
+#define TIME_H
+
+#ifndef __TIME_UNSIGNED
+#define __TIME_UNSIGNED 1
+#endif
+
+/* Bounds-checking interfaces from annex K of the C11 standard. */
+#if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__
+
+#ifndef __RSIZE_T_DEFINED
+#define __RSIZE_T_DEFINED
+typedef size_t rsize_t;
+#endif
+
+#ifndef __ERRNO_T_DEFINED
+#define __ERRNO_T_DEFINED
+typedef int errno_t;
+#endif
+
+#endif
+
+#if __TIME_UNSIGNED
+struct tm
+{
+  unsigned char tm_sec;                   /* Seconds.     [0-60]      */
+  unsigned char tm_min;                   /* Minutes.     [0-59]      */
+  unsigned char tm_hour;                  /* Hours.       [0-23]      */
+  unsigned char tm_mday;                  /* Day.         [1-31]      */
+  unsigned char tm_mon;                   /* Month.       [0-11]      */
+  int tm_year;                            /* Year since 1900          */
+  unsigned char tm_wday;                  /* Day of week. [0-6]       */
+  int tm_yday;                            /* Days in year.[0-365]     */
+  unsigned char tm_isdst;                 /* Daylight saving time     */
+  unsigned char tm_hundredth;             /* not standard 1/100th sec */
+};
+#else
+struct tm
+{
+  int tm_sec;                   /* Seconds.     [0-60]  */
+  int tm_min;                   /* Minutes.     [0-59]  */
+  int tm_hour;                  /* Hours.       [0-23]  */
+  int tm_mday;                  /* Day.         [1-31]  */
+  int tm_mon;                   /* Month.       [0-11]  */
+  int tm_year;                  /* Year since 1900      */
+  int tm_wday;                  /* Day of week. [0-6]   */
+  int tm_yday;                  /* Days in year.[0-365] */
+  int tm_isdst;                 /* Daylight saving time */
+  char *tm_zone;                /* Abbreviated timezone */
+};
+#endif
+
+typedef unsigned long time_t;
+
+time_t time(time_t *t);
+struct tm *gmtime(time_t *timep);
+struct tm *localtime(time_t *timep);
+time_t mktime(struct tm *timeptr);
+char *asctime(struct tm *timeptr);
+char *ctime(time_t *timep);
+
+#endif /* TIME_H */
+/*-------------------------------------------------------------------------
+   z180.h - definitions on the built in I/O ports for the Z180/HD64180
+            for use with SDCC
+
+   Copyright (C) 2003, Peter Townson <Peter.Townson AT tattsgroup.com>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#if !defined( __Z180_H__ )
+    #define   __Z180_H__ 
+
+#if !defined( Z180_IO_BASE )
+    #define   Z180_IO_BASE  0  /* zero is the Reset default */
+#endif
+
+/* will want this to be the case by default (I think) */
+#pragma portmode z180
+
+static void _ENABLE_Z180_ASSEMBLER_(void) __naked { __asm .hd64 __endasm; }
+
+/*
+ *---------------------------------------------------------------------------
+ *      Z180/HD64180 internal port addresses
+ */
+__sfr __at (Z180_IO_BASE+0x00) CNTLA0;  /* ASCI control register A channel 0 */
+__sfr __at (Z180_IO_BASE+0x01) CNTLA1;  /* ASCI control register A channel 1 */
+__sfr __at (Z180_IO_BASE+0x02) CNTLB0;  /* ASCI control register B channel 0 */
+__sfr __at (Z180_IO_BASE+0x03) CNTLB1;  /* ASCI control register B channel 0 */
+__sfr __at (Z180_IO_BASE+0x04) STAT0 ;  /* ASCI status register    channel 0 */
+__sfr __at (Z180_IO_BASE+0x05) STAT1 ;  /* ASCI status register    channel 1 */
+__sfr __at (Z180_IO_BASE+0x06) TDR0  ;  /* ASCI transmit data reg, channel 0 */
+__sfr __at (Z180_IO_BASE+0x07) TDR1  ;  /* ASCI transmit data reg, channel 1 */
+__sfr __at (Z180_IO_BASE+0x08) RDR0  ;  /* ASCI receive data reg,  channel 0 */
+__sfr __at (Z180_IO_BASE+0x09) RDR1  ;  /* ASCI receive data reg,  channel 0 */
+__sfr __at (Z180_IO_BASE+0x0A) CNTR  ;  /* CSI/0 control register */
+__sfr __at (Z180_IO_BASE+0x0B) TRDR  ;  /* CSI/0 transmit/receive data reg */
+
+__sfr __at (Z180_IO_BASE+0x0C) TMDR0L;  /* Timer data register,    channel 0L */
+__sfr __at (Z180_IO_BASE+0x0D) TMDR0H;  /* Timer data register,    channel 0H */
+__sfr __at (Z180_IO_BASE+0x0E) RLDR0L;  /* Timer reload register,  channel 0L */
+__sfr __at (Z180_IO_BASE+0x0F) RLDR0H;  /* Timer reload register,  channel 0H */
+__sfr __at (Z180_IO_BASE+0x10) TCR   ;  /* Timer control register */
+__sfr __at (Z180_IO_BASE+0x14) TMDR1L;  /* Timer data register,    channel 1L */
+__sfr __at (Z180_IO_BASE+0x15) TMDR1H;  /* Timer data register,    channel 1H */
+__sfr __at (Z180_IO_BASE+0x16) RLDR1L;  /* Timer reload register,  channel 1L */
+__sfr __at (Z180_IO_BASE+0x17) RLDR1H;  /* Timer reload register,  channel 1H */
+__sfr __at (Z180_IO_BASE+0x18) FRC   ;  /* Timer Free running counter */
+
+__sfr __at (Z180_IO_BASE+0x20) SAR0L ;  /* DMA source address reg, channel 0L */
+__sfr __at (Z180_IO_BASE+0x21) SAR0H ;  /* DMA source address reg, channel 0H */
+__sfr __at (Z180_IO_BASE+0x22) SAR0B ;  /* DMA source address reg, channel 0B */
+__sfr __at (Z180_IO_BASE+0x23) DAR0L ;  /* DMA dest address reg,   channel 0L */
+__sfr __at (Z180_IO_BASE+0x24) DAR0H ;  /* DMA dest address reg,   channel 0H */
+__sfr __at (Z180_IO_BASE+0x25) DAR0B ;  /* DMA dest address reg,   channel 0B */
+__sfr __at (Z180_IO_BASE+0x26) BCR0L ;  /* DMA byte count reg,     channel 0L */
+__sfr __at (Z180_IO_BASE+0x27) BCR0H ;  /* DMA byte count reg,     channel 0H */
+__sfr __at (Z180_IO_BASE+0x28) MAR1L ;  /* DMA memory address reg, channel 1L */
+__sfr __at (Z180_IO_BASE+0x29) MAR1H ;  /* DMA memory address reg, channel 1H */
+__sfr __at (Z180_IO_BASE+0x2A) MAR1B ;  /* DMA memory address reg, channel 1B */
+__sfr __at (Z180_IO_BASE+0x2B) IAR1L ;  /* DMA I/O address reg,    channel 1L */
+__sfr __at (Z180_IO_BASE+0x2C) IAR1H ;  /* DMA I/O address reg,    channel 1H */
+__sfr __at (Z180_IO_BASE+0x2E) BCR1L ;  /* DMA byte count reg,     channel 1L */
+__sfr __at (Z180_IO_BASE+0x2F) BCR1H ;  /* DMA byte count reg,     channel 1H */
+__sfr __at (Z180_IO_BASE+0x30) DSTAT ;  /* DMA status register */
+__sfr __at (Z180_IO_BASE+0x31) DMODE ;  /* DMA mode register */
+__sfr __at (Z180_IO_BASE+0x32) DCNTL ;  /* DMA/WAIT control register */
+
+__sfr __at (Z180_IO_BASE+0x33) IL    ;  /* Interrupt vector low register */
+__sfr __at (Z180_IO_BASE+0x34) ITC   ;  /* INT/TRAP control register */
+
+__sfr __at (Z180_IO_BASE+0x36) RCR   ;  /* Refresh control register */
+
+__sfr __at (Z180_IO_BASE+0x38) CBR   ;  /* MMU common base register */
+__sfr __at (Z180_IO_BASE+0x39) BBR   ;  /* MMU bank base register */
+__sfr __at (Z180_IO_BASE+0x3A) CBAR  ;  /* MMU common/bank area register */
+
+__sfr __at (Z180_IO_BASE+0x3E) OMCR  ;  /* Operation mode control register */
+
+__sfr __at               0x3F  ICR   ;  /* I/O base control register - does not move */
+
+/*
+ *---------------------------------------------------------------------------
+ *      Interrupt vectors (offsets) for Z180/HD64180 internal interrupts
+ */
+#define INT1_VECTOR     0x00    /* external /INT1 */
+#define INT2_VECTOR     0x02    /* external /INT2 */
+#define PRT0_VECTOR     0x04    /* PRT channel 0 */
+#define PRT1_VECTOR     0x06    /* PRT channel 1 */
+#define DMA0_VECTOR     0x08    /* DMA channel 0 */ /* ???? */
+#define DMA1_VECTOR     0x0A    /* DMA Channel 1 */
+#define CSIO_VECTOR     0x0C    /* Clocked serial I/O */
+#define ASCI0_VECTOR    0x0E    /* Async channel 0 */
+#define ASCI1_VECTOR    0x10    /* Async channel 1 */
+#define INCAP_VECTOR    0x12    /* input capture */
+#define OUTCMP_VECTOR   0x14    /* output compare */
+#define TIMOV_VECTOR    0x16    /* timer overflow */
+/*
+ *---------------------------------------------------------------------------
+ */
+#endif  /* __Z180_H__ */
+/*-------------------------------------------------------------------------
+   features.h - Z80 specific features.
+
+   Copyright (C) 2001, Michael Hope
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_ASM_Z80_FEATURES_H
+#define __SDCC_ASM_Z80_FEATURES_H   1
+
+#define _REENTRANT
+#define _CODE
+#define _AUTOMEM
+#define _STATMEM
+
+#define _SDCC_MANGLES_SUPPORT_FUNS	1
+#define _SDCC_Z80_STYLE_LIB_OPT		1
+
+#endif
+
+/*-------------------------------------------------------------------------
+   features.h - PIC16 port features.
+
+   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __PIC16_ASM_FEATURES_H
+#define __PIC16_ASM_FEATURES_H   1
+
+#define _REENTRANT
+
+#define _IL_REENTRANT
+#define _FS_REENTRANT
+#define _MATH_REENTRANT
+
+#define _CODE	__code
+#define _DATA	__data
+#define _AUTOMEM
+#define _STATMEM
+
+#endif	/* __PIC16_ASM_FEATURES_H */
+/*-------------------------------------------------------------------------
+   features.h - GBZ80 specific features.
+
+   Copyright (C) 2001, Michael Hope
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDC51_ASM_GBZ80_FEATURES_H
+#define __SDC51_ASM_GBZ80_FEATURES_H   1
+
+#define _REENTRANT
+#define _CODE
+#define _AUTOMEM
+#define _STATMEM
+
+#define _SDCC_MANGLES_SUPPORT_FUNS	1
+#define _SDCC_Z80_STYLE_LIB_OPT		1
+
+#endif
+/*-------------------------------------------------------------------------
+   features.h - DS390/DS400 specific features.
+
+   Copyright (C) 2004, Maarten Brock, sourceforge.brock@dse.nl
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDC51_ASM_DS390_FEATURES_H
+#define __SDC51_ASM_DS390_FEATURES_H   1
+
+#define _REENTRANT	__reentrant
+#define _CODE		__code
+
+/* define _AUTOMEM to indicate the default storage class for
+   automatic variables. To be used with pointers to automatic variables.
+   Cannot be used in reentrant declared functions!
+
+   void foo(void)
+   {
+     char Ar[10];
+     char _AUTOMEM * pAr = Ar;
+   }
+*/
+#if defined(__SDCC_STACK_AUTO)
+  #if defined(__SDCC_USE_XSTACK)
+    #define _AUTOMEM __pdata
+  #elif defined(__SDCC_STACK_TENBIT)
+    #define _AUTOMEM __xdata
+  #else
+    #define _AUTOMEM __idata
+  #endif
+#elif defined(__SDCC_MODEL_SMALL)
+  #define _AUTOMEM __data
+#else
+  #define _AUTOMEM __xdata
+#endif
+
+/* define _STATMEM to indicate the default storage class for
+   global/static variables. To be used with pointers to static variables.
+
+   char Ar[10];
+   void foo(void)
+   {
+     char _STATMEM * pAr = Ar;
+   }
+*/
+#if defined(__SDCC_MODEL_SMALL)
+  #define _STATMEM __data
+#else
+  #define _STATMEM __xdata
+#endif
+
+#endif
+/*-------------------------------------------------------------------------
+   features.h - Z80 specific features.
+
+   Copyright (C) 2001, Michael Hope
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_ASM_R2K_FEATURES_H
+#define __SDCC_ASM_R2K_FEATURES_H   1
+
+#define _REENTRANT
+#define _CODE
+#define _AUTOMEM
+#define _STATMEM
+
+#define _SDCC_MANGLES_SUPPORT_FUNS	1
+#define _SDCC_Z80_STYLE_LIB_OPT		1
+
+#endif
+
+/*-------------------------------------------------------------------------
+   features.h - PIC16 port features.
+
+   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
+   Adopted for pic14 port library by Raphael Neider <rneider at web.de> (2006)
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __PIC14_ASM_FEATURES_H
+#define __PIC14_ASM_FEATURES_H   1
+
+#define _REENTRANT
+
+#define _CODE	__code
+#define _DATA	__data
+#define _AUTOMEM
+#define _STATMEM
+
+#endif	/* __PIC14_ASM_FEATURES_H */
+/*---------------------------------------------------------------------------
+   features.h: MCS51 specific features.
+
+   Copyright (C) 2004, Maarten Brock, sourceforge.brock@dse.nl
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDC51_ASM_MCS51_FEATURES_H
+#define __SDC51_ASM_MCS51_FEATURES_H   1
+
+#define _REENTRANT	__reentrant
+#define _CODE		__code
+
+/* define _AUTOMEM to indicate the default storage class for
+   automatic variables. To be used with pointers to automatic variables.
+   Cannot be used in reentrant declared functions!
+
+   void foo(void)
+   {
+     char Ar[10];
+     char _AUTOMEM * pAr = Ar;
+   }
+*/
+#if defined(__SDCC_STACK_AUTO)
+  #if defined(__SDCC_USE_XSTACK)
+    #define _AUTOMEM __pdata
+  #else
+    #define _AUTOMEM __idata
+  #endif
+#elif defined(__SDCC_MODEL_SMALL)
+  #define _AUTOMEM __data
+#elif defined(__SDCC_MODEL_MEDIUM)
+  #define _AUTOMEM __pdata
+#else
+  #define _AUTOMEM __xdata
+#endif
+
+/* define _STATMEM to indicate the default storage class for
+   global/static variables. To be used with pointers to static variables.
+
+   char Ar[10];
+   void foo(void)
+   {
+     char _STATMEM * pAr = Ar;
+   }
+*/
+#if defined(__SDCC_MODEL_SMALL)
+  #define _STATMEM __data
+#elif defined(__SDCC_MODEL_MEDIUM)
+  #define _STATMEM __pdata
+#else
+  #define _STATMEM __xdata
+#endif
+
+
+/* define _RETURN for correct returning from inline asm functions
+*/
+#if defined(__SDCC_MODEL_HUGE)
+ #define _RETURN ljmp __sdcc_banked_ret
+#else
+ #define _RETURN ret
+#endif
+
+
+#endif
+/*-------------------------------------------------------------------------
+   features.h - STM8 specific features.
+
+   Copyright (C) 2001, Michael Hope, 2013, Philipp Klaus Krause
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_ASM_STM8_FEATURES_H
+#define __SDCC_ASM_STM8_FEATURES_H   1
+
+#define _REENTRANT
+#define _CODE
+#define _AUTOMEM
+#define _STATMEM
+
+#define _SDCC_MANGLES_SUPPORT_FUNS	1
+#define _SDCC_Z80_STYLE_LIB_OPT		1
+
+#endif
+
+/*-------------------------------------------------------------------------
+   features.h - default features.
+
+   Copyright (C) 2001, Michael Hope
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDC51_ASM_FEATURES_H
+#define __SDC51_ASM_FEATURES_H   1
+
+#define _REENTRANT	__reentrant
+#define _CODE		__code
+#define _AUTOMEM
+#define _STATMEM
+
+#endif
+/*-------------------------------------------------------------------------
+   features.h - Rabbit 3000A specific features.
+
+   Copyright (C) 2001, Michael Hope
+   
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_ASM_R3KA_FEATURES_H
+#define __SDCC_ASM_R3KA_FEATURES_H   1
+
+#define _REENTRANT
+#define _CODE
+#define _AUTOMEM
+#define _STATMEM
+
+#define _SDCC_MANGLES_SUPPORT_FUNS	1
+#define _SDCC_Z80_STYLE_LIB_OPT		1
+
+#endif
+
+/*-------------------------------------------------------------------------
+   features.h - Z80 specific features.
+
+   Copyright (C) 2001, Michael Hope
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License 
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __SDCC_ASM_TLCS90_FEATURES_H
+#define __SDCC_ASM_TLCS90_FEATURES_H   1
+
+#define _REENTRANT
+#define _CODE
+#define _AUTOMEM
+#define _STATMEM
+
+#define _SDCC_MANGLES_SUPPORT_FUNS	1
+#define _SDCC_Z80_STYLE_LIB_OPT		1
+
+#endif
+
+/*-------------------------------------------------------------------------
+   r2kc.h - definitions on the built in I/O ports for the Rabbit 2000C
+            for use with SDCC
+
+   Copyright (C) 2020, Philipp Klaus Krause <pkk AT spth.de>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __R2KC_H__
+#define __R2KC_H__ 1
+
+#ifndef _RABREG
+#define _RABREG(addr, reg)	__sfr __at(addr) reg
+#endif
+
+#include "r2kb.h"
+
+_RABREG(0x19, MTCR);  // Memory Timing Control Register
+
+#endif
+
+#ifndef __R2K_H__
+#define __R2K_H__ 1
+
+#ifndef _RABREG
+#define _RABREG(addr, reg) __sfr __at(addr) reg
+#endif
+
+_RABREG(0x00, GCSR);  // global control / status register
+
+_RABREG(0x01, RTCCR); // Real Time Clock Control Register
+_RABREG(0x02, RTC0R); // Real Time Clock Data Register 0
+_RABREG(0x03, RTC1R); // Real Time Clock Data Register 1
+_RABREG(0x04, RTC2R); // Real Time Clock Data Register 2
+_RABREG(0x05, RTC3R); // Real Time Clock Data Register 3
+_RABREG(0x06, RTC4R); // Real Time Clock Data Register 4
+_RABREG(0x07, RTC5R); // Real Time Clock Data Register 5
+
+_RABREG(0x08, WDTCR); // watch-dog timer control register
+_RABREG(0x09, WDTTR); // watch-dog timer test register
+
+_RABREG(0x0D, GPSCR); // global power save control register
+_RABREG(0x0E, GOCR);  // global output control register
+_RABREG(0x0F, GCDR);  // global clock double register
+
+_RABREG(0x10, MMIDR); // MMI Instruction/Data Register
+_RABREG(0x11, STACKSEG);
+_RABREG(0x12, DATASEG);
+_RABREG(0x13, SEGSIZE);
+
+_RABREG(0x14, MB0CR); // Memory Bank 0 Control Register
+_RABREG(0x15, MB1CR); // Memory Bank 1 Control Register
+_RABREG(0x16, MB2CR); // Memory Bank 2 Control Register
+_RABREG(0x17, MB3CR); // Memory Bank 3 Control Register
+
+_RABREG(0x20, SPD0R); // Slave Port Data 0 Register
+_RABREG(0x21, SPD1R); // Slave Port Data 1 Register
+_RABREG(0x22, SPD2R); // Slave Port Data 2 Register
+_RABREG(0x23, SPSR);  // Slave Port Status Register
+_RABREG(0x24, SPCR);  // Slave Port Control Register
+
+_RABREG(0x30, PADR);  // Port A Data Register
+_RABREG(0x40, PBDR);  // Port B Data Register
+
+_RABREG(0x50, PCDR);  // Port C Data Register
+_RABREG(0x55, PCFR);  // Port C Function Register
+
+_RABREG(0x60, PDDR);  // Port D Data Register
+_RABREG(0x64, PDCR);  // Port D Control Register
+_RABREG(0x64, PDDCR); // Port D Drive Control Register
+_RABREG(0x67, PDDDR); // Port D Data Direction Register
+_RABREG(0x68, PDB0R); // Port D Bit 0 Register
+_RABREG(0x69, PDB1R); // Port D Bit 1 Register
+_RABREG(0x6A, PDB2R); // Port D Bit 2 Register
+_RABREG(0x6B, PDB3R); // Port D Bit 3 Register
+_RABREG(0x6C, PDB4R); // Port D Bit 4 Register
+_RABREG(0x6D, PDB5R); // Port D Bit 5 Register
+_RABREG(0x6E, PDB6R); // Port D Bit 6 Register
+_RABREG(0x6F, PDB7R); // Port D Bit 7 Register
+
+_RABREG(0x70, PEDR);  // Port E data register
+_RABREG(0x74, PECR);  // Port E control register
+_RABREG(0x77, PEDDR); // Port E data direction register
+_RABREG(0x78, PEB0R); // Port E Bit 0 Register
+_RABREG(0x79, PEB1R); // Port E Bit 1 Register
+_RABREG(0x7A, PEB2R); // Port E Bit 2 Register
+_RABREG(0x7B, PEB3R); // Port E Bit 3 Register
+_RABREG(0x7C, PEB4R); // Port E Bit 4 Register
+_RABREG(0x7D, PEB5R); // Port E Bit 5 Register
+_RABREG(0x7E, PEB6R); // Port E Bit 6 Register
+_RABREG(0x7F, PEB7R); // Port E Bit 7 Register
+
+_RABREG(0x80, IB0CR); // I/O Bank 0 Control Register
+_RABREG(0x81, IB1CR); // I/O Bank 1 Control Register
+_RABREG(0x82, IB2CR); // I/O Bank 2 Control Register
+_RABREG(0x83, IB3CR); // I/O Bank 3 Control Register
+_RABREG(0x84, IB4CR); // I/O Bank 4 Control Register
+_RABREG(0x85, IB5CR); // I/O Bank 5 Control Register
+_RABREG(0x86, IB6CR); // I/O Bank 6 Control Register
+_RABREG(0x87, IB7CR); // I/O Bank 7 Control Register
+
+_RABREG(0x98, I0CR);  // Interrupt 0 Control Register
+_RABREG(0x99, I1CR);  // Interrupt 1 Control Register
+
+_RABREG(0xA0, TACSR); // Timer A Control/Status Register
+_RABREG(0xA3, TAT1R); // Timer A Time Constant 1 Register
+_RABREG(0xA4, TACR);  // Timer A Control Register
+_RABREG(0xA9, TAT4R); // Timer A Time Constant 4 Register
+_RABREG(0xAB, TAT5R); // Timer A Time Constant 5 Register
+_RABREG(0xAD, TAT6R); // Timer A Time Constant 6 Register
+_RABREG(0xAF, TAT7R); // Timer A Time Constant 7 Register
+
+_RABREG(0xB0, TBCSR); // Timer B Control/Status Register
+_RABREG(0xB1, TBCR);  // Timer B Control Register
+_RABREG(0xB2, TBM1R); // Timer B MSB 1 Register
+_RABREG(0xB3, TBL1R); // Timer B LSB 1 Register
+_RABREG(0xB4, TBM2R); // Timer B MSB 2 Register
+_RABREG(0xB5, TBL2R); // Timer B LSB 2 Register
+_RABREG(0xBE, TBCMR);  // Timer B Count MSB Register
+_RABREG(0xBF, TBCLR);  // Timer B Count LSB Register
+
+_RABREG(0xC0, SADR);  // Serial Port A Data Register
+_RABREG(0xC1, SAAR);  // Serial Port A Adress Register
+_RABREG(0xC3, SASR);  // Serial Port A Status Register
+_RABREG(0xC4, SACR);  // Serial Port A Control Register
+
+_RABREG(0xD0, SBDR);  // Serial Port B Data Register
+_RABREG(0xD1, SBAR);  // Serial Port B Adress Register
+_RABREG(0xD3, SBSR);  // Serial Port B Status Register
+_RABREG(0xD4, SBCR);  // Serial Port B Control Register
+
+_RABREG(0xE0, SCDR);  // Serial Port C Data Register
+_RABREG(0xE1, SCAR);  // Serial Port C Adress Register
+_RABREG(0xE3, SCSR);  // Serial Port C Status Register
+_RABREG(0xE4, SCCR);  // Serial Port C Control Register
+
+_RABREG(0xF0, SDDR);  // Serial Port D Data Register
+_RABREG(0xF1, SDAR);  // Serial Port D Adress Register
+_RABREG(0xF3, SDSR);  // Serial Port D Status Register
+_RABREG(0xF4, SDCR);  // Serial Port D Control Register
+
+#endif
+
+/*-------------------------------------------------------------------------
+   r3k.h - definitions on the built in I/O ports for the Rabbit 3000
+           for use with SDCC
+
+   Copyright (C) 2020, Philipp Klaus Krause <pkk AT spth.de>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __R3K_H__
+#define __R3K_H__ 1
+
+#ifndef _RABREG
+#define _RABREG(addr, reg) __sfr __at(addr) reg
+#endif
+
+#include "r2kc.h"
+
+_RABREG(0x0D, GPSCR); // Global Power Save Control Register
+
+_RABREG(0x18, MECR);  // MMu Expanded Code Register
+
+_RABREG(0x1C, BDCR);  // Breakpoint/Debug Control Register
+
+_RABREG(0x2C, GROM);  // Global RAM Configuration Register
+_RABREG(0x2D, GRAM);  // Global ROM Configuration Register
+
+_RABREG(0x38, PFDR);  // Port F Data Register
+_RABREG(0x3C, PFCR);  // Port F Control Register
+_RABREG(0x3D, PFFR);  // Port F Function Register
+_RABREG(0x3E, PFDCR); // Port F Drive Control Register
+_RABREG(0x3F, PFDDR); // Port F Data Direction Register
+
+_RABREG(0x47, PBDDR); // Port B Data Direction Register
+
+_RABREG(0x48, PGDR);  // Port G Data Register
+_RABREG(0x4C, PGCR);  // Port G Control Register
+_RABREG(0x4D, PGFR);  // Port G Function Register
+_RABREG(0x4E, PGDCR); // Port G Drive Control Register
+_RABREG(0x4F, PGDDR); // Port G Data Direction Register
+
+// TODO: Input capture registers, section 20.1.2 of the Rabbit 3000 User manual.
+
+// TODO: PWM registers, section 22.1.2 of the Rabbit 3000 User manual.
+
+_RABREG(0x90, QDCSR); // Quad Decode Ctrl/Status Register
+_RABREG(0x91, QDCR);  // Quad Decode Control Register
+_RABREG(0x94, QDC1R); // Quad Decode Count 1 Register
+_RABREG(0x96, QDC2R); // Quad Decode Count 2 Register
+
+_RABREG(0xA5, TAT2R); // Timer A Time Constant 2 Register
+_RABREG(0xA6, TAT8R); // Timer A Time Constant 8 Register
+_RABREG(0xA7, TAT3R); // Timer A Time Constant 3 Register
+_RABREG(0xA8, TAT9R); // Timer A Time Constant 9 Register
+_RABREG(0xAA, TAT10R);// Timer A Time Constant 10 Register
+
+_RABREG(0xC5, SAER);  // Serial Port A Extended Register
+
+_RABREG(0xD5, SBER);  // Serial Port B Extended Register
+
+_RABREG(0xE5, SCER);  // Serial Port C Extended Register
+
+_RABREG(0xF5, SDER);  // Serial Port D Extended Register
+
+_RABREG(0xC8, SEDR);  // Serial Port E Data Register
+_RABREG(0xC9, SEAR);  // Serial Port E Address Register
+_RABREG(0xCA, SELR);  // Serial Port E Long Stop Register
+_RABREG(0xCB, SESR);  // Serial Port E Status Register
+_RABREG(0xCC, SECR);  // Serial Port E Control Register
+_RABREG(0xCD, SEER);  // Serial Port E Extended Register
+
+_RABREG(0xD8, SFDR);  // Serial Port F Data Register
+_RABREG(0xD9, SFAR);  // Serial Port F Address Register
+_RABREG(0xDA, SFLR);  // Serial Port F Long Stop Register
+_RABREG(0xDB, SFSR);  // Serial Port F Status Register
+_RABREG(0xDC, SFCR);  // Serial Port F Control Register
+_RABREG(0xDD, SFER);  // Serial Port F Extended Register
+
+#endif
+
+/*-------------------------------------------------------------------------
+   r2ka.h - definitions on the built in I/O ports for the Rabbit 2000A
+            for use with SDCC
+
+   Copyright (C) 2020, Philipp Klaus Krause <pkk AT spth.de>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __R2KA_H__
+#define __R2KA_H__ 1
+
+#ifndef _RABREG
+#define _RABREG(addr, reg) __sfr __at(addr) reg
+#endif
+
+#include "r2k.h"
+
+_RABREG(0x2F, GREV);  // Global Revision Register
+_RABREG(0xC2, SALR);  // Serial Port A Long Stop Register
+_RABREG(0xD2, SBLR);  // Serial Port B Long Stop Register
+_RABREG(0xE2, SCLR);  // Serial Port C Long Stop Register
+_RABREG(0xF2, SDLR);  // Serial Port D Long Stop Register
+
+#endif
+
+/*-------------------------------------------------------------------------
+   r2kb.h - definitions on the built in I/O ports for the Rabbit 2000B
+            for use with SDCC
+
+   Copyright (C) 2020, Philipp Klaus Krause <pkk AT spth.de>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __R2KB_H__
+#define __R2KB_H__ 1
+
+#ifndef _RABREG
+#define _RABREG(addr, reg) __sfr __at(addr) reg
+#endif
+
+#include "r2ka.h"
+
+_RABREG(0x0A, GCM0R);  // Global Clock Modulator 0 Register
+_RABREG(0x0B, GCM1R);  // Global Clock Modulator 1 Register
+
+#endif
+
+/*-------------------------------------------------------------------------
+   r3ka.h - definitions on the built in I/O ports for the Rabbit 3000A
+            for use with SDCC
+
+   Copyright (C) 2020, Philipp Klaus Krause <pkk AT spth.de>
+
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
+
+#ifndef __R3KA_H__
+#define __R3KA_H__ 1
+
+#ifndef _RABREG
+#define _RABREG(addr, reg) __sfr __banked __at(addr) reg
+#endif
+
+#include "r3k.h"
+
+_RABREG(0x000C, SWDTR);  // Secondary Watchdog Timer Register
+
+_RABREG(0x0095, QDC1HR); // Quad Decode Count 1 High Register
+_RABREG(0x0097, QDC2HR); // Quad Decode Count 2 High Register
+
+_RABREG(0x0300, RTUER);  // Real Time Clock User Enable Register
+_RABREG(0x0320, SPUER);  // Slave Port User Enable Register
+_RABREG(0x0330, PAUER);  // Parallel Port A User Enable Register
+_RABREG(0x0338, PFUER);  // Parallel Port F User Enable Register
+_RABREG(0x0340, PBUER);  // Parallel Port B User Enable Register
+_RABREG(0x0348, PGUER);  // Parallel Port G User Enable Register
+_RABREG(0x0350, PCUER);  // Parallel Port C User Enable Register
+_RABREG(0x0358, ICUER);  // Input Capture C User Enable Register
+_RABREG(0x0360, PDUER);  // Parallel Port D User Enable Register
+_RABREG(0x0370, PEUER);  // Parallel Port E User Enable Register
+_RABREG(0x0380, IBUER);  // I/O Bank User Enable Register
+_RABREG(0x0388, PWUER);  // PWM User Enable Register
+_RABREG(0x0390, QDUER);  // Quad Decode User Enable Register
+_RABREG(0x0398, IUER);   // External Interrupt User Enable Register
+_RABREG(0x03A0, TAUER);  // Timer A User Enable Register
+_RABREG(0x03B0, TBUER);  // Timer B User Enable Register
+_RABREG(0x03C0, SAUER);  // Serial Port A User Enable Register
+_RABREG(0x03C8, SEUER);  // Serial Port E User Enable Register
+_RABREG(0x03D0, SBUER);  // Serial Port B User Enable Register
+_RABREG(0x03D8, SFUER);  // Serial Port F User Enable Register
+_RABREG(0x03E0, SCUER);  // Serial Port C User Enable Register
+_RABREG(0x03F0, SDUER);  // Serial Port D User Enable Register
+
+_RABREG(0x0420, EDMR);   // Enable Dual Mode Register
+
+_RABREG(0x0440, WPCR);   // Write Protect Control Register
+
+_RABREG(0x0444, STKKCR); // Stack Limit Control Register
+_RABREG(0x0445, STKLLR); // Stack Low Limit Register
+_RABREG(0x0446, STKHLR); // Stack High Limit Register
+
+_RABREG(0x0448, RAMSR);  // RAM Segment Register
+
+_RABREG(0x0460, WPLR);   // Write Protect Low Register
+_RABREG(0x0461, WPHR);   // Write Protect High Register
+_RABREG(0x0480, WPSAR);  // Write Protect Segment A Register
+_RABREG(0x0481, WPSALR); // Write Protect Segment A Low Register
+_RABREG(0x0482, WPSAHR); // Write Protect Segment A High Register
+_RABREG(0x0484, WPSBR);  // Write Protect Segment B Register
+_RABREG(0x0485, WPSBLR); // Write Protect Segment B Low Register
+_RABREG(0x0486, WPSBHR); // Write Protect Segment B High Register
+
+#endif
+
