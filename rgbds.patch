@@ -1,8 +1,8 @@
 diff --git a/include/asm/symbol.h b/include/asm/symbol.h
-index edef323..65052f7 100644
+index 729ec28..310539a 100644
 --- a/include/asm/symbol.h
 +++ b/include/asm/symbol.h
-@@ -115,6 +115,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
+@@ -114,6 +114,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
  
  int32_t sym_GetValue(struct Symbol const *sym);
  void sym_SetExportAll(bool set);
@@ -11,24 +11,24 @@ index edef323..65052f7 100644
  struct Symbol *sym_AddLabel(char const *symName);
  struct Symbol *sym_AddAnonLabel(void);
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index e2a9602..55aa1ed 100644
+index 48afd9d..08363f1 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
-@@ -625,7 +625,7 @@ lines		: %empty
+@@ -676,7 +676,7 @@ endofline	: T_NEWLINE | T_EOB
  ;
  
- last_line	: label
+ plain_directive	: label
 -		| label cpu_command
 +		| label { sym_AddSecret(); } cpu_command
  		| label macro
  		| label directive
  		| assignment_directive
 diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index d59b266..0176deb 100644
+index 1c70b04..59059b1 100644
 --- a/src/asm/symbol.c
 +++ b/src/asm/symbol.c
-@@ -381,6 +381,26 @@ static struct Symbol *createNonrelocSymbol(char const *symbolName)
- 	return symbol;
+@@ -381,6 +381,26 @@ static struct Symbol *createNonrelocSymbol(char const *symName, bool numeric)
+ 	return sym;
  }
  
 +static uint32_t secret_counter = 0;
@@ -55,10 +55,10 @@ index d59b266..0176deb 100644
   * Add an equated symbol
   */
 diff --git a/src/asm/warning.c b/src/asm/warning.c
-index c7ceda5..71d10f2 100644
+index dc23386..2df07b0 100644
 --- a/src/asm/warning.c
 +++ b/src/asm/warning.c
-@@ -226,7 +226,7 @@ void error(const char *fmt, ...)
+@@ -222,7 +222,7 @@ void error(const char *fmt, ...)
  	va_list args;
  
  	va_start(args, fmt);
@@ -67,7 +67,7 @@ index c7ceda5..71d10f2 100644
  	va_end(args);
  	nbErrors++;
  }
-@@ -236,7 +236,7 @@ _Noreturn void fatalerror(const char *fmt, ...)
+@@ -232,7 +232,7 @@ _Noreturn void fatalerror(const char *fmt, ...)
  	va_list args;
  
  	va_start(args, fmt);
@@ -76,7 +76,7 @@ index c7ceda5..71d10f2 100644
  	va_end(args);
  
  	exit(1);
-@@ -254,7 +254,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+@@ -250,7 +250,7 @@ void warning(enum WarningID id, char const *fmt, ...)
  		return;
  
  	case WARNING_ERROR:
@@ -85,7 +85,7 @@ index c7ceda5..71d10f2 100644
  		va_end(args);
  		return;
  
-@@ -266,7 +266,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+@@ -262,7 +262,7 @@ void warning(enum WarningID id, char const *fmt, ...)
  		break;
  	}
  
