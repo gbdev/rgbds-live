@@ -22,7 +22,7 @@ this.editors = new Object();
         if (typeof storage.getFiles()[filename] == "string")
             currentEditor = textEditor;
         else
-            currentEditor = nullEditor;
+            currentEditor = gfxEditor;
         if (prevEditor != currentEditor)
         {
             prevEditor.hide();
