@@ -113,7 +113,7 @@ this.compiler = new Object();
         var args = ['-o', 'output.gb', '--map', 'output.map'].concat(link_options);
         for(var name in obj_files)
             args.push(name + ".o");
-        logFunction("Running: " + args.join(" "));
+        logFunction("Running: rgblink " + args.join(" "));
         createRgbLink({
             'arguments': args,
             'preRun': function(m) {
