@@ -197,7 +197,7 @@ haltLoop:
                 if (entries.length < 1)
                     return;
                 var entry = entries.pop();
-                var type = editors.getFileType(entry.name) == 'binary' ? "string" : "uint8array";
+                var type = editors.getFileType(entry.name) == 'text' ? "string" : "uint8array";
                 entry.async(type).then(function(contents) {
                     files[entry.name] = contents;
                     loadNextFile();
