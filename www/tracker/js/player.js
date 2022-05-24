@@ -21,7 +21,7 @@ class Player {
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/hUGEDriver.asm", "hUGEDriver.asm");
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/hUGE.inc", "hUGE.inc");
         getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/hUGE_note_table.inc", "hUGE_note_table.inc");
-        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/HARDWARE.INC", "HARDWARE.INC");
+        getFile("https://raw.githubusercontent.com/untoxa/hUGEBuild/master/include/hardware.inc", "hardware.inc");
         storage.update("song.asm", "SECTION \"song\", ROM0[$1000]\n_song_descriptor:: ds $8000 - @")
         
         compiler.compile((rom_file, start_address, addr_to_line) => {
