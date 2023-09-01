@@ -3,35 +3,30 @@
 this.storage = new Object();
 (function(storage) {
 
-    var files = {"hardware.inc": hardware_inc, "main.asm": `INCLUDE "hardware.inc"
+    var hardware_inc = new XMLHttpRequest();
+    hardware_inc.open("GET", "starting_project/hardware.inc", false);
+    hardware_inc.send();
 
-SECTION "entry", ROM0[$100]
-  jp start
+    var main_asm = new XMLHttpRequest();
+    main_asm.open("GET", "starting_project/main.asm", false);
+    main_asm.send();
 
-SECTION "main", ROM0[$150]
-start:
-  nop
-haltLoop:
-  halt
-  jr haltLoop
-`};
+    var files = {"hardware.inc": hardware_inc.response, "main.asm": main_asm.response};      
+
     storage.autoUrl = false;
     storage.autoLocalStorage = false;
 
     storage.reset = function()
     {
-        files = {"hardware.inc": hardware_inc, "main.asm": `INCLUDE "hardware.inc"
+        var hardware_inc = new XMLHttpRequest();
+        hardware_inc.open("GET", "starting_project/hardware.inc", false);
+        hardware_inc.send();
 
-SECTION "entry", ROM0[$100]
-  jp start
+        var main_asm = new XMLHttpRequest();
+        main_asm.open("GET", "starting_project/main.asm", false);
+        main_asm.send();
 
-SECTION "main", ROM0[$150]
-start:
-  nop
-haltLoop:
-  halt
-  jr haltLoop
-`}
+        var files = {"hardware.inc": hardware_inc.response, "main.asm": main_asm.response};        
     }
 
     storage.autoLoad = function()
