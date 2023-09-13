@@ -28,4 +28,4 @@ jobs:
         actions-cache-folder: 'emsdk-cache'
     - name: build rgbds
       run: ./build-rgbds.sh
-        shell: bash
+      shell: bash
