@@ -1,6 +1,8 @@
 "use strict";
 
 this.emulator = new Object();
+// This is technically race-y, but should be fine for now.
+Binjgb().then(v => globalThis.Module = v);
 (function(emulator) {
     var e;
     var rom_ptr;

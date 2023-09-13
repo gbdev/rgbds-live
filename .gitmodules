@@ -1,0 +1,9 @@
+[submodule "binjgb"]
+	path = binjgb
+	url = https://github.com/daid/binjgb
+[submodule "rgbds"]
+	path = rgbds
+	url = https://github.com/gbdev/rgbds.git
+[submodule "hardware.inc"]
+	path = hardware.inc
+	url = https://github.com/gbdev/hardware.inc

@@ -7,12 +7,7 @@ if [[ "$(which emmake)" == "" ]]; then
     exit 1
 fi
 
-rm -rf rgbds
-git clone https://github.com/gbdev/rgbds.git
 cd rgbds
-git fetch --all --tags
-# Target RGBDS version
-git checkout v0.5.1
 
 patch -p1 < ../rgbds.patch
 echo "Allowing patching"
