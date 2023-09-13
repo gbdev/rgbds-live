@@ -1,0 +1,27 @@
+name: CI
+'on':
+  create:
+    tags: null
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    name: WASM Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Setup emscripten
+        uses: mymindstorm/setup-emsdk@v11
+        with:
+          version: 3.1.45
+          actions-cache-folder: emsdk-cache
+      - name: Build RGBDS
+        run: ./build-rgbds.sh
+        shell: bash
+      - name: Build binjgb
+        run: ./build-binjgb.sh
+        shell: bash
