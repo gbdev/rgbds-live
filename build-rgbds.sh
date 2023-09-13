@@ -11,8 +11,7 @@ cd rgbds
 
 patch -p1 < ../rgbds.patch
 echo "Allowing patching"
-read
-git diff > ../rgbds.patch
+
 
 MAKE_ARGS="Q= PNGCFLAGS= PNGLDFLAGS= PNGLDLIBS="
 CFLAGS="-O3 -s MODULARIZE=1 -s EXPORTED_RUNTIME_METHODS=['FS'] -s USE_LIBPNG"
