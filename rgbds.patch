@@ -1,8 +1,8 @@
 diff --git a/include/asm/symbol.h b/include/asm/symbol.h
-index 729ec28..310539a 100644
+index 627868f4..4dd9076b 100644
 --- a/include/asm/symbol.h
 +++ b/include/asm/symbol.h
-@@ -114,6 +114,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
+@@ -110,6 +110,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
  
  int32_t sym_GetValue(struct Symbol const *sym);
  void sym_SetExportAll(bool set);
@@ -11,10 +11,10 @@ index 729ec28..310539a 100644
  struct Symbol *sym_AddLabel(char const *symName);
  struct Symbol *sym_AddAnonLabel(void);
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index 48afd9d..08363f1 100644
+index 21d6a536..f98ecd36 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
-@@ -676,7 +676,7 @@ endofline	: T_NEWLINE | T_EOB
+@@ -789,7 +789,7 @@ else		: T_POP_ELSE T_NEWLINE {
  ;
  
  plain_directive	: label
@@ -24,11 +24,11 @@ index 48afd9d..08363f1 100644
  		| label directive
  		| assignment_directive
 diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index 1c70b04..59059b1 100644
+index 4a565d7a..3c176e22 100644
 --- a/src/asm/symbol.c
 +++ b/src/asm/symbol.c
-@@ -381,6 +381,26 @@ static struct Symbol *createNonrelocSymbol(char const *symName, bool numeric)
- 	return sym;
+@@ -349,6 +349,26 @@ void sym_SetCurrentSymbolScope(char const *newScope)
+ 	labelScope = newScope;
  }
  
 +static uint32_t secret_counter = 0;
@@ -52,22 +52,22 @@ index 1c70b04..59059b1 100644
 +
 +
  /*
-  * Add an equated symbol
-  */
+  * Create a symbol that will be non-relocatable and ensure that it
+  * hasn't already been defined or referenced in a context that would
 diff --git a/src/asm/warning.c b/src/asm/warning.c
-index dc23386..2df07b0 100644
+index e501da23..31fd42e5 100644
 --- a/src/asm/warning.c
 +++ b/src/asm/warning.c
-@@ -222,7 +222,7 @@ void error(const char *fmt, ...)
+@@ -346,7 +346,7 @@ void error(char const *fmt, ...)
  	va_list args;
  
  	va_start(args, fmt);
--	printDiag(fmt, args, "ERROR: ", ":\n    ", NULL);
-+	printDiag(fmt, args, "ERROR: ", ": ", NULL);
+-	printDiag(fmt, args, "error: ", ":\n    ", NULL);
++	printDiag(fmt, args, "error: ", ": ", NULL);
  	va_end(args);
  	nbErrors++;
  }
-@@ -232,7 +232,7 @@ _Noreturn void fatalerror(const char *fmt, ...)
+@@ -356,7 +356,7 @@ _Noreturn void fatalerror(char const *fmt, ...)
  	va_list args;
  
  	va_start(args, fmt);
@@ -76,16 +76,16 @@ index dc23386..2df07b0 100644
  	va_end(args);
  
  	exit(1);
-@@ -250,7 +250,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+@@ -374,7 +374,7 @@ void warning(enum WarningID id, char const *fmt, ...)
  		return;
  
  	case WARNING_ERROR:
--		printDiag(fmt, args, "ERROR: ", ": [-Werror=%s]\n    ", flag);
-+		printDiag(fmt, args, "ERROR: ", ": [-Werror=%s] ", flag);
+-		printDiag(fmt, args, "error: ", ": [-Werror=%s]\n    ", flag);
++		printDiag(fmt, args, "error: ", ": [-Werror=%s] ", flag);
  		va_end(args);
  		return;
  
-@@ -262,7 +262,7 @@ void warning(enum WarningID id, char const *fmt, ...)
+@@ -386,7 +386,7 @@ void warning(enum WarningID id, char const *fmt, ...)
  		break;
  	}
  
