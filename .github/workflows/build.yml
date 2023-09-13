@@ -1,34 +1,27 @@
 name: CI
-
-on:
+'on':
   create:
-    tags:
+    tags: null
   push:
     branches:
       - gh-action
-
-
 jobs:
   build:
-    name: Compile RGBDS and binjgb to wasm
+    name: WASM Build
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository and submodules
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: Setup emscripten
-      uses: mymindstorm/setup-emsdk@v11
-      with:
-        # Make sure to set a version number!
-        version: 3.1.45
-        # This is the name of the cache folder.
-        # The cache folder will be placed in the build directory,
-        #  so make sure it doesn't conflict with anything!
-        actions-cache-folder: 'emsdk-cache'
-    - name: Build RGBDS
-      run: ./build-rgbds.sh
-      shell: bash
-    - name: Build binjgb
-      run: ./build-binjgb.sh
-      shell: bash
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Setup emscripten
+        uses: mymindstorm/setup-emsdk@v11
+        with:
+          version: 3.1.45
+          actions-cache-folder: emsdk-cache
+      - name: Build RGBDS
+        run: ./build-rgbds.sh
+        shell: bash
+      - name: Build binjgb
+        run: ./build-binjgb.sh
+        shell: bash
