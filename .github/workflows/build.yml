@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  create:
+    tags:
+  push:
+    branches:
+      - gh-action
+
+
+jobs:
+  build:
+    name: build
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Setup emscripten
+      uses: lovasoa/setup-emscripten@master
+      with:
+        emscripten-version: '1.38.47'
