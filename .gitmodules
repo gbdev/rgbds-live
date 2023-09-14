@@ -1,6 +1,6 @@
 [submodule "binjgb"]
 	path = binjgb
-	url = https://github.com/daid/binjgb
+	url = https://github.com/binji/binjgb
 [submodule "rgbds"]
 	path = rgbds
 	url = https://github.com/gbdev/rgbds.git
