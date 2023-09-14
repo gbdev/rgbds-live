@@ -8,7 +8,7 @@ if [[ "$(which emsdk)" == "" ]]; then
 fi
 
 cd binjgb
-patch -p1 < ../binjgb.patch
-make wasm EMSCRIPTEN_DIR=${EMSDK}/upstream/emscripten
+
+make wasm CMAKEFLAGS="-DRGBDS_LIVE=ON" EMSCRIPTEN_DIR=${EMSDK}/upstream/emscripten
 mkdir -p ../www/wasm
 cp out/Wasm/binjgb.* ../www/wasm/
