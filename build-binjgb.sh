@@ -8,7 +8,15 @@ if [[ "$(which emsdk)" == "" ]]; then
 fi
 
 cd binjgb
-
-make wasm CMAKEFLAGS="-DRGBDS_LIVE=ON" EMSCRIPTEN_DIR=${EMSDK}/upstream/emscripten
-mkdir -p ../www/wasm
-cp out/Wasm/binjgb.* ../www/wasm/
+! mkdir out
+cd out
+cmake \
+    -DCMAKE_TOOLCHAIN_FILE=${EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DWERROR=ON \
+    -DWASM=true \
+    -DRGBDS_LIVE=ON \
+    ../
+make
+mkdir -p ../../www/wasm
+cp binjgb.* ../../www/wasm/
