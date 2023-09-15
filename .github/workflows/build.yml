@@ -25,3 +25,9 @@ jobs:
       - name: Build binjgb
         run: ./build-binjgb.sh
         shell: bash
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Build output to publish to the `gh-pages` branch:
+          publish_dir: ./www
