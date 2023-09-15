@@ -14,7 +14,25 @@ this.compiler = new Object();
 
     var line_nr_regex = /([\w\.]+)[\w\.\:~]*\(([0-9]+)\)/gi;
 
+    var buffered_log = "";
     function logFunction(str) {
+        if(/^[^:\s]+:/.test(str)) {
+            // If the log starts with a label, we can emit the previously buffered one.
+            flushLog();
+            buffered_log = str.trim();
+        } else {
+            // If the log doesn’t start with a label, it’s a follow-up to the previous log,
+            // so add it to the buffer.
+            buffered_log += " " + str.trim();
+        }
+    }
+
+    function flushLog() {
+        unbufferedLogFunction(buffered_log);
+        buffered_log = "";
+    }
+
+    function unbufferedLogFunction(str) {
         if (log_callback)
             log_callback(str);
 
@@ -98,6 +116,7 @@ this.compiler = new Object();
             },
             'print': logFunction, 'printErr': logFunction,
         }).then(function(m) {
+            flushLog();
             if (repeat) { buildFailed(); return; }
             var FS = m.FS;
             try { var obj_file = FS.readFile("output.o"); } catch { buildFailed(); return; }
@@ -123,6 +142,7 @@ this.compiler = new Object();
             },
             'print': logFunction, 'printErr': logFunction,
         }).then(function(m) {
+            flushLog();
             if (repeat) { buildFailed(); return; }
             var FS = m.FS;
             try { var rom_file = FS.readFile("output.gb"); } catch { buildFailed(); return; }
@@ -143,6 +163,7 @@ this.compiler = new Object();
             },
             'print': logFunction, 'printErr': logFunction,
         }).then(function(m) {
+            flushLog();
             var FS = m.FS;
             try { var rom_file = FS.readFile("output.gb"); } catch { buildFailed(); return; }
             
@@ -230,6 +251,7 @@ this.compiler = new Object();
                 }
             }
             logFunction("Build done");
+            flushLog();
             done_callback(rom_file, start_address, addr_to_line);
         }
     }
