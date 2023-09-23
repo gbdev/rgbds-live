@@ -1,6 +1,8 @@
 "use strict";
 
-this.emulator = new Object();
+import Binjgb from "../binjgb/out/binjgb.js";
+
+globalThis.emulator = new Object();
 // This is technically race-y, but should be fine for now.
 Binjgb().then(v => globalThis.Module = v);
 (function(emulator) {
@@ -241,4 +243,4 @@ Binjgb().then(v => globalThis.Module = v);
         const buffer_sec = audio_buffer_size / audio_ctx.sampleRate;
         audio_time += buffer_sec;
     }
-})(this.emulator);
+})(globalThis.emulator);

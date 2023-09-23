@@ -1,6 +1,10 @@
 "use strict";
 
-this.compiler = new Object();
+import createRgbAsm from "../rgbds/rgbasm";
+import createRgbLink from "../rgbds/rgblink";
+import createRgbFix from "../rgbds/rgbfix";
+
+globalThis.compiler = new Object();
 (function(compiler) {
     var busy = false;
     var repeat = false;
@@ -255,4 +259,4 @@ this.compiler = new Object();
             done_callback(rom_file, start_address, addr_to_line);
         }
     }
-})(this.compiler);
+})(globalThis.compiler);

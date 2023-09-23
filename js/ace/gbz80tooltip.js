@@ -1,8 +1,8 @@
 "use strict";
 
-var Tooltip = require("ace/tooltip").Tooltip;
+globalThis.Tooltip = require("ace/tooltip").Tooltip;
 var event = require("ace/lib/event");
-function TokenTooltip(editor) {
+globalThis.TokenTooltip = function TokenTooltip(editor) {
     if (editor.tokenTooltip)
         return;
     Tooltip.call(this, editor.container);

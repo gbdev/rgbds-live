@@ -1,6 +1,6 @@
 "use strict";
 
-this.editors = new Object();
+globalThis.editors = new Object();
 (function(editors) {
     var nullEditor = {
         'hide': function() { document.getElementById('nullEditorDiv').style.display = "none"; },
@@ -47,4 +47,4 @@ this.editors = new Object();
         if (ext == "txt") return 'text';
         return 'binary'
     }
-})(this.editors);
+})(globalThis.editors);

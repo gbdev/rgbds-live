@@ -1,3 +1,5 @@
+import {gameboy_hardware_constants} from "../gbz80.js";
+
 define("ace/mode/gbz80_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/text_highlight_rules"], function(require, exports, module) {
 "use strict";
 

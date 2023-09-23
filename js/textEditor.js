@@ -1,6 +1,6 @@
-"use strict";
+import {gbz80Completer} from "./ace/complete-gbz80.js";
 
-this.textEditor = new Object();
+globalThis.textEditor = new Object();
 (function(editor) {
     var editors = []
     var current_file = null;
@@ -156,4 +156,4 @@ this.textEditor = new Object();
         editors[0].resize()
         editors[0].renderer.updateFull()
     }
-})(this.textEditor);
+})(globalThis.textEditor);

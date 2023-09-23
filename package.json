@@ -1,0 +1,24 @@
+{
+  "name": "rgbds-live",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "description": "A live RGBDS programming environment in the browser",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gbdev/rgbds-live.git"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gbdev/rgbds-live/issues"
+  },
+  "homepage": "https://gbdev.io/rgbds-live/",
+  "devDependencies": {
+    "vite": "^4.4.9"
+  }
+}
