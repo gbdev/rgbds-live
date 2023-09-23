@@ -11,13 +11,17 @@ System requirements:
 - bison, cmake
 - [emscripten](https://emscripten.org/docs/getting_started/downloads.html)
 
-To build RGBDS live and run it locally:
+Make sure you initialize submodules to be able to build the WebAssembly modules:
 
 ```bash
 # Pull RGBDS-live, rgbds and binjgb sources
 git clone https://github.com/gbdev/rgbds-live --recursive
-# Generate WASM builds and put them in the main source folder
+# Do a full build
 ./build.sh
 ```
 
-Final build will be in `www/`. You can run the provided `serve-site.sh` to serve that folder locally over port 8080.
+To start hacking, use the development server:
+```bash
+# Development server with live refresh:
+npm run dev
+```

@@ -4,11 +4,11 @@ globalThis.storage = new Object();
 (function(storage) {
 
     var hardware_inc = new XMLHttpRequest();
-    hardware_inc.open("GET", "starting_project/hardware.inc", false);
+    hardware_inc.open("GET", new URL("../starting_project/hardware.inc", import.meta.url), false);
     hardware_inc.send();
 
     var main_asm = new XMLHttpRequest();
-    main_asm.open("GET", "starting_project/main.asm", false);
+    main_asm.open("GET", new URL("../starting_project/main.asm", import.meta.url), false);
     main_asm.send();
 
     var files = {"hardware.inc": hardware_inc.response, "main.asm": main_asm.response};      
@@ -19,11 +19,11 @@ globalThis.storage = new Object();
     storage.reset = function()
     {
         var hardware_inc = new XMLHttpRequest();
-        hardware_inc.open("GET", "starting_project/hardware.inc", false);
+        hardware_inc.open("GET", new URL("../starting_project/hardware.inc", import.meta.url), false);
         hardware_inc.send();
 
         var main_asm = new XMLHttpRequest();
-        main_asm.open("GET", "starting_project/main.asm", false);
+        main_asm.open("GET", new URL("../starting_project/main.asm", import.meta.url), false);
         main_asm.send();
 
         var files = {"hardware.inc": hardware_inc.response, "main.asm": main_asm.response};        
