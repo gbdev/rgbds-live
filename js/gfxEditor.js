@@ -1,6 +1,6 @@
 "use strict";
 
-this.gfxEditor = new Object();
+globalThis.gfxEditor = new Object();
 (function(editor) {
     var colors = [0xFFC2F0C4, 0xFFA8B95A, 0xFF6E601E, 0xFF001B2D]
 
@@ -170,4 +170,4 @@ this.gfxEditor = new Object();
         ctx.rect(1.5, selected_color * 16 + 1.5, 13, 13);
         ctx.stroke();
     }
-})(this.gfxEditor);
+})(globalThis.gfxEditor);

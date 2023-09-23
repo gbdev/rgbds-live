@@ -1,6 +1,6 @@
 "use strict";
 
-this.storage = new Object();
+globalThis.storage = new Object();
 (function(storage) {
 
     var hardware_inc = new XMLHttpRequest();
@@ -216,4 +216,4 @@ this.storage = new Object();
         editors.setCurrentFile(Object.keys(files)[0]);
         updateFileList();
     }
-})(storage);
+})(globalThis.storage);

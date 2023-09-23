@@ -1,6 +1,4 @@
-"use strict";
-
-var gameboy_hardware_constants = {
+const gameboy_hardware_constants = {
     "_HW": {
         description: "Start of the hardware IO registers.",
         value: "$FF00->$FF80"
@@ -617,3 +615,5 @@ for(var key in gameboy_hardware_constants)
         gameboy_hardware_constants[gameboy_hardware_constants[key].alias].alias = key
     }
 }
+
+export {gameboy_hardware_constants};

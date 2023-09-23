@@ -1,4 +1,4 @@
-"use strict";
+import {gameboy_hardware_constants} from "../gbz80.js";
 
 var gbz80Instructions = [
     {
@@ -1115,3 +1115,5 @@ var gbz80Completer = {
         }
     }
 }
+
+export {gbz80Completer};

@@ -10,13 +10,12 @@ fi
 cd binjgb
 ! mkdir out
 cd out
-cmake \
-    -DCMAKE_TOOLCHAIN_FILE=${EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DWERROR=ON \
-    -DWASM=true \
-    -DRGBDS_LIVE=ON \
-    ../
+cmake -E env LDFLAGS='-s EXPORT_ES6=1' \
+    cmake \
+        -DCMAKE_TOOLCHAIN_FILE=${EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DWERROR=ON \
+        -DWASM=true \
+        -DRGBDS_LIVE=ON \
+        ../
 make
-mkdir -p ../../www/wasm
-cp binjgb.* ../../www/wasm/
