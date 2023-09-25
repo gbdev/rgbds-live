@@ -1,3 +1,4 @@
+import * as compiler from "./compiler.js";
 import {gbz80Completer} from "./ace/complete-gbz80.js";
 
 globalThis.textEditor = new Object();

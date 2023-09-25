@@ -15,7 +15,6 @@
 <script type="module" src="js/ace/complete-gbz80.js"></script>
 <script type="module" src="js/ace/gbz80tooltip.js"></script>
 
-<script type="module" src="js/compiler.js"></script>
 <script type="module" src="js/emulator.js"></script>
 <script type="module" src="js/storage.js"></script>
 <script type="module" src="js/editors.js"></script>
@@ -24,6 +23,7 @@
 <script type="module" src="js/download.js"></script>
 
 <script type="module">
+import * as compiler from "./js/compiler.js";
 
 var cpu_line_marker = undefined;
 var start_address;
