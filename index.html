@@ -15,7 +15,6 @@
 <script type="module" src="js/ace/complete-gbz80.js"></script>
 <script type="module" src="js/ace/gbz80tooltip.js"></script>
 
-<script type="module" src="js/emulator.js"></script>
 <script type="module" src="js/storage.js"></script>
 <script type="module" src="js/editors.js"></script>
 <script type="module" src="js/textEditor.js"></script>
@@ -24,6 +23,7 @@
 
 <script type="module">
 import * as compiler from "./js/compiler.js";
+import * as emulator from "./js/emulator.js";
 
 var cpu_line_marker = undefined;
 var start_address;
@@ -347,7 +347,7 @@ function deleteFile(name)
     updateFileList();
 }
 
-window.addEventListener('DOMContentLoaded', (event) => {
+function init(event){
     textEditor.register("textEditorDiv");
     gfxEditor.register("gfxEditorDiv");
     storage.autoLoad();
@@ -574,7 +574,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
         storage.autoLocalStorage = document.getElementById("auto_local_storage_update").checked;
         storage.update();
     }
-});
+}
+init();
 
 </script>
 </head>
