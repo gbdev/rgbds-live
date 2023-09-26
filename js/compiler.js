@@ -1,3 +1,5 @@
+import * as storage from "./storage.js";
+
 import createRgbAsm from "../rgbds/rgbasm";
 import createRgbLink from "../rgbds/rgblink";
 import createRgbFix from "../rgbds/rgbfix";

@@ -1,3 +1,5 @@
+import * as storage from "./storage.js";
+
 "use strict";
 
 globalThis.editors = new Object();
