@@ -19,6 +19,8 @@
   },
   "homepage": "https://gbdev.io/rgbds-live/",
   "devDependencies": {
-    "vite": "^4.4.9"
+    "ace-builds": "^1.4.12",
+    "vite": "^4.4.9",
+    "vite-plugin-static-copy": "^0.17.0"
   }
 }
