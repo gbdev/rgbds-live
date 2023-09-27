@@ -1,5 +1,7 @@
-export let autoUrl = false;
-export let autoLocalStorage = false;
+export const config = {
+	autoUrl: false,
+	autoLocalStorage: false,
+};
 
 let files;
 
@@ -41,7 +43,7 @@ export function autoLoad() {
 			location.hash = "";
 		} else {
 			loadUrlHash();
-			autoUrl = true;
+			config.autoUrl = true;
 		}
 	} else if ("rgbds_storage" in localStorage) {
 		files = { "hardware.inc": hardware_inc };
@@ -51,7 +53,7 @@ export function autoLoad() {
 			if (data instanceof Object) data = Uint8Array.from(Object.values(data));
 			files[filename] = data;
 		}
-		autoLocalStorage = true;
+		config.autoLocalStorage = true;
 	}
 }
 
@@ -66,8 +68,9 @@ export function update(name, code) {
 		else files[name] = code;
 	}
 
-	if (autoUrl) document.location.hash = new URL(getHashUrl()).hash;
-	if (autoLocalStorage) localStorage["rgbds_storage"] = JSON.stringify(files);
+	if (config.autoUrl) document.location.hash = new URL(getHashUrl()).hash;
+	if (config.autoLocalStorage)
+		localStorage["rgbds_storage"] = JSON.stringify(files);
 }
 
 export function loadUrlHash() {

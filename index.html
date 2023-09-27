@@ -551,17 +551,17 @@ function init(event){
     document.getElementById("infodialog").onclick = function(e) { if (e.target == document.getElementById("infodialog")) document.getElementById("infodialog").style.display = "none"; }
     document.getElementById("infodialogclose").onclick = function() { document.getElementById("infodialog").style.display = "none"; }
     
-    document.getElementById("auto_url_update").checked = storage.autoUrl;
+    document.getElementById("auto_url_update").checked = storage.config.autoUrl;
     document.getElementById("auto_url_update").onclick = function() {
-        storage.autoUrl = document.getElementById("auto_url_update").checked;
-        if (storage.autoUrl)
+        storage.config.autoUrl = document.getElementById("auto_url_update").checked;
+        if (storage.config.autoUrl)
             storage.update();
         else
             document.location.hash = "";
     }
-    document.getElementById("auto_local_storage_update").checked = storage.autoLocalStorage;
+    document.getElementById("auto_local_storage_update").checked = storage.config.autoLocalStorage;
     document.getElementById("auto_local_storage_update").onclick = function() {
-        storage.autoLocalStorage = document.getElementById("auto_local_storage_update").checked;
+        storage.config.autoLocalStorage = document.getElementById("auto_local_storage_update").checked;
         storage.update();
     }
 }
