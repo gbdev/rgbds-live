@@ -104,7 +104,7 @@ function runRgbAsm(targets, obj_files) {
 	var target = targets.pop();
 	logFunction("Running: rgbasm " + target + " -o " + target + ".o -Wall");
 	createRgbAsm({
-		arguments: [target, "-o", "output.o", "-Wall"],
+		arguments: [target, "-o", "output.o", "-Wall", "-l"],
 		preRun: function (m) {
 			var FS = m.FS;
 			for (const [key, value] of Object.entries(storage.getFiles())) {
