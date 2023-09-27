@@ -17,7 +17,7 @@ var cpu_line_marker = null;
 var breakpoints = [];
 var cursor_position_per_file = {};
 
-export function register(div_id) {
+export function register(div_id, compileCode) {
 	var e = ace.edit(div_id);
 	new TokenTooltip(e);
 	e.setTheme("ace/theme/tomorrow");

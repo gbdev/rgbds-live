@@ -165,7 +165,6 @@ function runRgbLink(obj_files) {
 		}
 
 		runRgbFix(rom_file, map_file);
-		//buildDone(rom_file, map_file);
 	});
 }
 

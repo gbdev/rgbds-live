@@ -335,7 +335,7 @@ function deleteFile(name)
 }
 
 function init(event){
-    textEditor.register("textEditorDiv");
+    textEditor.register("textEditorDiv", compileCode);
     gfxEditor.register("gfxEditorDiv");
     storage.autoLoad();
     editors.setCurrentFile(Object.keys(storage.getFiles()).pop());
