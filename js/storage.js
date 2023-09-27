@@ -1,3 +1,9 @@
+import JSZip from "jszip";
+import LZString from "lz-string";
+
+import HARDWARE_INC from "../hardware.inc/hardware.inc?raw";
+import MAIN_ASM from "../starting_project/main.asm?raw";
+
 export const config = {
 	autoUrl: false,
 	autoLocalStorage: false,
@@ -8,25 +14,9 @@ let files;
 reset();
 
 export function reset() {
-	var hardware_inc = new XMLHttpRequest();
-	hardware_inc.open(
-		"GET",
-		new URL("../starting_project/hardware.inc", import.meta.url),
-		false,
-	);
-	hardware_inc.send();
-
-	var main_asm = new XMLHttpRequest();
-	main_asm.open(
-		"GET",
-		new URL("../starting_project/main.asm", import.meta.url),
-		false,
-	);
-	main_asm.send();
-
 	files = {
-		"hardware.inc": hardware_inc.response,
-		"main.asm": main_asm.response,
+		"hardware.inc": HARDWARE_INC,
+		"main.asm": MAIN_ASM,
 	};
 }
 
@@ -46,7 +36,7 @@ export function autoLoad() {
 			config.autoUrl = true;
 		}
 	} else if ("rgbds_storage" in localStorage) {
-		files = { "hardware.inc": hardware_inc };
+		files = { "hardware.inc": HARDWARE_INC };
 		for (var [filename, data] of Object.entries(
 			JSON.parse(localStorage["rgbds_storage"]),
 		)) {
@@ -84,7 +74,7 @@ export function loadUrlHash() {
 		return true;
 	}
 	all_code = all_code.split("\0");
-	files = { "hardware.inc": hardware_inc };
+	files = { "hardware.inc": HARDWARE_INC };
 	for (var idx = 0; idx < all_code.length - 1; idx += 2) {
 		files[all_code[idx]] = all_code[idx + 1];
 	}
@@ -94,7 +84,7 @@ export function loadUrlHash() {
 export function getHashUrl() {
 	var all_code = "";
 	for (var [name, data] of Object.entries(files)) {
-		if (name == "hardware.inc" && data == hardware_inc) continue;
+		if (name == "hardware.inc" && data == HARDWARE_INC) continue;
 		all_code += name + "\0" + data + "\0";
 	}
 	var url = new URL(document.location);
@@ -120,7 +110,7 @@ export function loadGithubGist(url) {
 	JSON.parse(req.response);
 
 	var result = JSON.parse(req.responseText);
-	files = { "hardware.inc": hardware_inc };
+	files = { "hardware.inc": HARDWARE_INC };
 	for (var [name, data] of Object.entries(result.files)) {
 		files[name] = data.content;
 	}
@@ -182,7 +172,7 @@ export function downloadZip() {
 }
 
 export function loadZip(file) {
-	files = { "hardware.inc": hardware_inc };
+	files = { "hardware.inc": HARDWARE_INC };
 	JSZip.loadAsync(file).then(function (zip) {
 		var entries = Object.values(zip.files);
 		function loadNextFile() {
@@ -201,7 +191,7 @@ export function loadZip(file) {
 }
 
 export function loadSingleUrl(url) {
-	files = { "hardware.inc": hardware_inc };
+	files = { "hardware.inc": HARDWARE_INC };
 	var req = new XMLHttpRequest();
 	req.open("GET", url, false);
 	req.send();
