@@ -4,26 +4,13 @@
 <meta name="google" content="notranslate">
 <link rel="stylesheet" href="css/style.css">
 
-<script type="module" src="js/lz-string.min.js"></script>
-<script type="module" src="js/jszip.min.js"></script>
-
-<script type="module" src="js/gbz80.js"></script>
-<script type="module" src="js/ace/ace.js"></script>
-<script type="module" src="js/ace/theme-tomorrow.js"></script>
-<script type="module" src="js/ace/ext-language_tools.js"></script>
-<script type="module" src="js/ace/mode-gbz80.js"></script>
-<script type="module" src="js/ace/complete-gbz80.js"></script>
-<script type="module" src="js/ace/gbz80tooltip.js"></script>
-
-<script type="module" src="js/compiler.js"></script>
-<script type="module" src="js/emulator.js"></script>
-<script type="module" src="js/storage.js"></script>
-<script type="module" src="js/editors.js"></script>
-<script type="module" src="js/textEditor.js"></script>
-<script type="module" src="js/gfxEditor.js"></script>
-<script type="module" src="js/download.js"></script>
-
 <script type="module">
+import * as compiler from "./js/compiler.js";
+import * as emulator from "./js/emulator.js";
+import * as storage from "./js/storage.js";
+import * as editors from "./js/editors.js";
+import * as textEditor from "./js/text-editor.js";
+import * as gfxEditor from "./js/gfx-editor.js";
 
 var cpu_line_marker = undefined;
 var start_address;
@@ -347,8 +334,8 @@ function deleteFile(name)
     updateFileList();
 }
 
-window.addEventListener('DOMContentLoaded', (event) => {
-    textEditor.register("textEditorDiv");
+function init(event){
+    textEditor.register("textEditorDiv", compileCode);
     gfxEditor.register("gfxEditorDiv");
     storage.autoLoad();
     editors.setCurrentFile(Object.keys(storage.getFiles()).pop());
@@ -561,20 +548,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
     document.getElementById("infodialog").onclick = function(e) { if (e.target == document.getElementById("infodialog")) document.getElementById("infodialog").style.display = "none"; }
     document.getElementById("infodialogclose").onclick = function() { document.getElementById("infodialog").style.display = "none"; }
     
-    document.getElementById("auto_url_update").checked = storage.autoUrl;
+    document.getElementById("auto_url_update").checked = storage.config.autoUrl;
     document.getElementById("auto_url_update").onclick = function() {
-        storage.autoUrl = document.getElementById("auto_url_update").checked;
-        if (storage.autoUrl)
+        storage.config.autoUrl = document.getElementById("auto_url_update").checked;
+        if (storage.config.autoUrl)
             storage.update();
         else
             document.location.hash = "";
     }
-    document.getElementById("auto_local_storage_update").checked = storage.autoLocalStorage;
+    document.getElementById("auto_local_storage_update").checked = storage.config.autoLocalStorage;
     document.getElementById("auto_local_storage_update").onclick = function() {
-        storage.autoLocalStorage = document.getElementById("auto_local_storage_update").checked;
+        storage.config.autoLocalStorage = document.getElementById("auto_local_storage_update").checked;
         storage.update();
     }
-});
+}
+init();
 
 </script>
 </head>
