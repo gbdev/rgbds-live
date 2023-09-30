@@ -12,6 +12,17 @@
 			import * as textEditor from "./js/text-editor.js";
 			import * as gfxEditor from "./js/gfx-editor.js";
 
+			if (import.meta.env.DEV) {
+				globalThis._rgbdsDebug = {
+					compiler,
+					emulator,
+					storage,
+					editors,
+					textEditor,
+					gfxEditor,
+				};
+			}
+
 			var cpu_line_marker = undefined;
 			var start_address;
 			var rom;
@@ -19,7 +30,6 @@
 			var line_to_addr = {};
 			var cpu_step_interval_id;
 			var emu_view = "";
-			var live_patch = false;
 
 			compiler.setLogCallback(function (str) {
 				var output = document.getElementById("output");
@@ -44,20 +54,11 @@
 					updateFileList();
 
 					var pc_line;
-					if (live_patch && textEditor.session.getMarkers()[cpu_line_marker]) {
-						pc_line =
-							textEditor.session.getMarkers()[cpu_line_marker].range.start.row +
-							1;
-					} else {
-						destroyEmulator();
-					}
+					destroyEmulator();
 					if (typeof _rom_file == "undefined") {
 						return;
 					}
 
-					if (live_patch) {
-						if (!emulator.updateRom(_rom_file)) destroyEmulator();
-					}
 					rom = _rom_file;
 					start_address = _start_address;
 					addr_to_line = _addr_to_line;
@@ -68,21 +69,6 @@
 						if (typeof line_to_addr[filename][line] == "undefined")
 							line_to_addr[filename][line] = [];
 						line_to_addr[filename][line].push(addr);
-
-						if (
-							live_patch &&
-							typeof pc_line != "undefined" &&
-							file == pc_line[0] &&
-							line == pc_line[1]
-						) {
-							console.log(
-								"Live patch PC update:",
-								emulator.getPC().toString(16),
-								addr.toString(16),
-								pc_line,
-							);
-							emulator.setPC(addr);
-						}
 					}
 					updateTextView();
 				});
