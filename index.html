@@ -1,162 +1,404 @@
 <html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="google" content="notranslate">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="google" content="notranslate" />
+		
 
+		
+		<script type="module" crossorigin src="/rgbds-live/assets/index-65dc99a7.js"></script>
+		<link rel="stylesheet" href="/rgbds-live/assets/index-21b6e803.css">
+	</head>
+	<body>
+		<div class="container">
+			<div class="menubar">
+				<ul>
+					<li>
+						File
+						<ul>
+							<li id="newfile">New file...</li>
+							<li id="delfile">Delete current file</li>
+							<li id="importmenu">Import project...</li>
+							<li id="exportmenu">Export project...</li>
+							<li id="newproject">New project...</li>
+						</ul>
+					</li>
+					<li>
+						Options
+						<ul>
+							<li>
+								<input type="checkbox" id="auto_url_update" /><label
+									for="auto_url_update"
+									>Auto URL update</label
+								>
+							</li>
+							<li>
+								<input type="checkbox" id="auto_local_storage_update" /><label
+									for="auto_local_storage_update"
+									>Store data between sessions</label
+								>
+							</li>
+						</ul>
+					</li>
+					<li>
+						About
+						<ul>
+							<li id="infomenu">Info...</li>
+							<li>
+								<a href="https://rgbds.gbdev.io/docs/v0.6.1" target="_blank"
+									>rgbds manual</a
+								>
+							</li>
+							<li>
+								<a
+									href="https://github.com/gbdev/rgbds-live/issues"
+									target="_blank"
+									>Report a problem</a
+								>
+							</li>
+							<li>Source:</li>
+							<li>
+								<a href="https://github.com/gbdev/rgbds-live" target="_blank"
+									>https://github.com/gbdev/rgbds-live</a
+								>
+							</li>
+							<li>Uses:</li>
+							<li>
+								<a href="https://github.com/gbdev/rgbds/" target="_blank"
+									>rgbds</a
+								>: Rednex Game Boy Development System
+							</li>
+							<li>
+								(MIT License, Copyright (c) 1997-2023, Carsten Sorensen and
+								RGBDS contributors)
+							</li>
+							<li>
+								<a href="https://github.com/binji/binjgb" target="_blank"
+									>binjgb</a
+								>: Gameboy Emulator
+							</li>
+							<li>(MIT License, Copyright (C) 2016, Ben Smith)</li>
+							<li>
+								<a href="https://ace.c9.io/" target="_blank">Ace</a>: High
+								performance code editor for web
+							</li>
+							<li>(BSD License, Copyright (c) 2010, Ajax.org B.V.)</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<div class="sidebar" style="position: relative">
+				<div class="filelist">
+					<ul id="filelist"></ul>
+				</div>
+			</div>
+			<div class="editor" id="textEditorDiv" style="display: none"></div>
+			<div class="editor" id="gfxEditorDiv">
+				<canvas
+					id="gfxEditorDrawCanvas"
+					width="8"
+					height="8"
+					style="width: 256px"
+				></canvas
+				><canvas
+					id="gfxEditorPalette"
+					width="16"
+					height="64"
+					style="width: 32px; margin-left: 2px"
+				></canvas>
+				<div width="100%" style="overflow: scroll; display: None">
+					<canvas id="gfxEditorTilesCanvas"></canvas>
+				</div>
+			</div>
+			<div class="editor" id="nullEditorDiv">Cannot edit selected file.</div>
+			<div class="emulator">
+				<table>
+					<tr>
+						<td colspan="4">
+							<div class="tabs">
+								<input
+									type="radio"
+									name="emulator_display_mode"
+									id="emulator_display_screen"
+									checked
+								/><label for="emulator_display_screen">Screen</label>
+								<input
+									type="radio"
+									name="emulator_display_mode"
+									id="emulator_display_vram"
+								/><label for="emulator_display_vram">VRAM</label>
+								<input
+									type="radio"
+									name="emulator_display_mode"
+									id="emulator_display_bg0"
+								/><label for="emulator_display_bg0">BG0</label>
+								<input
+									type="radio"
+									name="emulator_display_mode"
+									id="emulator_display_bg1"
+								/><label for="emulator_display_bg1">BG1</label>
+								<input
+									type="radio"
+									name="emulator_display_mode"
+									id="emulator_display_rom"
+								/><label for="emulator_display_rom">ROM</label>
+								<input
+									type="radio"
+									name="emulator_display_mode"
+									id="emulator_display_wram"
+								/><label for="emulator_display_wram">WRam</label>
+								<input
+									type="radio"
+									name="emulator_display_mode"
+									id="emulator_display_hram"
+								/><label for="emulator_display_hram">HRam</label>
+								<input
+									type="radio"
+									name="emulator_display_mode"
+									id="emulator_display_io"
+								/><label for="emulator_display_io">IO</label>
+							</div>
+							<div class="emulator_screen_container">
+								<canvas
+									class="emulator_canvas_screen"
+									id="emulator_screen_canvas"
+									width="160"
+									height="144"
+								></canvas>
+								<canvas
+									class="emulator_vram_screen"
+									id="emulator_vram_canvas"
+									width="256"
+									height="256"
+									style="display: none"
+								></canvas>
+								<div
+									style="
+										height: 100%;
+										width: 100%;
+										display: none;
+										overflow: scroll;
+									"
+									id="emulator_display_text"
+								></div>
+							</div>
+							<tr>
+								<td class="right">
+									<button id="download_rom">Download</button>
+								</td>
+								<td>
+									<button id="cpu_single_step">step</button
+									><button id="cpu_frame_step">frame</button
+									><input id="cpu_run_check" type="checkbox" />run
+								</td>
+								<td><button id="cpu_reset">Reset</button></td>
+								<td>
+									<tr>
+										<td class="right">PC:</td>
+										<td id="cpu_pc">-</td>
+										<td class="right">A:</td>
+										<td id="cpu_a">
+											-
+											<tr>
+												<td class="right">SP:</td>
+												<td id="cpu_sp">-</td>
+												<td class="right">BC:</td>
+												<td id="cpu_bc">
+													-
+													<tr>
+														<td class="right">Flags:</td>
+														<td id="cpu_flags">-</td>
+														<td class="right">DE:</td>
+														<td id="cpu_de">
+															-
+															<tr>
+																<td class="right"></td>
+																<td></td>
+																<td class="right">HL:</td>
+																<td id="cpu_hl">-</td>
+															</tr>
+														</td>
+													</tr>
+												</td>
+											</tr>
+										</td>
+									</tr>
+								</td>
+							</tr>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="console">
+				<textarea
+					style="height: 100%; width: 100%"
+					id="output"
+					readonly
+				></textarea>
+			</div>
 
+			<div id="infodialog" class="modal">
+				<div class="content">
+					<span id="infodialogclose" class="close"></span>
+					<p>
+						rgbds-live is a Gameboy programming environment. Allowing for
+						realtime assembly programming for the gameboy.
+					</p>
+					<p>
+						The environment runs 100% in your browser. Your source code does not
+						leave your browser, unless you export it.
+					</p>
+					<p>
+						It is powered by the excelent binjgb emulator, the ace javascript
+						sourcecode editor and rgbds compiled for webassembly.
+					</p>
+				</div>
+			</div>
 
-  <script type="module" crossorigin src="/rgbds-live/assets/index-bf257a49.js"></script>
-  <link rel="stylesheet" href="/rgbds-live/assets/index-21b6e803.css">
-</head>
-<body>
-<div class="container">
-    <div class="menubar">
-        <ul>
-            <li>File<ul>
-                <li id="newfile">New file...</li>
-                <li id="delfile">Delete current file</li>
-                <li id="importmenu">Import project...</li>
-                <li id="exportmenu">Export project...</li>
-                <li id="newproject">New project...</li>
-            </ul></li>
-            <li>Options<ul>
-                <li><input type="checkbox" id="auto_url_update"/><label for="auto_url_update">Auto URL update</label></li>
-                <li><input type="checkbox" id="auto_local_storage_update"/><label for="auto_local_storage_update">Store data between sessions</label></li>
-            </ul></li>
-            <li>About<ul>
-                <li id="infomenu">Info...</li>
-                <li><a href="https://rgbds.gbdev.io/docs/v0.6.1" target="_blank">rgbds manual</a></li>
-                <li><a href="https://github.com/gbdev/rgbds-live/issues" target="_blank">Report a problem</a></li>
-                <li>Source:</li>
-                <li><a href="https://github.com/gbdev/rgbds-live" target="_blank">https://github.com/gbdev/rgbds-live</a></li>
-                <li>Uses:</li>
-                <li><a href="https://github.com/gbdev/rgbds/" target="_blank">rgbds</a>: Rednex Game Boy Development System</li>
-                <li>(MIT License, Copyright (c) 1997-2023, Carsten Sorensen and RGBDS contributors)</li>
-                <li><a href="https://github.com/binji/binjgb" target="_blank">binjgb</a>: Gameboy Emulator</li>
-                <li>(MIT License, Copyright (C) 2016, Ben Smith)</li>
-                <li><a href="https://ace.c9.io/" target="_blank">Ace</a>: High performance code editor for web</li>
-                <li>(BSD License, Copyright (c) 2010, Ajax.org B.V.)</li>
-            </ul></li>
-        </ul>
-    </div>
-    <div class="sidebar" style="position: relative">
-        <div class="filelist">
-            <ul id="filelist">
-            </ul>
-        </div>
-    </div>
-    <div class="editor" id="textEditorDiv" style="display: none"></div>
-    <div class="editor" id="gfxEditorDiv">
-        <canvas id="gfxEditorDrawCanvas" width="8" height="8" style="width: 256px;"></canvas><canvas id="gfxEditorPalette" width="16" height="64" style="width:32px; margin-left: 2px"></canvas>
-        <div width="100%" style="overflow: scroll; display: None;"><canvas id="gfxEditorTilesCanvas"></canvas></div>
-    </div>
-    <div class="editor" id="nullEditorDiv">Cannot edit selected file.</div>
-    <div class="emulator">
-        <table><tr><td colspan="4">
-            <div class="tabs">
-                <input type="radio" name="emulator_display_mode" id="emulator_display_screen" checked /><label for="emulator_display_screen">Screen</label>
-                <input type="radio" name="emulator_display_mode" id="emulator_display_vram" /><label for="emulator_display_vram">VRAM</label>
-                <input type="radio" name="emulator_display_mode" id="emulator_display_bg0" /><label for="emulator_display_bg0">BG0</label>
-                <input type="radio" name="emulator_display_mode" id="emulator_display_bg1" /><label for="emulator_display_bg1">BG1</label>
-                <input type="radio" name="emulator_display_mode" id="emulator_display_rom" /><label for="emulator_display_rom">ROM</label>
-                <input type="radio" name="emulator_display_mode" id="emulator_display_wram" /><label for="emulator_display_wram">WRam</label>
-                <input type="radio" name="emulator_display_mode" id="emulator_display_hram" /><label for="emulator_display_hram">HRam</label>
-                <input type="radio" name="emulator_display_mode" id="emulator_display_io" /><label for="emulator_display_io">IO</label>
-            </div>
-            <div class="emulator_screen_container">
-                <canvas class="emulator_canvas_screen" id="emulator_screen_canvas" width="160" height="144"></canvas>
-                <canvas class="emulator_vram_screen" id="emulator_vram_canvas" width="256" height="256" style="display: none"></canvas>
-                <div style="height: 100%; width: 100%; display: none; overflow: scroll;" id="emulator_display_text"></div>
-            </div>
-        <tr><td class="right"><button id="download_rom">Download</button><td><button id="cpu_single_step">step</button><button id="cpu_frame_step">frame</button><input id="cpu_run_check" type="checkbox">run<td><button id="cpu_reset">Reset</button><td>
-        <tr><td class="right">PC:<td id="cpu_pc">-<td class="right">A:<td id="cpu_a">-
-        <tr><td class="right">SP:<td id="cpu_sp">-<td class="right">BC:<td id="cpu_bc">-
-        <tr><td class="right">Flags:<td id="cpu_flags">-<td class="right">DE:<td id="cpu_de">-
-        <tr><td class="right"><td><td class="right">HL:<td id="cpu_hl">-
-        </table>
-    </div>
-    <div class="console"><textarea style="height: 100%; width: 100%" id="output" readonly></textarea></div>
+			<div id="newfiledialog" class="modal">
+				<div class="content">
+					<span id="newfiledialogclose" class="close"></span>
+					<div class="tabs">
+						<input
+							type="radio"
+							name="newfile_mode"
+							id="newfile_mode_empty"
+							checked
+						/><label for="newfile_mode_empty">Empty file</label>
+						<div>
+							<p>Create a new empty file.</p>
+							<p>Name: <input id="newfile_name" /></p>
+							<p><button id="newfile_empty_create">Create</button></p>
+						</div>
+						<input
+							type="radio"
+							name="newfile_mode"
+							id="newfile_mode_upload"
+						/><label for="newfile_mode_upload">Existing file</label>
+						<div>
+							<p>Load a file from your local harddisk</p>
+							<p><input type="file" id="newfile_upload" /></p>
+						</div>
+					</div>
+				</div>
+			</div>
 
-    <div id="infodialog" class="modal">
-        <div class="content">
-            <span id="infodialogclose" class="close"></span>
-            <p>rgbds-live is a Gameboy programming environment. Allowing for realtime assembly programming for the gameboy.</p>
-            <p>The environment runs 100% in your browser. Your source code does not leave your browser, unless you export it.</p>
-            <p>It is powered by the excelent binjgb emulator, the ace javascript sourcecode editor and rgbds compiled for webassembly.</p>
-        </div>
-    </div>
-    
-    <div id="newfiledialog" class="modal">
-        <div class="content">
-            <span id="newfiledialogclose" class="close"></span>
-            <div class="tabs">
-                <input type="radio" name="newfile_mode" id="newfile_mode_empty" checked /><label for="newfile_mode_empty">Empty file</label>
-                <div>
-                    <p>Create a new empty file.</p>
-                    <p>Name: <input id="newfile_name"/></p>
-                    <p><button id="newfile_empty_create">Create</button></p>
-                </div>
-                <input type="radio" name="newfile_mode" id="newfile_mode_upload" /><label for="newfile_mode_upload">Existing file</label>
-                <div>
-                    <p>Load a file from your local harddisk</p>
-                    <p><input type="file" id="newfile_upload" /></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="importdialog" class="modal">
-        <div class="content">
-            <span id="importdialogclose" class="close"></span>
-            <div class="tabs">
-                <input type="radio" name="import_mode" id="import_mode_gist" checked /><label for="import_mode_gist">GitHub Gist</label>
-                <div>
-                    <p>Import code from a GitHub Gist:</p>
-                    <p>Gist URL: <input id="import_gist_url" /></p>
-                    <p><button id="import_gist">Import</button></p>
-                </div>
-                <input type="radio" name="import_mode" id="import_mode_github" /><label for="import_mode_github">GitHub</label>
-                <div>
-                    <p>At some point in the future you will be able to directly import github repositories here.</p>
-                </div>
-                <input type="radio" name="import_mode" id="import_mode_upload" /><label for="import_mode_upload">Load .zip</label>
-                <div>
-                    <p>Load a zip file:</p>
-                    <p><input type="file" id="import_zipfile" /></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="exportdialog" class="modal">
-        <div class="content">
-            <span id="exportdialogclose" class="close"></span>
-            <div class="tabs">
-                <input type="radio" name="export_mode" id="export_mode_url" checked /><label for="export_mode_url">URL</label>
-                <div>
-                    <p>Export the project as URL. Only suitable for small projects.</p>
-                    <p><input id="export_hash_url" style="width: 100%" onClick="this.select();" readonly /></p>
-                </div>
-                <input type="radio" name="export_mode" id="export_mode_gist" /><label for="export_mode_gist">GitHub Gist</label>
-                <div>
-                    <p>Export the code as a new GitHub Gist, or update an existing Gist with new code.</p>
-                    <p>Github username: <input id="export_gist_username" /></p>
-                    <p>Github personal access token: <input id="export_gist_token" autocomplete="off"/> (<a href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token" target="_blank">info</a>)</p>
-                    <p>Gist URL: <input id="export_gist_url" /> (leave empty for new gist)</p>
-                    <p><button id="export_gist">Save</button></p>
-                    <p><input id="export_gist_import_url" style="width: 100%" onClick="this.select();" readonly /></p>
-                </div>
-                <input type="radio" name="export_mode" id="export_mode_github" /><label for="export_mode_github">GitHub</label>
-                <div>
-                    <p>At some point in the future you will be able to save your code to a github repository here.</p>
-                </div>
-                <input type="radio" name="export_mode" id="export_mode_download" /><label for="export_mode_download">Download</label>
-                <div>
-                    <p>Download your project as a zip archive.</p>
-                    <p><button id="export_zip">Save</button></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-</body>
+			<div id="importdialog" class="modal">
+				<div class="content">
+					<span id="importdialogclose" class="close"></span>
+					<div class="tabs">
+						<input
+							type="radio"
+							name="import_mode"
+							id="import_mode_gist"
+							checked
+						/><label for="import_mode_gist">GitHub Gist</label>
+						<div>
+							<p>Import code from a GitHub Gist:</p>
+							<p>Gist URL: <input id="import_gist_url" /></p>
+							<p><button id="import_gist">Import</button></p>
+						</div>
+						<input
+							type="radio"
+							name="import_mode"
+							id="import_mode_github"
+						/><label for="import_mode_github">GitHub</label>
+						<div>
+							<p>
+								At some point in the future you will be able to directly import
+								github repositories here.
+							</p>
+						</div>
+						<input
+							type="radio"
+							name="import_mode"
+							id="import_mode_upload"
+						/><label for="import_mode_upload">Load .zip</label>
+						<div>
+							<p>Load a zip file:</p>
+							<p><input type="file" id="import_zipfile" /></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="exportdialog" class="modal">
+				<div class="content">
+					<span id="exportdialogclose" class="close"></span>
+					<div class="tabs">
+						<input
+							type="radio"
+							name="export_mode"
+							id="export_mode_url"
+							checked
+						/><label for="export_mode_url">URL</label>
+						<div>
+							<p>
+								Export the project as URL. Only suitable for small projects.
+							</p>
+							<p>
+								<input
+									id="export_hash_url"
+									style="width: 100%"
+									onClick="this.select();"
+									readonly
+								/>
+							</p>
+						</div>
+						<input
+							type="radio"
+							name="export_mode"
+							id="export_mode_gist"
+						/><label for="export_mode_gist">GitHub Gist</label>
+						<div>
+							<p>
+								Export the code as a new GitHub Gist, or update an existing Gist
+								with new code.
+							</p>
+							<p>Github username: <input id="export_gist_username" /></p>
+							<p>
+								Github personal access token:
+								<input id="export_gist_token" autocomplete="off" /> (<a
+									href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token"
+									target="_blank"
+									>info</a
+								>)
+							</p>
+							<p>
+								Gist URL: <input id="export_gist_url" /> (leave empty for new
+								gist)
+							</p>
+							<p><button id="export_gist">Save</button></p>
+							<p>
+								<input
+									id="export_gist_import_url"
+									style="width: 100%"
+									onClick="this.select();"
+									readonly
+								/>
+							</p>
+						</div>
+						<input
+							type="radio"
+							name="export_mode"
+							id="export_mode_github"
+						/><label for="export_mode_github">GitHub</label>
+						<div>
+							<p>
+								At some point in the future you will be able to save your code
+								to a github repository here.
+							</p>
+						</div>
+						<input
+							type="radio"
+							name="export_mode"
+							id="export_mode_download"
+						/><label for="export_mode_download">Download</label>
+						<div>
+							<p>Download your project as a zip archive.</p>
+							<p><button id="export_zip">Save</button></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
