@@ -19,14 +19,13 @@ export function init(canvas, rom_data) {
 
 	var required_size = ((rom_data.length - 1) | 0x3fff) + 1;
 	if (required_size < 0x8000) required_size = 0x8000;
-	if (rom_size < required_size) {
-		if (typeof rom_ptr != "undefined") Module._free(rom_ptr);
-		rom_ptr = Module._malloc(required_size);
-		rom_size = required_size;
-	}
-	for (var n = 0; n < rom_size; n++) Module.HEAP8[rom_ptr + n] = 0;
-	for (var n = 0; n < rom_data.length; n++)
-		Module.HEAP8[rom_ptr + n] = rom_data[n];
+	if (typeof rom_ptr != "undefined") Module._free(rom_ptr);
+	rom_ptr = Module._malloc(required_size);
+	rom_size = required_size;
+
+	const romView = Module.HEAP8.subarray(rom_ptr, rom_ptr + rom_size);
+	romView.fill(0);
+	romView.set(rom_data);
 
 	e = Module._emulator_new_simple(
 		rom_ptr,
@@ -67,18 +66,6 @@ export function init(canvas, rom_data) {
 
 	audio_ctx.resume();
 	audio_time = audio_ctx.currentTime;
-}
-
-export function updateRom(rom_data) {
-	if (!isAvailable()) return false;
-
-	var required_size = ((rom_data.length - 1) | 0x3fff) + 1;
-	if (required_size < 0x8000) required_size = 0x8000;
-	if (rom_size < required_size) return false;
-	for (var n = 0; n < rom_size; n++) Module.HEAP8[rom_ptr + n] = 0;
-	for (var n = 0; n < rom_data.length; n++)
-		Module.HEAP8[rom_ptr + n] = rom_data[n];
-	return true;
 }
 
 export function destroy() {

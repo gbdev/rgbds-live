@@ -12,6 +12,17 @@
 			import * as textEditor from "./js/text-editor.js";
 			import * as gfxEditor from "./js/gfx-editor.js";
 
+			if (import.meta.env.DEV) {
+				globalThis._rgbdsDebug = {
+					compiler,
+					emulator,
+					storage,
+					editors,
+					textEditor,
+					gfxEditor,
+				};
+			}
+
 			var cpu_line_marker = undefined;
 			var start_address;
 			var rom;
