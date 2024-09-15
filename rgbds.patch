@@ -1,56 +1,51 @@
-diff --git a/include/asm/symbol.h b/include/asm/symbol.h
-index 627868f4..4dd9076b 100644
---- a/include/asm/symbol.h
-+++ b/include/asm/symbol.h
-@@ -110,6 +110,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
+diff --git a/include/asm/symbol.hpp b/include/asm/symbol.hpp
+index 409e2ba5..58b78ba0 100644
+--- a/include/asm/symbol.hpp
++++ b/include/asm/symbol.hpp
+@@ -100,4 +100,6 @@ void sym_Init(time_t now);
+ std::optional<std::string> const &sym_GetCurrentSymbolScope();
+ void sym_SetCurrentSymbolScope(std::optional<std::string> const &newScope);
  
- int32_t sym_GetValue(struct Symbol const *sym);
- void sym_SetExportAll(bool set);
-+struct Symbol *sym_AddSecret();
- struct Symbol *sym_AddLocalLabel(char const *symName);
- struct Symbol *sym_AddLabel(char const *symName);
- struct Symbol *sym_AddAnonLabel(void);
++Symbol *sym_AddSecret();
++
+ #endif // RGBDS_ASM_SYMBOL_HPP
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index 21d6a536..f98ecd36 100644
+index 55044bfc..94ec183d 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
-@@ -789,7 +789,7 @@ else		: T_POP_ELSE T_NEWLINE {
+@@ -429,7 +429,9 @@ else:
+ 
+ plain_directive:
+ 	  label
+-	| label cpu_commands
++	| label {
++	       sym_AddSecret();
++	} cpu_commands
+ 	| label macro
+ 	| label directive
  ;
- 
- plain_directive	: label
--		| label cpu_command
-+		| label { sym_AddSecret(); } cpu_command
- 		| label macro
- 		| label directive
- 		| assignment_directive
-diff --git a/src/asm/symbol.c b/src/asm/symbol.c
-index 4a565d7a..3c176e22 100644
---- a/src/asm/symbol.c
-+++ b/src/asm/symbol.c
-@@ -349,6 +349,26 @@ void sym_SetCurrentSymbolScope(char const *newScope)
- 	labelScope = newScope;
+diff --git a/src/asm/symbol.cpp b/src/asm/symbol.cpp
+index 8d803a39..be108ae8 100644
+--- a/src/asm/symbol.cpp
++++ b/src/asm/symbol.cpp
+@@ -597,3 +597,20 @@ void sym_Init(time_t now) {
+ 	sym_AddEqu("__UTC_MINUTE__"s, time_utc->tm_min)->isBuiltin = true;
+ 	sym_AddEqu("__UTC_SECOND__"s, time_utc->tm_sec)->isBuiltin = true;
  }
- 
++
 +static uint32_t secret_counter = 0;
-+struct Symbol *sym_AddSecret()
-+{
-+    struct Symbol *sym;
-+    char name[MAXSYMLEN + 1];
-+    secret_counter += 1;
-+    sprintf(name, "__SEC_%x_%x_%s", secret_counter, lexer_GetLineNo(), fstk_GetFileName());
++Symbol *sym_AddSecret() {
++       Symbol *sym;
++       char name[256];
++       secret_counter += 1;
++       sprintf(name, "__SEC_%x_%x_%s", secret_counter, lexer_GetLineNo(), fstk_GetFileStack()->name().c_str());
 +
-+    sym = createsymbol(name);
-+	sym->type = SYM_LABEL;
-+    sym->value = sect_GetSymbolOffset();
-+    sym->isExported = true;
++       sym = &createSymbol(name);
++       sym->type = SYM_LABEL;
++       sym->data = (int32_t)sect_GetSymbolOffset();
++       sym->isExported = true;
++       sym->section = sect_GetSymbolSection();
 +
-+	sym->section = sect_GetSymbolSection();
-+
-+	updateSymbolFilename(sym);
-+    return sym;
++       updateSymbolFilename(*sym);
++       return sym;
 +}
-+
-+
- /*
-  * Create a symbol that will be non-relocatable and ensure that it
-  * hasn't already been defined or referenced in a context that would

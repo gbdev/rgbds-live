@@ -16,7 +16,7 @@ export default defineConfig({
 		viteStaticCopy({
 			targets: [
 				{
-					src: "./node_modules/ace-builds/src-noconflict",
+					src: "./node_modules/ace-builds/src-noconflict/**",
 					dest: "assets/ace",
 				},
 			],

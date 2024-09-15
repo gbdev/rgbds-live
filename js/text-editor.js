@@ -3,7 +3,7 @@ import * as compiler from "./compiler.js";
 import * as storage from "./storage.js";
 import "./ace/mode-gbz80.js";
 
-ace.config.set("basePath", `/${import.meta.env.BASE_URL}/assets/ace`);
+ace.config.set("basePath", `assets/ace`);
 
 import { TokenTooltip } from "./ace/gbz80tooltip.js";
 import { gbz80Completer } from "./ace/complete-gbz80.js";
