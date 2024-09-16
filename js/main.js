@@ -326,6 +326,22 @@ function deleteFile(name) {
 export function init(event) {
     textEditor.register("textEditorDiv", compileCode);
     gfxEditor.register("gfxEditorDiv");
+    var urlParams = new URLSearchParams(window.location.search);
+    const asmOptions = (urlParams.get('asm') ?? '').trim();
+    if(asmOptions != '') {
+        document.getElementById("copmpiler_settings_asm").value = asmOptions;
+        compiler.setAsmOptions(asmOptions.split(' '));
+    }
+    const linkOptions = (urlParams.get('link') ?? '').trim();
+    if(linkOptions != '') {
+        document.getElementById("copmpiler_settings_link").value = linkOptions;
+        compiler.setLinkOptions(linkOptions.split(' '));
+    }				
+    const fixOptions =(urlParams.get('fix') ?? '').trim();
+    if(fixOptions != '') {
+        document.getElementById("copmpiler_settings_fix").value = fixOptions;
+        compiler.setFixOptions(fixOptions.split(' '));
+    }				
     storage.autoLoad();
     editors.setCurrentFile(Object.keys(storage.getFiles()).pop());
     updateFileList();
@@ -615,4 +631,52 @@ export function init(event) {
             ).checked;
             storage.update();
         };
+        
+    document.getElementById("settingsmenu").onclick = function () {
+        document.getElementById("settingsdialog").style.display = "block";
+    };
+    document.getElementById("settingsdialog").onclick = function (e) {
+        if (e.target == document.getElementById("settingsdialog"))
+            document.getElementById("settingsdialog").style.display = "none";
+    };
+    document.getElementById("settingsdialogclose").onclick = function () {
+        document.getElementById("settingsdialog").style.display = "none";
+    };
+    document.getElementById("copmpiler_settings_set").onclick =
+        function () {
+            urlParams  = new URLSearchParams(window.location.search);
+            var asmOptions = document.getElementById("copmpiler_settings_asm").value.trim();
+            if(asmOptions != '') {
+                urlParams.set('asm', asmOptions);
+                compiler.setAsmOptions(asmOptions.split(' '));
+            } else {
+                compiler.setAsmOptions([]);
+                urlParams.delete('asm');
+            }
+            var linkOptions = document.getElementById("copmpiler_settings_link").value.trim();
+            if(linkOptions != '') {
+                urlParams.set('link', linkOptions);
+                compiler.setLinkOptions(linkOptions.split(' '));
+            } else {
+                compiler.setLinkOptions([]);
+                urlParams.delete('link');
+            }
+            var fixOptions = document.getElementById("copmpiler_settings_fix").value.trim();
+            if(fixOptions != '') {
+                urlParams.set('fix', fixOptions);
+                compiler.setFixOptions(fixOptions.split(' '));
+            } else {
+                urlParams.delete('fix');
+                compiler.setFixOptions([]);
+            }						
+            var url = new URL(window.location);
+            url.search = urlParams.toString();
+            window.history.replaceState({}, '', url);
+            document.getElementById("settingsdialog").style.display = "none";
+            compileCode();
+        };
+    if(urlParams.has('autorun')) {
+        document.getElementById("cpu_run_check").checked = true;
+        document.getElementById("cpu_run_check").onclick();
+    }					
 }
