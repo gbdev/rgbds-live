@@ -347,8 +347,17 @@ export function init(event) {
         document.getElementById("copmpiler_settings_fix").value = fixOptions;
         compiler.setFixOptions(fixOptions.split(' '));
     }				
-  
-    storage.autoLoad();
+
+    var gist = (urlParams.get('gist') ?? '').trim();
+    if(gist == '' || window.location.hash != '') {
+        storage.autoLoad();
+    }
+    else {
+        if(!gist.startsWith("http")) {
+            gist = 'https://gist.github.com/dummy/' + gist;
+        }
+        storage.loadGithubGist(gist);
+    }
     editors.setCurrentFile(Object.keys(storage.getFiles()).pop());
     updateFileList();
 
@@ -637,7 +646,7 @@ export function init(event) {
             ).checked;
             storage.update();
         };
-  
+
     document.getElementById("settingsmenu").onclick = function () {
         document.getElementById("settingsdialog").style.display = "block";
     };
