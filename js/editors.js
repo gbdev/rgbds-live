@@ -1,5 +1,6 @@
 import * as storage from "./storage.js";
 import * as textEditor from "./text-editor.js";
+import * as gfxEditor from "./gfx-editor.js";
 
 var nullEditor = {
 	hide: function () {
