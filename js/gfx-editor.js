@@ -1,3 +1,5 @@
+import * as storage from "./storage.js";
+
 var colors = [0xffc2f0c4, 0xffa8b95a, 0xff6e601e, 0xff001b2d];
 
 var current_file;
@@ -47,13 +49,13 @@ export function register(div_id) {
 		var x = ~~((((e.clientX - rect.left) / rect.width) * e.target.width) / 8);
 		var y = ~~((((e.clientY - rect.top) / rect.height) * e.target.height) / 8);
 		e.preventDefault();
-		editor.setTileIndex(x + y * 16);
+		setTileIndex(x + y * 16);
 	};
 }
 
 export function setCurrentFile(filename) {
 	current_file = filename;
-	this.setTileIndex(0);
+	setTileIndex(0);
 
 	var data = storage.getFiles()[filename];
 	var tile_count = ~~(data.length / 16);
@@ -131,7 +133,7 @@ function drawPixel(x, y, color) {
 	else data[current_tile_index * 16 + y * 2 + 0] &= ~(0x80 >> x);
 	if (color & 2) data[current_tile_index * 16 + y * 2 + 1] |= 0x80 >> x;
 	else data[current_tile_index * 16 + y * 2 + 1] &= ~(0x80 >> x);
-	editor.setTileIndex(current_tile_index);
+	setTileIndex(current_tile_index);
 
 	storage.update(current_file, data);
 
