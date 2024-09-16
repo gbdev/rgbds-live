@@ -24,6 +24,10 @@ var line_to_addr = {};
 var cpu_step_interval_id;
 var emu_view = "";
 
+export function isDarkMode() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 compiler.setLogCallback(function (str) {
     var output = document.getElementById("output");
     if (str === null) {
@@ -247,7 +251,7 @@ function updateTextView() {
     if (typeof data == "undefined") return;
 
     var text =
-        "<div style='position: fixed; background-color: #fff'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp; 1&nbsp; 2&nbsp; 3&nbsp; 4&nbsp; 5&nbsp; 6&nbsp; 7&nbsp; 8&nbsp; 9&nbsp; a&nbsp; b&nbsp; c&nbsp; d&nbsp; e&nbsp; f</div><br/>";
+        "<div style='position: fixed; background-color: var(--background-alt)'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp; 1&nbsp; 2&nbsp; 3&nbsp; 4&nbsp; 5&nbsp; 6&nbsp; 7&nbsp; 8&nbsp; 9&nbsp; a&nbsp; b&nbsp; c&nbsp; d&nbsp; e&nbsp; f</div><br/>";
     var symbol = null;
     var span = false;
     var span_color = 0;
@@ -281,7 +285,7 @@ function updateTextView() {
                     symbol +
                     "' style='background-color: hsl(" +
                     span_color +
-                    ", 50%, 50%)'>";
+                    (isDarkMode() ? ", 30%, 30%)'>" : ", 50%, 50%)'>");
                 span = true;
             }
             text += hex[idx];

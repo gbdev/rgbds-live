@@ -18,10 +18,21 @@ var cpu_line_marker = null;
 var breakpoints = [];
 var cursor_position_per_file = {};
 
+const runColorMode = (fn) => {
+	if (!window.matchMedia) {
+	  return;
+	}
+	const query = window.matchMedia('(prefers-color-scheme: dark)');
+	fn(query.matches);
+	query.addEventListener('change', (event) => fn(event.matches));
+  }
+
 export function register(div_id, compileCode) {
 	var e = ace.edit(div_id);
 	new TokenTooltip(e);
-	e.setTheme("ace/theme/tomorrow");
+	runColorMode((isDarkMode) => {
+		e.setTheme(isDarkMode ? "ace/theme/tomorrow_night_eighties" : "ace/theme/tomorrow");
+	});
 	e.session.setMode("ace/mode/gbz80");
 	e.setOptions({
 		tabSize: 2,
