@@ -205,4 +205,5 @@ export function loadSingleUrl(url) {
 function postLoadUIUpdate() {
 	editors.setCurrentFile(Object.keys(files)[0]);
 	main.updateFileList();
+	main.compileCode();
 }
