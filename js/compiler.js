@@ -12,6 +12,8 @@ var log_callback;
 var error_list = [];
 var rom_symbols = [];
 var ram_symbols = [];
+var asm_options = [];
+var fix_options = [];
 var link_options = [];
 
 var line_nr_regex = /([\w\.]+)[\w\.\:~]*\(([0-9]+)\)/gi;
@@ -79,8 +81,16 @@ export function getRamSymbols() {
 	return ram_symbols;
 }
 
+export function setAsmOptions(options) {
+	asm_options = options;
+}
+
 export function setLinkOptions(options) {
 	link_options = options;
+}
+
+export function setFixOptions(options) {
+	fix_options = options;
 }
 
 function trigger() {
@@ -102,9 +112,10 @@ function startCompile() {
 
 function runRgbAsm(targets, obj_files) {
 	var target = targets.pop();
-	logFunction("Running: rgbasm " + target + " -o " + target + ".o -Wall");
+	var args = [target, "-o", "output.o", "-Wall"].concat(asm_options);
+	logFunction("Running: rgbasm " + args.join(" "));
 	createRgbAsm({
-		arguments: [target, "-o", "output.o", "-Wall"],
+		arguments: args,
 		preRun: function (m) {
 			var FS = m.FS;
 			for (const [key, value] of Object.entries(storage.getFiles())) {
@@ -169,9 +180,10 @@ function runRgbLink(obj_files) {
 }
 
 function runRgbFix(input_rom_file, map_file) {
-	logFunction("Running: rgbfix -v output.gb -p 0xff");
+	var args = ["-v", "output.gb", "-p", "0xff"].concat(fix_options);
+	logFunction("Running: rgbfix " + args.join(" "));
 	createRgbFix({
-		arguments: ["-v", "output.gb", "-p", "0xff"],
+		arguments: args,
 		preRun: function (m) {
 			var FS = m.FS;
 			FS.writeFile("output.gb", input_rom_file);

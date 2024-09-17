@@ -38,6 +38,7 @@
 									>Store data between sessions</label
 								>
 							</li>
+							<li id="settingsmenu">Settings...</li>
 						</ul>
 					</li>
 					<li>
@@ -396,6 +397,27 @@
 							<p>Download your project as a zip archive.</p>
 							<p><button id="export_zip">Save</button></p>
 						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div id="settingsdialog" class="modal">
+				<div class="content">
+					<span id="settingsdialogclose" class="close"></span>
+					<div class="tabs">
+						<input
+							type="radio"
+							name="settings_mode"
+							id="settings_mode_compiler"
+							checked
+						/><label for="settings_mode_compiler">Compiler</label>
+						<div>
+							<p>Additional options for</p>
+							<p>RGBASM: <input id="copmpiler_settings_asm" /></p>
+							<p>RGBLINK: <input id="copmpiler_settings_link" /></p>
+							<p>RGBFIX: <input id="copmpiler_settings_fix" /></p>
+							<p><button id="copmpiler_settings_set">Set</button></p>
+						</div>					
 					</div>
 				</div>
 			</div>
