@@ -326,6 +326,7 @@ function deleteFile(name) {
 export function init(event) {
     textEditor.register("textEditorDiv", compileCode);
     gfxEditor.register("gfxEditorDiv");
+
     var urlParams = new URLSearchParams(window.location.search);
     const asmOptions = (urlParams.get('asm') ?? '').trim();
     if(asmOptions != '') {
@@ -342,6 +343,7 @@ export function init(event) {
         document.getElementById("copmpiler_settings_fix").value = fixOptions;
         compiler.setFixOptions(fixOptions.split(' '));
     }				
+  
     storage.autoLoad();
     editors.setCurrentFile(Object.keys(storage.getFiles()).pop());
     updateFileList();
@@ -631,7 +633,7 @@ export function init(event) {
             ).checked;
             storage.update();
         };
-        
+  
     document.getElementById("settingsmenu").onclick = function () {
         document.getElementById("settingsdialog").style.display = "block";
     };
