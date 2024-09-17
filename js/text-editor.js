@@ -1,6 +1,7 @@
 import ace from "./ace/loader.js";
 import * as compiler from "./compiler.js";
 import * as storage from "./storage.js";
+import * as main  from "./main.js";
 import "./ace/mode-gbz80.js";
 
 ace.config.set("basePath", `assets/ace`);
@@ -89,7 +90,7 @@ export function setCpuLine(filename, line_nr, scroll_to_line) {
 
 function addBreakpoint(filename, line_nr) {
 	breakpoints.push([filename, line_nr]);
-	window.updateBreakpoints();
+	main.updateBreakpoints();
 	updateBreakpoints();
 }
 
@@ -97,7 +98,7 @@ function removeBreakpoint(filename, line_nr) {
 	breakpoints = breakpoints.filter(
 		(data) => data[0] != filename || data[1] != line_nr,
 	);
-	window.updateBreakpoints();
+	main.updateBreakpoints();
 	updateBreakpoints();
 }
 

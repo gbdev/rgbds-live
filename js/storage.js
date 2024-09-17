@@ -1,6 +1,9 @@
 import JSZip from "jszip";
 import LZString from "lz-string";
 
+import * as editors from "./editors.js";
+import * as main from "./main.js";
+
 import HARDWARE_INC from "../hardware.inc/hardware.inc?raw";
 import MAIN_ASM from "../starting_project/main.asm?raw";
 
@@ -201,5 +204,6 @@ export function loadSingleUrl(url) {
 
 function postLoadUIUpdate() {
 	editors.setCurrentFile(Object.keys(files)[0]);
-	updateFileList();
+	main.updateFileList();
+	main.compileCode();
 }
