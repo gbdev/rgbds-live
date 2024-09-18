@@ -1,10 +1,7 @@
 name: CI
 'on':
-  create:
-    tags: null
   push:
-    branches:
-      - master
+  pull_request:
 jobs:
   build:
     name: WASM Build
@@ -34,6 +31,8 @@ jobs:
       - name: Build with Vite 
         run: npm run build
       - name: Deploy to GitHub Pages
+        # Do not run this unless *pushing* to `master`.
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
