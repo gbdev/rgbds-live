@@ -3,7 +3,6 @@ import Binjgb from "../binjgb/out/binjgb.js";
 const Module = await Binjgb();
 
 var e;
-var rom_ptr;
 var rom_size = 0;
 var canvas_ctx;
 var canvas_image_data;
@@ -19,14 +18,15 @@ export function init(canvas, rom_data) {
 
 	var required_size = ((rom_data.length - 1) | 0x3fff) + 1;
 	if (required_size < 0x8000) required_size = 0x8000;
-	if (typeof rom_ptr != "undefined") Module._free(rom_ptr);
-	rom_ptr = Module._malloc(required_size);
+	var rom_ptr = Module._malloc(required_size);
 	rom_size = required_size;
 
 	const romView = Module.HEAP8.subarray(rom_ptr, rom_ptr + rom_size);
 	romView.fill(0);
 	romView.set(rom_data);
 
+	// Note: this takes ownership of `rom_ptr`, even if init fails.
+	//       The ROM will be freed when `emulator_delete` is called from `destroy()`, and not leaked.
 	e = Module._emulator_new_simple(
 		rom_ptr,
 		rom_size,
