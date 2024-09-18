@@ -28,21 +28,32 @@ export function isDarkMode() {
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
-compiler.setLogCallback(function (str) {
+function escapeHTML(str) {
+    var escapedHTML = document.createElement("div");
+    escapedHTML.innerText = str;
+    return escapedHTML.innerHTML;
+}
+
+compiler.setLogCallback(function (str, kind) {
     var output = document.getElementById("output");
-    if (str === null) {
-        output.value = "";
+    if (str === null && kind == null) {
+        output.innerHTML = "";
         return;
     }
-    output.value += str + "\n";
-    output.scrollTop = output.clientHeight;
+    output.innerHTML += "<span class=\"" + kind + "\">" + escapeHTML(str) + "</span>\n";
+    output.scrollTop = output.scrollHeight;
 });
 emulator.setSerialCallback(function (value) {
     var output = document.getElementById("output");
-    if ((value >= 32 && value < 128) || value == 13)
-        output.value += String.fromCharCode(value);
-    else output.value += "[" + ("00" + value.toString(16)).slice(-2) + "]";
-    output.scrollTop = output.clientHeight;
+    if ((value >= 32 && value < 128) || value == 13) {
+        output.innerHTML += escapeHTML(String.fromCharCode(value));
+    } else {
+        output.innerHTML +=
+            "<u>" +
+            escapeHTML("[" + ("00" + value.toString(16)).slice(-2) + "]") +
+            "</u>";
+    }
+    output.scrollTop = output.scrollHeight;
 });
 
 export function compileCode() {
@@ -118,7 +129,6 @@ export function updateBreakpoints() {
 }
 
 function handleGBKey(code, down) {
-    
     //Map the directional keys and A/S to B/A and shift/enter to select/start
     if (code == 'ArrowRight') emulator.setKeyPad("right", down);
     if (code == 'ArrowLeft') emulator.setKeyPad("left", down);
@@ -341,13 +351,13 @@ export function init(event) {
     if(linkOptions != '') {
         document.getElementById("copmpiler_settings_link").value = linkOptions;
         compiler.setLinkOptions(linkOptions.split(' '));
-    }				
+    }
     const fixOptions =(urlParams.get('fix') ?? '').trim();
     if(fixOptions != '') {
         document.getElementById("copmpiler_settings_fix").value = fixOptions;
         compiler.setFixOptions(fixOptions.split(' '));
-    }				
-  
+    }
+
     storage.autoLoad();
     editors.setCurrentFile(Object.keys(storage.getFiles()).pop());
     updateFileList();
@@ -637,7 +647,7 @@ export function init(event) {
             ).checked;
             storage.update();
         };
-  
+
     document.getElementById("settingsmenu").onclick = function () {
         document.getElementById("settingsdialog").style.display = "block";
     };
@@ -674,7 +684,7 @@ export function init(event) {
             } else {
                 urlParams.delete('fix');
                 compiler.setFixOptions([]);
-            }						
+            }
             var url = new URL(window.location);
             url.search = urlParams.toString();
             window.history.replaceState({}, '', url);
@@ -684,5 +694,5 @@ export function init(event) {
     if(urlParams.has('autorun')) {
         document.getElementById("cpu_run_check").checked = true;
         document.getElementById("cpu_run_check").onclick();
-    }					
+    }
 }

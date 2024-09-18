@@ -18,31 +18,15 @@ var link_options = [];
 
 var line_nr_regex = /([\w\.]+)[\w\.\:~]*\(([0-9]+)\)/gi;
 
-var buffered_log = "";
-function logFunction(str) {
-	if (/^[^:\s]+:/.test(str)) {
-		// If the log starts with a label, we can emit the previously buffered one.
-		flushLog();
-		buffered_log = str.trim();
-	} else {
-		// If the log doesn’t start with a label, it’s a follow-up to the previous log,
-		// so add it to the buffer.
-		buffered_log += " " + str.trim();
-	}
-}
-
-function flushLog() {
-	unbufferedLogFunction(buffered_log);
-	buffered_log = "";
-}
-
-function unbufferedLogFunction(str) {
-	if (log_callback) log_callback(str);
+function logFunction(str, kind) {
+	if (log_callback) log_callback(str, kind);
 
 	if (
-		str.startsWith("error: ") ||
-		str.startsWith("ERROR: ") ||
-		str.startsWith("warning: ")
+		kind == "stderr" && (
+			str.startsWith("error: ") ||
+			str.startsWith("ERROR: ") ||
+			str.startsWith("warning: ")
+		)
 	) {
 		var type = "error";
 		if (str.startsWith("warning: ")) type = "warning";
@@ -53,6 +37,18 @@ function unbufferedLogFunction(str) {
 			error_list.push([type, m[1], error_line, str]);
 		}
 	}
+}
+
+function infoFunction(str) {
+	logFunction(str, "info");
+}
+
+function outFunction(str) {
+	logFunction(str, "stdout");
+}
+
+function errFunction(str) {
+	logFunction(str, "stderr");
 }
 
 export function setLogCallback(callback) {
@@ -99,7 +95,7 @@ function trigger() {
 }
 
 function startCompile() {
-	if (log_callback) log_callback(null);
+	if (log_callback) log_callback(null, null);
 	error_list = [];
 	rom_symbols = [];
 	ram_symbols = [];
@@ -113,7 +109,7 @@ function startCompile() {
 function runRgbAsm(targets, obj_files) {
 	var target = targets.pop();
 	var args = [target, "-o", "output.o", "-Wall"].concat(asm_options);
-	logFunction("Running: rgbasm " + args.join(" "));
+	infoFunction("Running: rgbasm " + args.join(" "));
 	createRgbAsm({
 		arguments: args,
 		preRun: function (m) {
@@ -122,10 +118,9 @@ function runRgbAsm(targets, obj_files) {
 				FS.writeFile(key, value);
 			}
 		},
-		print: logFunction,
-		printErr: logFunction,
+		print: outFunction,
+		printErr: errFunction,
 	}).then(function (m) {
-		flushLog();
 		if (repeat) {
 			buildFailed();
 			return;
@@ -146,17 +141,16 @@ function runRgbAsm(targets, obj_files) {
 function runRgbLink(obj_files) {
 	var args = ["-o", "output.gb", "--map", "output.map"].concat(link_options);
 	for (var name in obj_files) args.push(name + ".o");
-	logFunction("Running: rgblink " + args.join(" "));
+	infoFunction("Running: rgblink " + args.join(" "));
 	createRgbLink({
 		arguments: args,
 		preRun: function (m) {
 			var FS = m.FS;
 			for (var name in obj_files) FS.writeFile(name + ".o", obj_files[name]);
 		},
-		print: logFunction,
-		printErr: logFunction,
+		print: outFunction,
+		printErr: errFunction,
 	}).then(function (m) {
-		flushLog();
 		if (repeat) {
 			buildFailed();
 			return;
@@ -181,17 +175,16 @@ function runRgbLink(obj_files) {
 
 function runRgbFix(input_rom_file, map_file) {
 	var args = ["-v", "output.gb", "-p", "0xff"].concat(fix_options);
-	logFunction("Running: rgbfix " + args.join(" "));
+	infoFunction("Running: rgbfix " + args.join(" "));
 	createRgbFix({
 		arguments: args,
 		preRun: function (m) {
 			var FS = m.FS;
 			FS.writeFile("output.gb", input_rom_file);
 		},
-		print: logFunction,
-		printErr: logFunction,
+		print: outFunction,
+		printErr: errFunction,
 	}).then(function (m) {
-		flushLog();
 		var FS = m.FS;
 		try {
 			var rom_file = FS.readFile("output.gb");
@@ -205,7 +198,7 @@ function runRgbFix(input_rom_file, map_file) {
 }
 
 function buildFailed() {
-	logFunction("Build failed");
+	infoFunction("Build failed");
 	if (repeat) {
 		repeat = false;
 		trigger();
@@ -277,7 +270,7 @@ function buildDone(rom_file, map_file) {
 				var total = 0x4000;
 				if (section_type.startsWith("WRAM")) total = 0x1000;
 				else if (section_type.startsWith("HRAM")) total = 127;
-				logFunction(
+				infoFunction(
 					"Space left: " +
 						section_type +
 						"[" +
@@ -290,8 +283,7 @@ function buildDone(rom_file, map_file) {
 				);
 			}
 		}
-		logFunction("Build done");
-		flushLog();
+		infoFunction("Build done");
 		done_callback(rom_file, start_address, addr_to_line);
 	}
 }
