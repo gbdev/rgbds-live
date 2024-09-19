@@ -1,5 +1,6 @@
 <html>
   <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google" content="notranslate" />
     <link rel="stylesheet" href="style.css" />
@@ -30,55 +31,55 @@
     <script src="js/ui/sequence.js"></script>
 
     <script>
-      "use strict";
+      'use strict';
 
       var song = new Song();
       song.createDefaults();
       var ui = {};
       var player = null;
 
-      window.addEventListener("DOMContentLoaded", (event) => {
-        document.getElementById("playButton").onclick = (event) => {
+      window.addEventListener('DOMContentLoaded', (event) => {
+        document.getElementById('playButton').onclick = (event) => {
           player.play();
         };
-        document.getElementById("stopButton").onclick = (event) => {
+        document.getElementById('stopButton').onclick = (event) => {
           player.stop();
         };
-        document.getElementById("downloadHttButton").onclick = (event) => {
+        document.getElementById('downloadHttButton').onclick = (event) => {
           new AssemblyExporter().downloadHttZip();
         };
-        document.getElementById("downloadSdccButton").onclick = (event) => {
+        document.getElementById('downloadSdccButton').onclick = (event) => {
           var code = new SdccExporter().getCCode();
 
-          var element = document.createElement("a");
+          var element = document.createElement('a');
           var url = window.URL.createObjectURL(
-            new Blob([code], { type: "application/octet-stream" }),
+            new Blob([code], { type: 'application/octet-stream' })
           );
-          element.setAttribute("href", url);
-          element.setAttribute("download", "song.c");
+          element.setAttribute('href', url);
+          element.setAttribute('download', 'song.c');
 
-          element.style.display = "none";
+          element.style.display = 'none';
           document.body.appendChild(element);
           element.click();
           document.body.removeChild(element);
           window.URL.revokeObjectURL(url);
         };
-        document.getElementById("downloadUgeButton").onclick = (event) => {
+        document.getElementById('downloadUgeButton').onclick = (event) => {
           saveUge(song);
         };
 
-        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
           document.body.addEventListener(
             eventName,
             (e) => {
               e.preventDefault();
               e.stopPropagation();
             },
-            false,
+            false
           );
         });
         document.body.addEventListener(
-          "drop",
+          'drop',
           (e) => {
             e.dataTransfer.files[0].arrayBuffer().then((data) => {
               song = loadUGESong(data);
@@ -88,7 +89,7 @@
               ui.instruments.updateInstrumentList();
             });
           },
-          false,
+          false
         );
 
         player = new Player();
@@ -98,6 +99,7 @@
       });
     </script>
   </head>
+
   <body>
     <div class="container">
       <div class="instruments">
@@ -119,9 +121,7 @@
             <td><input id="instrumentName" /></td>
           </tr>
           <tr>
-            <td>
-              Length:<input type="checkbox" id="instrumentLengthEnabled" />
-            </td>
+            <td>Length:<input type="checkbox" id="instrumentLengthEnabled" /></td>
             <td>
               <input id="instrumentLength" type="range" min="0" max="63" />
             </td>
@@ -145,13 +145,7 @@
           <tr type="DN">
             <td>Change:</td>
             <td>
-              <input
-                id="instrumentVolumeChange"
-                type="range"
-                min="-7"
-                max="7"
-                list="tickmarks7"
-              />
+              <input id="instrumentVolumeChange" type="range" min="-7" max="7" list="tickmarks7" />
             </td>
           </tr>
           <tr type="DN">
@@ -181,13 +175,7 @@
           <tr type="D">
             <td>Sweep size:</td>
             <td>
-              <input
-                id="instrumentSweepChange"
-                type="range"
-                min="-7"
-                max="7"
-                list="tickmarks7"
-              />
+              <input id="instrumentSweepChange" type="range" min="-7" max="7" list="tickmarks7" />
             </td>
           </tr>
           <tr type="D">
@@ -344,32 +332,20 @@
               <th>Right</th>
             </tr>
             <tr>
-              <td>
-                <input id="trackerEffectPanningLD1" type="checkbox" />Duty 1
-              </td>
-              <td>
-                <input id="trackerEffectPanningRD1" type="checkbox" />Duty 1
-              </td>
+              <td><input id="trackerEffectPanningLD1" type="checkbox" />Duty 1</td>
+              <td><input id="trackerEffectPanningRD1" type="checkbox" />Duty 1</td>
             </tr>
             <tr>
-              <td>
-                <input id="trackerEffectPanningLD2" type="checkbox" />Duty 2
-              </td>
-              <td>
-                <input id="trackerEffectPanningRD2" type="checkbox" />Duty 2
-              </td>
+              <td><input id="trackerEffectPanningLD2" type="checkbox" />Duty 2</td>
+              <td><input id="trackerEffectPanningRD2" type="checkbox" />Duty 2</td>
             </tr>
             <tr>
               <td><input id="trackerEffectPanningLW" type="checkbox" />Wave</td>
               <td><input id="trackerEffectPanningRW" type="checkbox" />Wave</td>
             </tr>
             <tr>
-              <td>
-                <input id="trackerEffectPanningLN" type="checkbox" />Noise
-              </td>
-              <td>
-                <input id="trackerEffectPanningRN" type="checkbox" />Noise
-              </td>
+              <td><input id="trackerEffectPanningLN" type="checkbox" />Noise</td>
+              <td><input id="trackerEffectPanningRN" type="checkbox" />Noise</td>
             </tr>
           </table>
           <select id="trackerEffectDutyCycle" style="font-family: monospace">

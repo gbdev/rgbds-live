@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 //TODO: Merge this code with assemblyExport, currently lots of duplication
 
 function asmHex2(n) {
-  return "$" + ("00" + n.toString(16).toUpperCase()).slice(-2);
+  return '$' + ('00' + n.toString(16).toUpperCase()).slice(-2);
 }
 
 function exportSongAsAssembly(song) {
@@ -33,21 +33,17 @@ order_cnt: db ${song.sequence.length * 2}
       data += `order${track + 1}: ${this.getSequenceMappingFor(track)}\n`;
     for (var idx = 0; idx < this.patterns.length; idx++) {
       data += `song_pattern_${idx}:\n`;
-      for (var cell of this.patterns[idx])
-        data += `${this.formatPatternCell(cell)}\n`;
+      for (var cell of this.patterns[idx]) data += `${this.formatPatternCell(cell)}\n`;
     }
-    data += "duty_instruments:\n";
-    for (var instr of song.duty_instruments)
-      data += `${this.formatInstrument(instr)}\n`;
-    data += "wave_instruments:\n";
-    for (var instr of song.wave_instruments)
-      data += `${this.formatInstrument(instr)}\n`;
-    data += "noise_instruments:\n";
-    for (var instr of song.noise_instruments)
-      data += `${this.formatInstrument(instr)}\n`;
+    data += 'duty_instruments:\n';
+    for (var instr of song.duty_instruments) data += `${this.formatInstrument(instr)}\n`;
+    data += 'wave_instruments:\n';
+    for (var instr of song.wave_instruments) data += `${this.formatInstrument(instr)}\n`;
+    data += 'noise_instruments:\n';
+    for (var instr of song.noise_instruments) data += `${this.formatInstrument(instr)}\n`;
     //data += "routines:\n";
     //TODO
-    data += "waves:\n";
+    data += 'waves:\n';
     for (var wave of song.waves) data += `${this.formatWave(wave)}\n`;
     console.log(data);
     return data;
@@ -56,56 +52,45 @@ order_cnt: db ${song.sequence.length * 2}
   downloadHttZip() {
     var zip = new JSZip();
 
-    zip.file("constants.htt", `TICKS equ ${song.ticks_per_row}`);
+    zip.file('constants.htt', `TICKS equ ${song.ticks_per_row}`);
 
     var data = `order_cnt: db ${song.sequence.length * 2}\n`;
     for (var track = 0; track < 4; track++)
       data += `order${track + 1}: ${this.getSequenceMappingFor(track)}\n`;
-    zip.file("order.htt", data);
+    zip.file('order.htt', data);
 
-    data = "";
+    data = '';
     for (var idx = 0; idx < this.patterns.length; idx++)
       data +=
         `song_pattern_${idx}:\n` +
-        this.patterns[idx]
-          .map((cell) => this.formatPatternCell(cell))
-          .join("\n") +
-        "\n";
-    zip.file("pattern.htt", data);
+        this.patterns[idx].map((cell) => this.formatPatternCell(cell)).join('\n') +
+        '\n';
+    zip.file('pattern.htt', data);
 
     zip.file(
-      "duty_instrument.htt",
-      song.duty_instruments
-        .map((instr) => this.formatInstrument(instr))
-        .join("\n"),
+      'duty_instrument.htt',
+      song.duty_instruments.map((instr) => this.formatInstrument(instr)).join('\n')
     );
     zip.file(
-      "wave_instrument.htt",
-      song.wave_instruments
-        .map((instr) => this.formatInstrument(instr))
-        .join("\n"),
+      'wave_instrument.htt',
+      song.wave_instruments.map((instr) => this.formatInstrument(instr)).join('\n')
     );
     zip.file(
-      "noise_instrument.htt",
-      song.noise_instruments
-        .map((instr) => this.formatInstrument(instr))
-        .join("\n"),
+      'noise_instrument.htt',
+      song.noise_instruments.map((instr) => this.formatInstrument(instr)).join('\n')
     );
-    zip.file(
-      "wave.htt",
-      song.waves.map((wave) => this.formatWave(wave)).join("\n"),
-    );
-    for (var idx = 0; idx < 16; idx++) zip.file(`routine${idx}.htt`, "");
+    zip.file('wave.htt', song.waves.map((wave) => this.formatWave(wave)).join('\n'));
+    for (var idx = 0; idx < 16; idx++) zip.file(`routine${idx}.htt`, '');
 
-    zip.generateAsync({ type: "blob" }).then((content) => {
-      var element = document.createElement("a");
+    zip.generateAsync({ type: 'blob' }).then((content) => {
+      var element = document.createElement('a');
       var url = window.URL.createObjectURL(content, {
-        type: "application/octet-stream",
+        type: 'application/octet-stream',
       });
-      element.setAttribute("href", url);
-      element.setAttribute("download", "assembly.zip");
+      element.setAttribute('href', url);
+      element.setAttribute('download', 'assembly.zip');
 
-      element.style.display = "none";
+      element.style.display = 'none';
       document.body.appendChild(element);
       element.click();
       document.body.removeChild(element);
@@ -115,10 +100,7 @@ order_cnt: db ${song.sequence.length * 2}
 
   getSequenceMappingFor(track) {
     return (
-      "dw " +
-      song.sequence
-        .map((n) => `song_pattern_${this.pattern_map[[n, track]]}`)
-        .join(", ")
+      'dw ' + song.sequence.map((n) => `song_pattern_${this.pattern_map[[n, track]]}`).join(', ')
     );
   }
 
@@ -141,14 +123,9 @@ order_cnt: db ${song.sequence.length * 2}
         (instr.frequency_sweep_time << 4) |
         (instr.frequency_sweep_shift < 0 ? 0x08 : 0x00) |
         Math.abs(instr.frequency_sweep_shift);
-      var nr11 =
-        (instr.duty_cycle << 6) |
-        ((instr.length !== null ? 64 - instr.length : 0) & 0x3f);
-      var nr12 =
-        (instr.initial_volume << 4) |
-        (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
-      if (instr.volume_sweep_change != 0)
-        nr12 |= 8 - Math.abs(instr.volume_sweep_change);
+      var nr11 = (instr.duty_cycle << 6) | ((instr.length !== null ? 64 - instr.length : 0) & 0x3f);
+      var nr12 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
+      if (instr.volume_sweep_change != 0) nr12 |= 8 - Math.abs(instr.volume_sweep_change);
       var nr14 = 0x80 | (instr.length !== null ? 0x40 : 0);
       return `db ${asmHex2(nr10)}, ${asmHex2(nr11)}, ${asmHex2(nr12)}, ${asmHex2(nr14)}`;
     }
@@ -160,11 +137,8 @@ order_cnt: db ${song.sequence.length * 2}
       return `db ${asmHex2(nr31)}, ${asmHex2(nr32)}, ${asmHex2(wave_nr)}, ${asmHex2(nr34)}`;
     }
     if (instr instanceof NoiseInstrument) {
-      var param0 =
-        (instr.initial_volume << 4) |
-        (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
-      if (instr.volume_sweep_change != 0)
-        param0 |= 8 - Math.abs(instr.volume_sweep_change);
+      var param0 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
+      if (instr.volume_sweep_change != 0) param0 |= 8 - Math.abs(instr.volume_sweep_change);
       var param1 = (instr.length !== null ? 64 - instr.length : 0) & 0x3f;
       if (instr.length !== null) param1 |= 0x40;
       if (instr.bit_count == 7) param1 |= 0x80;
@@ -175,10 +149,8 @@ order_cnt: db ${song.sequence.length * 2}
 
   formatWave(wave) {
     return (
-      "db " +
-      Array.from(Array(16).keys(), (n) =>
-        asmHex2((wave[n * 2] << 4) | wave[n * 2 + 1]),
-      ).join(", ")
+      'db ' +
+      Array.from(Array(16).keys(), (n) => asmHex2((wave[n * 2] << 4) | wave[n * 2 + 1])).join(', ')
     );
   }
 

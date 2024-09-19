@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 function saveUge(song) {
   var buffer = new ArrayBuffer(1024 * 1024);
@@ -23,14 +23,12 @@ function saveUge(song) {
   function addInstrument(type, i) {
     addUint32(type);
     if (!i) i = {};
-    addShortString(i.name || "");
+    addShortString(i.name || '');
     addUint32(i.length ? i.length : 0);
     addUint8(i.length === null ? 0 : 1);
     addUint8(i.initial_volume);
     addUint32(i.volume_sweep_change < 0 ? 1 : 0);
-    addUint8(
-      i.volume_sweep_change != 0 ? 8 - Math.abs(i.volume_sweep_change) : 0,
-    );
+    addUint8(i.volume_sweep_change != 0 ? 8 - Math.abs(i.volume_sweep_change) : 0);
 
     addUint32(i.frequency_sweep_time);
     addUint32(i.frequency_sweep_shift < 0 ? 1 : 0);
@@ -63,24 +61,10 @@ function saveUge(song) {
   for (var pattern of song.patterns) {
     for (var track = 0; track < 4; track++) {
       for (var m = 0; m < 64; m++) {
-        addUint32(
-          pattern[m][track].note === null ? 90 : pattern[m][track].note,
-        );
-        addUint32(
-          pattern[m][track].instrument === null
-            ? 0
-            : pattern[m][track].instrument + 1,
-        );
-        addUint32(
-          pattern[m][track].effectcode === null
-            ? 0
-            : pattern[m][track].effectcode,
-        );
-        addUint8(
-          pattern[m][track].effectparam === null
-            ? 0
-            : pattern[m][track].effectparam,
-        );
+        addUint32(pattern[m][track].note === null ? 90 : pattern[m][track].note);
+        addUint32(pattern[m][track].instrument === null ? 0 : pattern[m][track].instrument + 1);
+        addUint32(pattern[m][track].effectcode === null ? 0 : pattern[m][track].effectcode);
+        addUint8(pattern[m][track].effectparam === null ? 0 : pattern[m][track].effectparam);
       }
     }
   }
@@ -91,5 +75,5 @@ function saveUge(song) {
   }
   for (var n = 0; n < 16; n++) addUint32(0); //Add empty routines
 
-  downloadBlob(new Blob([buffer.slice(0, idx)]), "song.uge");
+  downloadBlob(new Blob([buffer.slice(0, idx)]), 'song.uge');
 }

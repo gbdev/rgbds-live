@@ -1,13 +1,13 @@
-import ace from "./ace/loader.js";
-import * as compiler from "./compiler.js";
-import * as storage from "./storage.js";
-import * as main from "./main.js";
-import "./ace/mode-gbz80.js";
+import ace from './ace/loader.js';
+import * as compiler from './compiler.js';
+import * as storage from './storage.js';
+import * as main from './main.js';
+import './ace/mode-gbz80.js';
 
-ace.config.set("basePath", `assets/ace`);
+ace.config.set('basePath', `assets/ace`);
 
-import { TokenTooltip } from "./ace/gbz80tooltip.js";
-import { gbz80Completer } from "./ace/complete-gbz80.js";
+import { TokenTooltip } from './ace/gbz80tooltip.js';
+import { gbz80Completer } from './ace/complete-gbz80.js';
 
 var editors = [];
 var current_file = null;
@@ -22,20 +22,18 @@ const runColorMode = (fn) => {
   if (!window.matchMedia) {
     return;
   }
-  const query = window.matchMedia("(prefers-color-scheme: dark)");
+  const query = window.matchMedia('(prefers-color-scheme: dark)');
   fn(query.matches);
-  query.addEventListener("change", (event) => fn(event.matches));
+  query.addEventListener('change', (event) => fn(event.matches));
 };
 
 export function register(div_id, compileCode) {
   var e = ace.edit(div_id);
   new TokenTooltip(e);
   runColorMode((isDarkMode) => {
-    e.setTheme(
-      isDarkMode ? "ace/theme/tomorrow_night_eighties" : "ace/theme/tomorrow",
-    );
+    e.setTheme(isDarkMode ? 'ace/theme/tomorrow_night_eighties' : 'ace/theme/tomorrow');
   });
-  e.session.setMode("ace/mode/gbz80");
+  e.session.setMode('ace/mode/gbz80');
   e.setOptions({
     tabSize: 2,
     useSoftTabs: true,
@@ -45,16 +43,16 @@ export function register(div_id, compileCode) {
   });
   e.completers = [gbz80Completer];
 
-  e.session.on("change", function (delta) {
+  e.session.on('change', function (delta) {
     if (e.curOp && e.curOp.command.name) {
       storage.update(current_file, e.getValue());
       compileCode();
     }
   });
-  e.on("guttermousedown", function (event) {
+  e.on('guttermousedown', function (event) {
     var target = event.domEvent.target;
 
-    if (target.className.indexOf("ace_gutter-cell") == -1) return;
+    if (target.className.indexOf('ace_gutter-cell') == -1) return;
     var row = event.getDocumentPosition().row;
     toggleBreakpoint(current_file, row + 1);
     event.stop();
@@ -71,9 +69,7 @@ export function setCurrentFile(filename) {
   editors[0].selection.clearSelection();
   editors[0].session.getUndoManager().reset();
   if (current_file in cursor_position_per_file)
-    editors[0].selection.moveCursorToPosition(
-      cursor_position_per_file[current_file],
-    );
+    editors[0].selection.moveCursorToPosition(cursor_position_per_file[current_file]);
   else editors[0].selection.moveCursorTo(0, 0);
   editors[0].scrollToLine(editors[0].selection.getCursor().row, true);
   editors[0].focus();
@@ -108,17 +104,13 @@ function addBreakpoint(filename, line_nr) {
 }
 
 function removeBreakpoint(filename, line_nr) {
-  breakpoints = breakpoints.filter(
-    (data) => data[0] != filename || data[1] != line_nr,
-  );
+  breakpoints = breakpoints.filter((data) => data[0] != filename || data[1] != line_nr);
   main.updateBreakpoints();
   updateBreakpoints();
 }
 
 function toggleBreakpoint(filename, line_nr) {
-  var idx = breakpoints.findIndex(
-    (data) => data[0] == filename && data[1] == line_nr,
-  );
+  var idx = breakpoints.findIndex((data) => data[0] == filename && data[1] == line_nr);
   if (idx > -1) removeBreakpoint(filename, line_nr);
   else addBreakpoint(filename, line_nr);
 }
@@ -129,17 +121,13 @@ function updateBreakpoints() {
     if (filename == current_file)
       editors[0].session.setBreakpoint(
         line_nr - 1,
-        valid ? "ace_breakpoint" : "ace_invalid_breakpoint",
+        valid ? 'ace_breakpoint' : 'ace_invalid_breakpoint'
       );
   }
 }
 
 function updateCpuLine(scroll_to_line) {
-  if (
-    scroll_to_line &&
-    current_file != null &&
-    current_file != cpu_line_filename
-  )
+  if (scroll_to_line && current_file != null && current_file != cpu_line_filename)
     setCurrentFile(cpu_line_filename);
 
   if (cpu_line_marker != null) {
@@ -150,16 +138,10 @@ function updateCpuLine(scroll_to_line) {
   if (cpu_line_filename == current_file) {
     cpu_line_marker = editors[0].session.addMarker(
       new ace.Range(cpu_line_line_nr - 1, 0, cpu_line_line_nr - 1, 1),
-      "cpuLineMarker",
-      "fullLine",
+      'cpuLineMarker',
+      'fullLine'
     );
-    if (scroll_to_line)
-      editors[0].scrollToLine(
-        cpu_line_line_nr - 1,
-        true,
-        false,
-        function () {},
-      );
+    if (scroll_to_line) editors[0].scrollToLine(cpu_line_line_nr - 1, true, false, function () {});
   }
 }
 
@@ -172,11 +154,11 @@ export function getBreakpoints() {
 }
 
 export function hide() {
-  editors[0].renderer.getContainerElement().style.display = "none";
+  editors[0].renderer.getContainerElement().style.display = 'none';
 }
 
 export function show() {
-  editors[0].renderer.getContainerElement().style.display = "";
+  editors[0].renderer.getContainerElement().style.display = '';
   editors[0].resize();
   editors[0].renderer.updateFull();
 }

@@ -7,21 +7,21 @@ td {
   border: 1px solid black;
   background: white;
   font:
-    12px / normal "Monaco",
-    "Menlo",
-    "Ubuntu Mono",
-    "Consolas",
-    "source-code-pro",
+    12px / normal 'Monaco',
+    'Menlo',
+    'Ubuntu Mono',
+    'Consolas',
+    'source-code-pro',
     monospace;
 }
 body {
   margin: 0;
   font:
-    12px / normal "Monaco",
-    "Menlo",
-    "Ubuntu Mono",
-    "Consolas",
-    "source-code-pro",
+    12px / normal 'Monaco',
+    'Menlo',
+    'Ubuntu Mono',
+    'Consolas',
+    'source-code-pro',
     monospace;
 }
 
@@ -29,7 +29,7 @@ body {
 .instruments select {
   width: 100%;
 }
-.instruments input[type="checkbox"] {
+.instruments input[type='checkbox'] {
   width: unset;
   float: right;
   margin: 0;

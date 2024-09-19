@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 //TODO: Merge this code with assemblyExport, currently lots of duplication
 
 function cHex2(n) {
-  return "0x" + ("00" + n.toString(16).toUpperCase()).slice(-2);
+  return '0x' + ('00' + n.toString(16).toUpperCase()).slice(-2);
 }
 
 class SdccExporter {
@@ -26,30 +26,26 @@ static const unsigned char order_cnt = ${song.sequence.length * 2};
 `;
     for (var idx = 0; idx < this.patterns.length; idx++) {
       data += `static const unsigned char song_pattern_${idx}[] = {\n`;
-      for (var cell of this.patterns[idx])
-        data += `    ${this.formatPatternCell(cell)},\n`;
-      data += "};\n";
+      for (var cell of this.patterns[idx]) data += `    ${this.formatPatternCell(cell)},\n`;
+      data += '};\n';
     }
     for (var track = 0; track < 4; track++)
       data += `static const unsigned char* const order${track + 1}[] = {${this.getSequenceMappingFor(track)}};\n`;
-    data += "static const unsigned char duty_instruments[] = {\n";
-    for (var instr of song.duty_instruments)
-      data += `    ${this.formatInstrument(instr)},\n`;
-    data += "};\n";
-    data += "static const unsigned char wave_instruments[] = {\n";
-    for (var instr of song.wave_instruments)
-      data += `    ${this.formatInstrument(instr)},\n`;
-    data += "};\n";
-    data += "static const unsigned char noise_instruments[] = {\n";
-    for (var instr of song.noise_instruments)
-      data += `    ${this.formatInstrument(instr)},\n`;
-    data += "};\n";
+    data += 'static const unsigned char duty_instruments[] = {\n';
+    for (var instr of song.duty_instruments) data += `    ${this.formatInstrument(instr)},\n`;
+    data += '};\n';
+    data += 'static const unsigned char wave_instruments[] = {\n';
+    for (var instr of song.wave_instruments) data += `    ${this.formatInstrument(instr)},\n`;
+    data += '};\n';
+    data += 'static const unsigned char noise_instruments[] = {\n';
+    for (var instr of song.noise_instruments) data += `    ${this.formatInstrument(instr)},\n`;
+    data += '};\n';
     //data += "static const unsigned char routines[] = {\n";
     //TODO
     //data += "};\n";
-    data += "static const unsigned char waves[] = {\n";
+    data += 'static const unsigned char waves[] = {\n';
     for (var wave of song.waves) data += `    ${this.formatWave(wave)},\n`;
-    data += "};\n";
+    data += '};\n';
 
     data += `
 const hUGESong_t SONG_VAR_NAME = {
@@ -65,9 +61,7 @@ const hUGESong_t SONG_VAR_NAME = {
   }
 
   getSequenceMappingFor(track) {
-    return song.sequence
-      .map((n) => `song_pattern_${this.pattern_map[[n, track]]}`)
-      .join(", ");
+    return song.sequence.map((n) => `song_pattern_${this.pattern_map[[n, track]]}`).join(', ');
   }
 
   formatPatternCell(cell) {
@@ -89,14 +83,9 @@ const hUGESong_t SONG_VAR_NAME = {
         (instr.frequency_sweep_time << 4) |
         (instr.frequency_sweep_shift < 0 ? 0x08 : 0x00) |
         Math.abs(instr.frequency_sweep_shift);
-      var nr11 =
-        (instr.duty_cycle << 6) |
-        ((instr.length !== null ? 64 - instr.length : 0) & 0x3f);
-      var nr12 =
-        (instr.initial_volume << 4) |
-        (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
-      if (instr.volume_sweep_change != 0)
-        nr12 |= 8 - Math.abs(instr.volume_sweep_change);
+      var nr11 = (instr.duty_cycle << 6) | ((instr.length !== null ? 64 - instr.length : 0) & 0x3f);
+      var nr12 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
+      if (instr.volume_sweep_change != 0) nr12 |= 8 - Math.abs(instr.volume_sweep_change);
       var nr14 = 0x80 | (instr.length !== null ? 0x40 : 0);
       return `${cHex2(nr10)}, ${cHex2(nr11)}, ${cHex2(nr12)}, ${cHex2(nr14)}`;
     }
@@ -108,11 +97,8 @@ const hUGESong_t SONG_VAR_NAME = {
       return `${cHex2(nr31)}, ${cHex2(nr32)}, ${cHex2(wave_nr)}, ${cHex2(nr34)}`;
     }
     if (instr instanceof NoiseInstrument) {
-      var param0 =
-        (instr.initial_volume << 4) |
-        (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
-      if (instr.volume_sweep_change != 0)
-        param0 |= 8 - Math.abs(instr.volume_sweep_change);
+      var param0 = (instr.initial_volume << 4) | (instr.volume_sweep_change > 0 ? 0x08 : 0x00);
+      if (instr.volume_sweep_change != 0) param0 |= 8 - Math.abs(instr.volume_sweep_change);
       var param1 = (instr.length !== null ? 64 - instr.length : 0) & 0x3f;
       if (instr.length !== null) param1 |= 0x40;
       if (instr.bit_count == 7) param1 |= 0x80;
@@ -122,9 +108,9 @@ const hUGESong_t SONG_VAR_NAME = {
   }
 
   formatWave(wave) {
-    return Array.from(Array(16).keys(), (n) =>
-      cHex2((wave[n * 2] << 4) | wave[n * 2 + 1]),
-    ).join(", ");
+    return Array.from(Array(16).keys(), (n) => cHex2((wave[n * 2] << 4) | wave[n * 2 + 1])).join(
+      ', '
+    );
   }
 
   buildPatterns() {

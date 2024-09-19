@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 function loadUGESong(data) {
   var song = new Song();
@@ -7,7 +7,7 @@ function loadUGESong(data) {
   //TODO: Use `DataView` object instead of loads of Uint32Arrays
   var offset = 0;
   var version = new Uint32Array(data.slice(offset, offset + 4))[0];
-  console.log("uge version: " + version);
+  console.log('uge version: ' + version);
   if (version < 0 || version > 3) return null;
 
   var uint8data = new Uint8Array(data);
@@ -16,13 +16,9 @@ function loadUGESong(data) {
   var td = new TextDecoder();
   song.name = td.decode(data.slice(offset + 1, offset + 1 + uint8data[offset]));
   offset += 256;
-  song.artist = td.decode(
-    data.slice(offset + 1, offset + 1 + uint8data[offset]),
-  );
+  song.artist = td.decode(data.slice(offset + 1, offset + 1 + uint8data[offset]));
   offset += 256;
-  song.comment = td.decode(
-    data.slice(offset + 1, offset + 1 + uint8data[offset]),
-  );
+  song.comment = td.decode(data.slice(offset + 1, offset + 1 + uint8data[offset]));
   offset += 256;
 
   var instrument_count = version < 3 ? 15 : 45;
@@ -32,9 +28,7 @@ function loadUGESong(data) {
   for (var n = 0; n < instrument_count; n++) {
     var type = new Uint32Array(data.slice(offset, offset + 4))[0];
     offset += 4;
-    var name = td.decode(
-      data.slice(offset + 1, offset + 1 + uint8data[offset]),
-    );
+    var name = td.decode(data.slice(offset + 1, offset + 1 + uint8data[offset]));
     offset += 256;
 
     var length = new Uint32Array(data.slice(offset, offset + 4))[0];
@@ -53,9 +47,7 @@ function loadUGESong(data) {
 
     var freq_sweep_time = new Uint32Array(data.slice(offset, offset + 4))[0];
     offset += 4;
-    var freq_sweep_direction = new Uint32Array(
-      data.slice(offset, offset + 4),
-    )[0];
+    var freq_sweep_direction = new Uint32Array(data.slice(offset, offset + 4))[0];
     offset += 4;
     var freq_sweep_shift = new Uint32Array(data.slice(offset, offset + 4))[0];
     offset += 4;
@@ -66,19 +58,13 @@ function loadUGESong(data) {
 
     var wave_output_level = new Uint32Array(data.slice(offset, offset + 4))[0];
     offset += 4;
-    var wave_waveform_index = new Uint32Array(
-      data.slice(offset, offset + 4),
-    )[0];
+    var wave_waveform_index = new Uint32Array(data.slice(offset, offset + 4))[0];
     offset += 4;
-    var noise_shift_clock_frequency = new Uint32Array(
-      data.slice(offset, offset + 4),
-    )[0];
+    var noise_shift_clock_frequency = new Uint32Array(data.slice(offset, offset + 4))[0];
     offset += 4;
     var noise_counter_step = new Uint32Array(data.slice(offset, offset + 4))[0];
     offset += 4;
-    var noise_dividing_ratio = new Uint32Array(
-      data.slice(offset, offset + 4),
-    )[0];
+    var noise_dividing_ratio = new Uint32Array(data.slice(offset, offset + 4))[0];
     offset += 4;
     // TODO: Unreleased V4 format has some kind of "noise macro" after this data, most likely 6 bytes or integers.
 
@@ -146,9 +132,7 @@ function loadUGESong(data) {
   for (var n = 0; n < pattern_count; n++) {
     var pattern = [];
     for (var m = 0; m < 64; m++) {
-      var [note, instrument, effectcode] = new Int32Array(
-        data.slice(offset, offset + 12),
-      );
+      var [note, instrument, effectcode] = new Int32Array(data.slice(offset, offset + 12));
       offset += 12;
       var effectparam = uint8data[offset];
       offset += 1;
@@ -162,9 +146,7 @@ function loadUGESong(data) {
   for (var n = 0; n < 4; n++) {
     var order_count = new Uint32Array(data.slice(offset, offset + 4))[0]; //The amount of pattern orders stored in the file has an off-by-one.
     offset += 4;
-    orders.push(
-      new Uint32Array(data.slice(offset, offset + 4 * (order_count - 1))),
-    );
+    orders.push(new Uint32Array(data.slice(offset, offset + 4 * (order_count - 1))));
     offset += 4 * order_count;
   }
   //TODO: If version > 1 then custom routines follow.
@@ -175,8 +157,7 @@ function loadUGESong(data) {
     for (var m = 0; m < 64; m++) {
       var row = [];
       for (var track = 0; track < 4; track++) {
-        var [note, instrument, effectcode, effectparam] =
-          patterns[orders[track][n]][m];
+        var [note, instrument, effectcode, effectparam] = patterns[orders[track][n]][m];
         var cell = new PatternCell();
         if (note != 90) cell.note = note;
         if (instrument != 0) {
@@ -208,15 +189,15 @@ function loadUGESong(data) {
 
   //TODO: Remove unused instruments, unused waves, and deduplicate patterns.
   for (var idx = 0; idx < song.duty_instruments.length; ) {
-    if (!song.usesInstrument("duty", idx)) song.removeInstrument("duty", idx);
+    if (!song.usesInstrument('duty', idx)) song.removeInstrument('duty', idx);
     else idx += 1;
   }
   for (var idx = 0; idx < song.wave_instruments.length; ) {
-    if (!song.usesInstrument("wave", idx)) song.removeInstrument("wave", idx);
+    if (!song.usesInstrument('wave', idx)) song.removeInstrument('wave', idx);
     else idx += 1;
   }
   for (var idx = 0; idx < song.noise_instruments.length; ) {
-    if (!song.usesInstrument("noise", idx)) song.removeInstrument("noise", idx);
+    if (!song.usesInstrument('noise', idx)) song.removeInstrument('noise', idx);
     else idx += 1;
   }
 

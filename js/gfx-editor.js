@@ -1,4 +1,4 @@
-import * as storage from "./storage.js";
+import * as storage from './storage.js';
 
 var colors = [0xffc2f0c4, 0xffa8b95a, 0xff6e601e, 0xff001b2d];
 
@@ -12,13 +12,13 @@ var selected_color = 0;
 
 export function register(div_id) {
   main_div = document.getElementById(div_id);
-  tile_canvas = document.getElementById("gfxEditorTilesCanvas");
-  draw_canvas = document.getElementById("gfxEditorDrawCanvas");
-  palette_canvas = document.getElementById("gfxEditorPalette");
+  tile_canvas = document.getElementById('gfxEditorTilesCanvas');
+  draw_canvas = document.getElementById('gfxEditorDrawCanvas');
+  palette_canvas = document.getElementById('gfxEditorPalette');
   new ResizeObserver(function () {
     tile_canvas.parentElement.style.maxWidth = main_div.clientWidth;
     tile_canvas.parentElement.style.maxHeight = main_div.clientHeight - 300;
-    tile_canvas.parentElement.style.display = "";
+    tile_canvas.parentElement.style.display = '';
   }).observe(main_div);
 
   draw_canvas.onmousemove = function (e) {
@@ -65,13 +65,8 @@ export function setCurrentFile(filename) {
 
   tile_canvas.style.width = tile_canvas.width * 4;
 
-  var ctx = tile_canvas.getContext("2d");
-  var image_data = ctx.getImageData(
-    0,
-    0,
-    tile_canvas.width,
-    tile_canvas.height,
-  );
+  var ctx = tile_canvas.getContext('2d');
+  var image_data = ctx.getImageData(0, 0, tile_canvas.width, tile_canvas.height);
   var pixels = new Uint32Array(image_data.data.buffer);
   var pitch = tile_canvas.width;
   for (var n = 0; n < tile_count; n++) {
@@ -79,22 +74,17 @@ export function setCurrentFile(filename) {
     var row = ~~(n / 16);
     var pixel_index = col * 8 + row * 8 * pitch;
 
-    decodeTile(
-      new Uint8Array(data.buffer, n * 16, 16),
-      pixels,
-      pixel_index,
-      pitch,
-    );
+    decodeTile(new Uint8Array(data.buffer, n * 16, 16), pixels, pixel_index, pitch);
   }
   ctx.putImageData(image_data, 0, 0);
 }
 
 export function hide() {
-  main_div.style.display = "none";
+  main_div.style.display = 'none';
 }
 
 export function show() {
-  main_div.style.display = "";
+  main_div.style.display = '';
 }
 
 export function setTileIndex(index) {
@@ -102,13 +92,8 @@ export function setTileIndex(index) {
   if (index >= data.length / 16) index = data.length / 16 - 1;
   current_tile_index = index;
 
-  var ctx = draw_canvas.getContext("2d");
-  var image_data = ctx.getImageData(
-    0,
-    0,
-    draw_canvas.width,
-    draw_canvas.height,
-  );
+  var ctx = draw_canvas.getContext('2d');
+  var image_data = ctx.getImageData(0, 0, draw_canvas.width, draw_canvas.height);
   var pixels = new Uint32Array(image_data.data.buffer);
   decodeTile(new Uint8Array(data.buffer, index * 16, 16), pixels, 0, 8);
   ctx.putImageData(image_data, 0, 0);
@@ -138,46 +123,36 @@ function drawPixel(x, y, color) {
   storage.update(current_file, data);
 
   // Update the tile in the tile list
-  var ctx = tile_canvas.getContext("2d");
-  var image_data = ctx.getImageData(
-    0,
-    0,
-    tile_canvas.width,
-    tile_canvas.height,
-  );
+  var ctx = tile_canvas.getContext('2d');
+  var image_data = ctx.getImageData(0, 0, tile_canvas.width, tile_canvas.height);
   var pixels = new Uint32Array(image_data.data.buffer);
   var pitch = tile_canvas.width;
   var col = current_tile_index % 16;
   var row = ~~(current_tile_index / 16);
   var pixel_index = col * 8 + row * 8 * pitch;
-  decodeTile(
-    new Uint8Array(data.buffer, current_tile_index * 16, 16),
-    pixels,
-    pixel_index,
-    pitch,
-  );
+  decodeTile(new Uint8Array(data.buffer, current_tile_index * 16, 16), pixels, pixel_index, pitch);
   ctx.putImageData(image_data, 0, 0);
 }
 
 function updatePalette() {
-  var ctx = palette_canvas.getContext("2d");
+  var ctx = palette_canvas.getContext('2d');
   for (var n = 0; n < 4; n++) {
     ctx.fillStyle =
-      "rgb(" +
+      'rgb(' +
       (colors[n] & 0xff) +
-      ", " +
+      ', ' +
       ((colors[n] >> 8) & 0xff) +
-      ", " +
+      ', ' +
       ((colors[n] >> 16) & 0xff) +
-      ")";
+      ')';
     ctx.fillRect(0, n * 16, 16, 16);
   }
 
-  ctx.strokeStyle = "#FFF";
+  ctx.strokeStyle = '#FFF';
   ctx.beginPath();
   ctx.rect(2.5, selected_color * 16 + 2.5, 11, 11);
   ctx.stroke();
-  ctx.strokeStyle = "#000";
+  ctx.strokeStyle = '#000';
   ctx.beginPath();
   ctx.rect(1.5, selected_color * 16 + 1.5, 13, 13);
   ctx.stroke();

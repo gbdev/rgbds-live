@@ -1,8 +1,8 @@
-import { gameboy_hardware_constants } from "../gbz80.js";
-import ace, { require } from "./loader.js";
+import { gameboy_hardware_constants } from '../gbz80.js';
+import ace, { require } from './loader.js';
 
-const { Tooltip } = await require("ace/tooltip");
-const AceEvent = await require("ace/lib/event");
+const { Tooltip } = await require('ace/tooltip');
+const AceEvent = await require('ace/lib/event');
 
 export class TokenTooltip extends Tooltip {
   token = {};
@@ -16,12 +16,8 @@ export class TokenTooltip extends Tooltip {
     this.update = this.update.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
-    AceEvent.addListener(
-      editor.renderer.scroller,
-      "mousemove",
-      this.onMouseMove,
-    );
-    AceEvent.addListener(editor.renderer.content, "mouseout", this.onMouseOut);
+    AceEvent.addListener(editor.renderer.scroller, 'mousemove', this.onMouseMove);
+    AceEvent.addListener(editor.renderer.content, 'mouseout', this.onMouseOut);
   }
 
   update() {
@@ -36,23 +32,19 @@ export class TokenTooltip extends Tooltip {
     }
 
     var canvasPos = r.rect || (r.rect = r.scroller.getBoundingClientRect());
-    var offset =
-      (this.x + r.scrollLeft - canvasPos.left - r.$padding) / r.characterWidth;
+    var offset = (this.x + r.scrollLeft - canvasPos.left - r.$padding) / r.characterWidth;
     var row = Math.floor((this.y + r.scrollTop - canvasPos.top) / r.lineHeight);
     var col = Math.round(offset);
 
     var screenPos = { row: row, column: col, side: offset - col > 0 ? 1 : -1 };
     var session = this.editor.session;
-    var docPos = session.screenToDocumentPosition(
-      screenPos.row,
-      screenPos.column,
-    );
+    var docPos = session.screenToDocumentPosition(screenPos.row, screenPos.column);
     var token = session.getTokenAt(docPos.row, docPos.column);
 
     if (!token && !session.getLine(docPos.row)) {
       token = {
-        type: "",
-        value: "",
+        type: '',
+        value: '',
         state: session.bgTokenizer.getState(0),
       };
     }
@@ -61,18 +53,14 @@ export class TokenTooltip extends Tooltip {
       return;
     }
 
-    var tokenText = "";
-    if (
-      token.type == "variable.constant" &&
-      token.value in gameboy_hardware_constants
-    ) {
+    var tokenText = '';
+    if (token.type == 'variable.constant' && token.value in gameboy_hardware_constants) {
       var info = gameboy_hardware_constants[token.value];
       tokenText = info.description;
-      if (info.value) tokenText += "\nValue: " + info.value;
+      if (info.value) tokenText += '\nValue: ' + info.value;
       if (info.flags) {
-        tokenText += "\n";
-        for (var flag in info.flags)
-          tokenText += "\n" + flag + ": " + info.flags[flag].description;
+        tokenText += '\n';
+        for (var flag in info.flags) tokenText += '\n' + flag + ': ' + info.flags[flag].description;
       }
     } else {
       this.hide();
@@ -108,8 +96,7 @@ export class TokenTooltip extends Tooltip {
   }
 
   setPosition(x, y) {
-    if (x + 10 + this.width > this.maxWidth)
-      x = window.innerWidth - this.width - 10;
+    if (x + 10 + this.width > this.maxWidth) x = window.innerWidth - this.width - 10;
     if (y > window.innerHeight * 0.75 || y + 20 + this.height > this.maxHeight)
       y = y - this.height - 30;
 
@@ -118,16 +105,8 @@ export class TokenTooltip extends Tooltip {
 
   destroy() {
     this.onMouseOut();
-    event.removeListener(
-      this.editor.renderer.scroller,
-      "mousemove",
-      this.onMouseMove,
-    );
-    event.removeListener(
-      this.editor.renderer.content,
-      "mouseout",
-      this.onMouseOut,
-    );
+    event.removeListener(this.editor.renderer.scroller, 'mousemove', this.onMouseMove);
+    event.removeListener(this.editor.renderer.content, 'mouseout', this.onMouseOut);
     delete this.editor.tokenTooltip;
   }
 }

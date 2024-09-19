@@ -1,8 +1,8 @@
-import * as storage from "./storage.js";
+import * as storage from './storage.js';
 
-import createRgbAsm from "../rgbds/rgbasm";
-import createRgbLink from "../rgbds/rgblink";
-import createRgbFix from "../rgbds/rgbfix";
+import createRgbAsm from '../rgbds/rgbasm';
+import createRgbLink from '../rgbds/rgblink';
+import createRgbFix from '../rgbds/rgbfix';
 
 var busy = false;
 var repeat = false;
@@ -22,13 +22,11 @@ function logFunction(str, kind) {
   if (log_callback) log_callback(str, kind);
 
   if (
-    kind == "stderr" &&
-    (str.startsWith("error: ") ||
-      str.startsWith("ERROR: ") ||
-      str.startsWith("warning: "))
+    kind == 'stderr' &&
+    (str.startsWith('error: ') || str.startsWith('ERROR: ') || str.startsWith('warning: '))
   ) {
-    var type = "error";
-    if (str.startsWith("warning: ")) type = "warning";
+    var type = 'error';
+    if (str.startsWith('warning: ')) type = 'warning';
 
     var line_nr_match = str.matchAll(line_nr_regex);
     for (var m of line_nr_match) {
@@ -39,15 +37,15 @@ function logFunction(str, kind) {
 }
 
 function infoFunction(str) {
-  logFunction(str, "info");
+  logFunction(str, 'info');
 }
 
 function outFunction(str) {
-  logFunction(str, "stdout");
+  logFunction(str, 'stdout');
 }
 
 function errFunction(str) {
-  logFunction(str, "stderr");
+  logFunction(str, 'stderr');
 }
 
 export function setLogCallback(callback) {
@@ -89,7 +87,7 @@ export function setFixOptions(options) {
 }
 
 function trigger() {
-  if (typeof start_delay_timer != "undefined") clearTimeout(start_delay_timer);
+  if (typeof start_delay_timer != 'undefined') clearTimeout(start_delay_timer);
   start_delay_timer = setTimeout(startCompile, 500);
 }
 
@@ -100,15 +98,14 @@ function startCompile() {
   ram_symbols = [];
 
   var targets = [];
-  for (const name of Object.keys(storage.getFiles()))
-    if (name.endsWith(".asm")) targets.push(name);
+  for (const name of Object.keys(storage.getFiles())) if (name.endsWith('.asm')) targets.push(name);
   runRgbAsm(targets, {});
 }
 
 function runRgbAsm(targets, obj_files) {
   var target = targets.pop();
-  var args = [target, "-o", "output.o", "-Wall"].concat(asm_options);
-  infoFunction("Running: rgbasm " + args.join(" "));
+  var args = [target, '-o', 'output.o', '-Wall'].concat(asm_options);
+  infoFunction('Running: rgbasm ' + args.join(' '));
   createRgbAsm({
     arguments: args,
     preRun: function (m) {
@@ -126,7 +123,7 @@ function runRgbAsm(targets, obj_files) {
     }
     var FS = m.FS;
     try {
-      var obj_file = FS.readFile("output.o");
+      var obj_file = FS.readFile('output.o');
     } catch {
       buildFailed();
       return;
@@ -138,14 +135,14 @@ function runRgbAsm(targets, obj_files) {
 }
 
 function runRgbLink(obj_files) {
-  var args = ["-o", "output.gb", "--map", "output.map"].concat(link_options);
-  for (var name in obj_files) args.push(name + ".o");
-  infoFunction("Running: rgblink " + args.join(" "));
+  var args = ['-o', 'output.gb', '--map', 'output.map'].concat(link_options);
+  for (var name in obj_files) args.push(name + '.o');
+  infoFunction('Running: rgblink ' + args.join(' '));
   createRgbLink({
     arguments: args,
     preRun: function (m) {
       var FS = m.FS;
-      for (var name in obj_files) FS.writeFile(name + ".o", obj_files[name]);
+      for (var name in obj_files) FS.writeFile(name + '.o', obj_files[name]);
     },
     print: outFunction,
     printErr: errFunction,
@@ -156,13 +153,13 @@ function runRgbLink(obj_files) {
     }
     var FS = m.FS;
     try {
-      var rom_file = FS.readFile("output.gb");
+      var rom_file = FS.readFile('output.gb');
     } catch {
       buildFailed();
       return;
     }
     try {
-      var map_file = FS.readFile("output.map", { encoding: "utf8" });
+      var map_file = FS.readFile('output.map', { encoding: 'utf8' });
     } catch {
       buildFailed();
       return;
@@ -173,20 +170,20 @@ function runRgbLink(obj_files) {
 }
 
 function runRgbFix(input_rom_file, map_file) {
-  var args = ["-v", "output.gb", "-p", "0xff"].concat(fix_options);
-  infoFunction("Running: rgbfix " + args.join(" "));
+  var args = ['-v', 'output.gb', '-p', '0xff'].concat(fix_options);
+  infoFunction('Running: rgbfix ' + args.join(' '));
   createRgbFix({
     arguments: args,
     preRun: function (m) {
       var FS = m.FS;
-      FS.writeFile("output.gb", input_rom_file);
+      FS.writeFile('output.gb', input_rom_file);
     },
     print: outFunction,
     printErr: errFunction,
   }).then(function (m) {
     var FS = m.FS;
     try {
-      var rom_file = FS.readFile("output.gb");
+      var rom_file = FS.readFile('output.gb');
     } catch {
       buildFailed();
       return;
@@ -197,7 +194,7 @@ function runRgbFix(input_rom_file, map_file) {
 }
 
 function buildFailed() {
-  infoFunction("Build failed");
+  infoFunction('Build failed');
   if (repeat) {
     repeat = false;
     trigger();
@@ -221,27 +218,23 @@ function buildDone(rom_file, map_file) {
     var section_re = /^\s*SECTION: \$([0-9a-f]+)-\$([0-9a-f]+)/;
     var slack_re = /^\s*SLACK: \$([0-9a-f]+) bytes/;
 
-    var section_type = "";
-    var section_name = "";
+    var section_type = '';
+    var section_name = '';
     var bank_nr = 0;
-    for (var line of map_file.split("\n")) {
+    for (var line of map_file.split('\n')) {
       var m;
       if ((m = sym_re.exec(line))) {
         var addr = parseInt(m[1], 16);
         var sym = m[2];
 
-        if (sym.startsWith("__SEC_")) {
+        if (sym.startsWith('__SEC_')) {
           sym = sym.substr(6);
-          var file = sym.substr(sym.indexOf("_") + 1);
-          file = file.substr(file.indexOf("_") + 1);
-          var line_nr = parseInt(sym.split("_")[1], 16);
+          var file = sym.substr(sym.indexOf('_') + 1);
+          file = file.substr(file.indexOf('_') + 1);
+          var line_nr = parseInt(sym.split('_')[1], 16);
           addr = (addr & 0x3fff) | (bank_nr << 14);
           addr_to_line[addr] = [file, line_nr];
-        } else if (
-          sym == "emustart" ||
-          sym == "emuStart" ||
-          sym == "emu_start"
-        ) {
+        } else if (sym == 'emustart' || sym == 'emuStart' || sym == 'emu_start') {
           start_address = addr;
         } else if (addr < 0x8000) {
           addr = (addr & 0x3fff) | (bank_nr << 14);
@@ -267,22 +260,22 @@ function buildDone(rom_file, map_file) {
       } else if ((m = slack_re.exec(line))) {
         var space = parseInt(m[1], 16);
         var total = 0x4000;
-        if (section_type.startsWith("WRAM")) total = 0x1000;
-        else if (section_type.startsWith("HRAM")) total = 127;
+        if (section_type.startsWith('WRAM')) total = 0x1000;
+        else if (section_type.startsWith('HRAM')) total = 127;
         infoFunction(
-          "Space left: " +
+          'Space left: ' +
             section_type +
-            "[" +
+            '[' +
             bank_nr +
-            "]: " +
+            ']: ' +
             space +
-            "  (" +
+            '  (' +
             ((space / total) * 100).toFixed(1) +
-            "%)",
+            '%)'
         );
       }
     }
-    infoFunction("Build done");
+    infoFunction('Build done');
     done_callback(rom_file, start_address, addr_to_line);
   }
 }
