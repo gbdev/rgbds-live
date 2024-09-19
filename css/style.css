@@ -4,6 +4,8 @@
     --background: #FAFAFA;
     --background-alt: #EFEFEF;
     --border-color: #D6D6D6;
+    --link: #0000FF;
+    --active-link: #FF0000;
     --log-info: #7D7D7C;
     --log-out: #1D1D1C;
     --log-err: #FF0000;
@@ -16,10 +18,16 @@
         --background: #2D2D2D;
         --background-alt: #424242;
         --border-color: #575757;
+        --link: #8888FF;
+        --active-link: #FF8888;
         --log-info: #999999;
         --log-out: #FFFFFF;
         --log-err: #FF0000;
     }
+}
+
+* {
+    font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 }
 
 body {
@@ -38,14 +46,23 @@ input, textarea {
 button {
     border: 1px solid #555;
     border-radius: 4px;
-    padding: 8px;
+    padding: 2px 8px;
     margin: 2px;
     background-color: var(--background);
     color: var(--color);
 }
 
-button:hover{
+button:hover {
     background-color: var(--background-alt);
+}
+
+a:link, a:visited {
+  color: var(--link);
+  text-decoration: underline;
+}
+a:hover, a:active {
+  color: var(--active-link);
+  text-decoration: none;
 }
 
 .cpuLineMarker {
@@ -53,13 +70,13 @@ button:hover{
   background:rgba(100,200,100,0.5);
   z-index:20
 }
-.ace_gutter-cell.ace_breakpoint{ 
+.ace_gutter-cell.ace_breakpoint {
     border-radius: 14px;
-    box-shadow: 10px 0px 1px 1px #ff2020 inset; 
+    box-shadow: 10px 0px 1px 1px #ff2020 inset;
 }
-.ace_gutter-cell.ace_invalid_breakpoint{ 
+.ace_gutter-cell.ace_invalid_breakpoint {
     border-radius: 14px;
-    box-shadow: 10px 0px 1px 1px #802020 inset; 
+    box-shadow: 10px 0px 1px 1px #802020 inset;
 }
 .right {
     text-align: right;
@@ -104,13 +121,9 @@ table {
 table, th, td {
   border: 1px solid var(--border-color);
   background: var(--background);
-  font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 }
 body {
   margin: 0;
-}
-textarea {
-  resize: none;
 }
 canvas {
     image-rendering: pixelated;
@@ -159,7 +172,6 @@ canvas {
 .filelist li {
   overflow: auto;
   background: var(--background);
-  font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
   padding: 1px;
   cursor: pointer;
   user-select: none;
