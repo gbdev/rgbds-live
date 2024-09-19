@@ -52,9 +52,7 @@
           var code = new SdccExporter().getCCode();
 
           var element = document.createElement('a');
-          var url = window.URL.createObjectURL(
-            new Blob([code], { type: 'application/octet-stream' })
-          );
+          var url = window.URL.createObjectURL(new Blob([code], { type: 'application/octet-stream' }));
           element.setAttribute('href', url);
           element.setAttribute('download', 'song.c');
 
@@ -133,13 +131,7 @@
           <tr type="DN">
             <td>Initial volume:</td>
             <td>
-              <input
-                id="instrumentInitialVolume"
-                type="range"
-                min="0"
-                max="15"
-                list="tickmarks15"
-              />
+              <input id="instrumentInitialVolume" type="range" min="0" max="15" list="tickmarks15" />
             </td>
           </tr>
           <tr type="DN">
@@ -233,25 +225,13 @@
           <tr type="N">
             <td>Shift clock mask</td>
             <td>
-              <input
-                id="instrumentNoiseShiftClockMask"
-                type="range"
-                min="0"
-                max="15"
-                list="tickmarks15"
-              />
+              <input id="instrumentNoiseShiftClockMask" type="range" min="0" max="15" list="tickmarks15" />
             </td>
           </tr>
           <tr type="N">
             <td>Dividing ratio</td>
             <td>
-              <input
-                id="instrumentNoiseDividingRatio"
-                type="range"
-                min="0"
-                max="7"
-                list="tickmarks7"
-              />
+              <input id="instrumentNoiseDividingRatio" type="range" min="0" max="7" list="tickmarks7" />
             </td>
           </tr>
           <tr type="N">

@@ -108,9 +108,7 @@ const hUGESong_t SONG_VAR_NAME = {
   }
 
   formatWave(wave) {
-    return Array.from(Array(16).keys(), (n) => cHex2((wave[n * 2] << 4) | wave[n * 2 + 1])).join(
-      ', '
-    );
+    return Array.from(Array(16).keys(), (n) => cHex2((wave[n * 2] << 4) | wave[n * 2 + 1])).join(', ');
   }
 
   buildPatterns() {
@@ -118,8 +116,7 @@ const hUGESong_t SONG_VAR_NAME = {
       var source_pattern = song.patterns[n];
       for (var track = 0; track < 4; track++) {
         var target_pattern = [];
-        for (var m = 0; m < source_pattern.length; m++)
-          target_pattern.push(source_pattern[m][track]);
+        for (var m = 0; m < source_pattern.length; m++) target_pattern.push(source_pattern[m][track]);
 
         var idx = this.findPattern(target_pattern);
         if (idx !== null) {

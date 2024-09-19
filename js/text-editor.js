@@ -62,8 +62,7 @@ export function register(div_id, compileCode) {
 }
 
 export function setCurrentFile(filename) {
-  if (current_file != null)
-    cursor_position_per_file[current_file] = editors[0].selection.getCursor();
+  if (current_file != null) cursor_position_per_file[current_file] = editors[0].selection.getCursor();
   current_file = filename;
   editors[0].setValue(storage.getFiles()[filename]);
   editors[0].selection.clearSelection();
@@ -119,16 +118,12 @@ function updateBreakpoints() {
   editors[0].session.clearBreakpoints();
   for (var [filename, line_nr, valid] of breakpoints) {
     if (filename == current_file)
-      editors[0].session.setBreakpoint(
-        line_nr - 1,
-        valid ? 'ace_breakpoint' : 'ace_invalid_breakpoint'
-      );
+      editors[0].session.setBreakpoint(line_nr - 1, valid ? 'ace_breakpoint' : 'ace_invalid_breakpoint');
   }
 }
 
 function updateCpuLine(scroll_to_line) {
-  if (scroll_to_line && current_file != null && current_file != cpu_line_filename)
-    setCurrentFile(cpu_line_filename);
+  if (scroll_to_line && current_file != null && current_file != cpu_line_filename) setCurrentFile(cpu_line_filename);
 
   if (cpu_line_marker != null) {
     editors[0].session.removeMarker(cpu_line_marker);

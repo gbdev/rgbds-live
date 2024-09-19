@@ -79,11 +79,7 @@ export function step(step_type) {
 
 export function renderScreen() {
   if (!isAvailable()) return;
-  var buffer = new Uint8Array(
-    Module.HEAP8.buffer,
-    Module._get_frame_buffer_ptr(e),
-    Module._get_frame_buffer_size(e)
-  );
+  var buffer = new Uint8Array(Module.HEAP8.buffer, Module._get_frame_buffer_ptr(e), Module._get_frame_buffer_size(e));
   canvas_image_data.data.set(buffer);
   canvas_ctx.putImageData(canvas_image_data, 0, 0);
 }

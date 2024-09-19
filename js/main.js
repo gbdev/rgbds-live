@@ -48,8 +48,7 @@ emulator.setSerialCallback(function (value) {
   if ((value >= 32 && value < 128) || value == 13) {
     output.innerHTML += escapeHTML(String.fromCharCode(value));
   } else {
-    output.innerHTML +=
-      '<u>' + escapeHTML('[' + ('00' + value.toString(16)).slice(-2) + ']') + '</u>';
+    output.innerHTML += '<u>' + escapeHTML('[' + ('00' + value.toString(16)).slice(-2) + ']') + '</u>';
   }
   output.scrollTop = output.scrollHeight;
 });
@@ -113,11 +112,7 @@ export function updateBreakpoints() {
   for (var data of breakpoints) {
     var [filename, line_nr, valid] = data;
     data[2] = false;
-    if (
-      typeof line_to_addr[filename] == 'undefined' ||
-      typeof line_to_addr[filename][line_nr] == 'undefined'
-    )
-      continue;
+    if (typeof line_to_addr[filename] == 'undefined' || typeof line_to_addr[filename][line_nr] == 'undefined') continue;
     data[2] = true;
     for (var addr of line_to_addr[filename][line_nr]) emulator.setBreakpoint(addr);
   }
@@ -157,8 +152,7 @@ function updateCpuState(afterSingleStep) {
 
   var file_line_nr = addr_to_line[pc];
   if (typeof file_line_nr == 'undefined') file_line_nr = addr_to_line[pc - 1];
-  if (typeof file_line_nr != 'undefined')
-    textEditor.setCpuLine(file_line_nr[0], file_line_nr[1], afterSingleStep);
+  if (typeof file_line_nr != 'undefined') textEditor.setCpuLine(file_line_nr[0], file_line_nr[1], afterSingleStep);
   else textEditor.setCpuLine(null, null);
   updateVRamCanvas();
   updateTextView();
@@ -244,16 +238,11 @@ function updateTextView() {
   var span = false;
   var span_color = 0;
   for (var n = 0; n < data.length; n += 16) {
-    var hex = Array.prototype.map.call(data.slice(n, n + 16), (x) =>
-      ('00' + x.toString(16)).slice(-2)
-    );
+    var hex = Array.prototype.map.call(data.slice(n, n + 16), (x) => ('00' + x.toString(16)).slice(-2));
     var bank = ~~(n / bank_size);
     var addr = n & (bank_size - 1);
     if (bank > 0) addr += bank_size;
-    text +=
-      ('00' + bank.toString(16)).slice(-2) +
-      ':' +
-      ('0000' + (addr + offset).toString(16)).slice(-4);
+    text += ('00' + bank.toString(16)).slice(-2) + ':' + ('0000' + (addr + offset).toString(16)).slice(-4);
     for (var idx = 0; idx < hex.length; idx++) {
       text += ' ';
       var new_symbol = symbols[n + idx + offset];
@@ -309,8 +298,7 @@ export function updateFileList() {
 function deleteFile(name) {
   if (Object.keys(storage.getFiles()).length < 2) return;
   storage.update(name, null);
-  if (editors.getCurrentFilename() == name)
-    editors.setCurrentFile(Object.keys(storage.getFiles()).sort()[0]);
+  if (editors.getCurrentFilename() == name) editors.setCurrentFile(Object.keys(storage.getFiles()).sort()[0]);
   updateFileList();
 }
 
@@ -370,10 +358,7 @@ export function init(event) {
   document.getElementById('newfile_upload').onchange = function (e) {
     if (e.target.files.length > 0) {
       var name = e.target.files[0].name;
-      var p =
-        editors.getFileType(name) == 'text'
-          ? e.target.files[0].text()
-          : e.target.files[0].arrayBuffer();
+      var p = editors.getFileType(name) == 'text' ? e.target.files[0].text() : e.target.files[0].arrayBuffer();
       p.then(function (data) {
         storage.update(name, data);
         editors.setCurrentFile(name);
@@ -497,9 +482,7 @@ export function init(event) {
   document.getElementById('download_rom').onclick = function () {
     if (typeof rom == 'undefined') return;
     var element = document.createElement('a');
-    var url = window.URL.createObjectURL(
-      new Blob([rom.buffer], { type: 'application/octet-stream' })
-    );
+    var url = window.URL.createObjectURL(new Blob([rom.buffer], { type: 'application/octet-stream' }));
     element.setAttribute('href', url);
     element.setAttribute('download', 'rom.gb');
 
@@ -551,8 +534,7 @@ export function init(event) {
 
     url = storage.saveGithubGist(username, token, url);
     if (url == null) {
-      document.getElementById('export_gist_import_url').value =
-        'Gist create/update failed. Incorrect token?';
+      document.getElementById('export_gist_import_url').value = 'Gist create/update failed. Incorrect token?';
     } else {
       document.getElementById('export_gist_url').value = url;
 
@@ -569,8 +551,7 @@ export function init(event) {
     document.getElementById('infodialog').style.display = 'block';
   };
   document.getElementById('infodialog').onclick = function (e) {
-    if (e.target == document.getElementById('infodialog'))
-      document.getElementById('infodialog').style.display = 'none';
+    if (e.target == document.getElementById('infodialog')) document.getElementById('infodialog').style.display = 'none';
   };
   document.getElementById('infodialogclose').onclick = function () {
     document.getElementById('infodialog').style.display = 'none';

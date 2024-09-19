@@ -185,9 +185,7 @@ class InstrumentUI {
       var points = [];
       var value = i.initial_volume / 15.0;
       var change =
-        i.volume_sweep_change == 0
-          ? 0
-          : Math.sign(i.volume_sweep_change) / (8 - Math.abs(i.volume_sweep_change)) / 32;
+        i.volume_sweep_change == 0 ? 0 : Math.sign(i.volume_sweep_change) / (8 - Math.abs(i.volume_sweep_change)) / 32;
       for (var n = 0; n < 128; n++) {
         points.push(value);
         value += change;
@@ -240,10 +238,7 @@ class InstrumentUI {
     ctx.lineWidth = 3;
     ctx.moveTo(0, 3 + h - Math.max(0.0, Math.min(1.0, points[0])) * h);
     for (var idx = 1; idx < points.length; idx++) {
-      ctx.lineTo(
-        (w * idx) / (points.length - 1),
-        3 + h - Math.max(0.0, Math.min(1.0, points[idx])) * h
-      );
+      ctx.lineTo((w * idx) / (points.length - 1), 3 + h - Math.max(0.0, Math.min(1.0, points[idx])) * h);
     }
     ctx.stroke();
   }

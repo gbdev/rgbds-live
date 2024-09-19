@@ -97,8 +97,7 @@ export class TokenTooltip extends Tooltip {
 
   setPosition(x, y) {
     if (x + 10 + this.width > this.maxWidth) x = window.innerWidth - this.width - 10;
-    if (y > window.innerHeight * 0.75 || y + 20 + this.height > this.maxHeight)
-      y = y - this.height - 30;
+    if (y > window.innerHeight * 0.75 || y + 20 + this.height > this.maxHeight) y = y - this.height - 30;
 
     Tooltip.prototype.setPosition.call(this, x + 10, y + 20);
   }

@@ -12,10 +12,7 @@ function instrumentNumberToText(instrument) {
 }
 function effectToText(effectcode, effectparam) {
   if (effectcode === null) return '...';
-  return (
-    effectcode.toString(16).toUpperCase() +
-    ('00' + effectparam.toString(16).toUpperCase()).slice(-2)
-  );
+  return effectcode.toString(16).toUpperCase() + ('00' + effectparam.toString(16).toUpperCase()).slice(-2);
 }
 
 class TrackerUI {
@@ -129,8 +126,7 @@ class TrackerUI {
       var row = e.target.row;
       var col = e.target.col;
       var type = e.target.type;
-      if (typeof row == 'undefined' || typeof col == 'undefined' || typeof type == 'undefined')
-        return;
+      if (typeof row == 'undefined' || typeof col == 'undefined' || typeof type == 'undefined') return;
       this.setSelection(row, col, type);
 
       tracker.focus();
@@ -387,8 +383,7 @@ class TrackerUI {
   }
   setInstrument(value) {
     song.patterns[this.pattern_index][this.selected_row][this.selected_col].instrument = value;
-    this.getCell(this.selected_row, this.selected_col, 'instrument').innerText =
-      instrumentNumberToText(value);
+    this.getCell(this.selected_row, this.selected_col, 'instrument').innerText = instrumentNumberToText(value);
     player.updateRom();
   }
   setEffectType(value) {
@@ -396,20 +391,14 @@ class TrackerUI {
     c.effectcode = value;
     if (c.effectcode === null) c.effectparam = null;
     else if (c.effectparam === null) c.effectparam = 0;
-    this.getCell(this.selected_row, this.selected_col, 'effect').innerText = effectToText(
-      c.effectcode,
-      c.effectparam
-    );
+    this.getCell(this.selected_row, this.selected_col, 'effect').innerText = effectToText(c.effectcode, c.effectparam);
     this.setSelection(this.selected_row, this.selected_col, 'effect');
     player.updateRom();
   }
   setEffectParam(value, mask) {
     var c = song.patterns[this.pattern_index][this.selected_row][this.selected_col];
     c.effectparam = (c.effectparam & ~mask) | (value & mask);
-    this.getCell(this.selected_row, this.selected_col, 'effect').innerText = effectToText(
-      c.effectcode,
-      c.effectparam
-    );
+    this.getCell(this.selected_row, this.selected_col, 'effect').innerText = effectToText(c.effectcode, c.effectparam);
     this.updateEffectInfo();
     player.updateRom();
   }
@@ -427,8 +416,7 @@ class TrackerUI {
 
     var cell = this.getCell(this.selected_row, this.selected_col, this.selected_type);
     cell.classList.add('active');
-    for (var c of cell.parentElement.parentElement.children)
-      for (var cc of c.children) cc.classList.add('highlight');
+    for (var c of cell.parentElement.parentElement.children) for (var cc of c.children) cc.classList.add('highlight');
     cell.scrollIntoViewIfNeeded();
 
     var effectpopup = document.getElementById('effectpopup');
@@ -456,39 +444,23 @@ class TrackerUI {
         document.getElementById('trackerEffectPanningRN').checked = c.effectparam & 0x80;
         document.getElementById('trackerEffectDutyCycle').selectedIndex = c.effectparam >> 6;
       }
-      document.getElementById('trackerEffectNibbleLow').style.display = [
-        0, 4, 5, 6, 10, 12,
-      ].includes(c.effectcode)
+      document.getElementById('trackerEffectNibbleLow').style.display = [0, 4, 5, 6, 10, 12].includes(c.effectcode)
         ? ''
         : 'none';
-      document.getElementById('trackerEffectNibbleHigh').style.display = [0, 5, 10].includes(
-        c.effectcode
-      )
+      document.getElementById('trackerEffectNibbleHigh').style.display = [0, 5, 10].includes(c.effectcode)
         ? ''
         : 'none';
-      document.getElementById('trackerEffectByte').style.display = [
-        1, 2, 3, 7, 11, 13, 14, 15,
-      ].includes(c.effectcode)
+      document.getElementById('trackerEffectByte').style.display = [1, 2, 3, 7, 11, 13, 14, 15].includes(c.effectcode)
         ? ''
         : 'none';
-      document.getElementById('trackerEffectWaveform').style.display = [4].includes(c.effectcode)
-        ? ''
-        : 'none';
-      document.getElementById('trackerEffectPanningTable').style.display = [8].includes(
-        c.effectcode
-      )
-        ? ''
-        : 'none';
-      document.getElementById('trackerEffectDutyCycle').style.display = [9].includes(c.effectcode)
-        ? ''
-        : 'none';
+      document.getElementById('trackerEffectWaveform').style.display = [4].includes(c.effectcode) ? '' : 'none';
+      document.getElementById('trackerEffectPanningTable').style.display = [8].includes(c.effectcode) ? '' : 'none';
+      document.getElementById('trackerEffectDutyCycle').style.display = [9].includes(c.effectcode) ? '' : 'none';
       this.updateEffectInfo();
 
       if (
         cell.getBoundingClientRect().y <
-        effectpopup.getBoundingClientRect().height +
-          16 -
-          document.getElementById('tracker').parentElement.scrollTop
+        effectpopup.getBoundingClientRect().height + 16 - document.getElementById('tracker').parentElement.scrollTop
       ) {
         effectpopup.style.top =
           cell.getBoundingClientRect().y +
@@ -509,8 +481,7 @@ class TrackerUI {
     var info = '???';
     var c = song.patterns[this.pattern_index][this.selected_row][this.selected_col];
     if (c.effectcode === null) info = '-';
-    else if (c.effectcode === 0)
-      info = `Arpeggiate by +${c.effectparam >> 4}, +${c.effectparam & 0x0f} semitones`;
+    else if (c.effectcode === 0) info = `Arpeggiate by +${c.effectparam >> 4}, +${c.effectparam & 0x0f} semitones`;
     else if (c.effectcode === 1) info = `Slide up by ${c.effectparam} units`;
     else if (c.effectcode === 2) info = `Slide down by ${c.effectparam} units`;
     else if (c.effectcode === 3) info = `Tone portamento by ${c.effectparam} units`;

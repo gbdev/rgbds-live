@@ -1087,8 +1087,7 @@ for (var key in gameboy_hardware_constants) {
   if (constant.description) doc = constant.description.replace('\n', '<br>');
   if (constant.value) doc += '<br><b>Value:</b> ' + constant.value;
   if (constant.flags) {
-    for (var flag in constant.flags)
-      doc += '<br><b>' + flag + ':</b> ' + constant.flags[flag].description;
+    for (var flag in constant.flags) doc += '<br><b>' + flag + ':</b> ' + constant.flags[flag].description;
   }
   if (constant.alias) doc += '<br><b>Alias:</b> ' + constant.alias;
   var i = {

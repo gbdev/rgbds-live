@@ -29,8 +29,7 @@ dw $0000 ; routines
 dw waves
 order_cnt: db ${song.sequence.length * 2}
 `;
-    for (var track = 0; track < 4; track++)
-      data += `order${track + 1}: ${this.getSequenceMappingFor(track)}\n`;
+    for (var track = 0; track < 4; track++) data += `order${track + 1}: ${this.getSequenceMappingFor(track)}\n`;
     for (var idx = 0; idx < this.patterns.length; idx++) {
       data += `song_pattern_${idx}:\n`;
       for (var cell of this.patterns[idx]) data += `${this.formatPatternCell(cell)}\n`;
@@ -55,30 +54,18 @@ order_cnt: db ${song.sequence.length * 2}
     zip.file('constants.htt', `TICKS equ ${song.ticks_per_row}`);
 
     var data = `order_cnt: db ${song.sequence.length * 2}\n`;
-    for (var track = 0; track < 4; track++)
-      data += `order${track + 1}: ${this.getSequenceMappingFor(track)}\n`;
+    for (var track = 0; track < 4; track++) data += `order${track + 1}: ${this.getSequenceMappingFor(track)}\n`;
     zip.file('order.htt', data);
 
     data = '';
     for (var idx = 0; idx < this.patterns.length; idx++)
       data +=
-        `song_pattern_${idx}:\n` +
-        this.patterns[idx].map((cell) => this.formatPatternCell(cell)).join('\n') +
-        '\n';
+        `song_pattern_${idx}:\n` + this.patterns[idx].map((cell) => this.formatPatternCell(cell)).join('\n') + '\n';
     zip.file('pattern.htt', data);
 
-    zip.file(
-      'duty_instrument.htt',
-      song.duty_instruments.map((instr) => this.formatInstrument(instr)).join('\n')
-    );
-    zip.file(
-      'wave_instrument.htt',
-      song.wave_instruments.map((instr) => this.formatInstrument(instr)).join('\n')
-    );
-    zip.file(
-      'noise_instrument.htt',
-      song.noise_instruments.map((instr) => this.formatInstrument(instr)).join('\n')
-    );
+    zip.file('duty_instrument.htt', song.duty_instruments.map((instr) => this.formatInstrument(instr)).join('\n'));
+    zip.file('wave_instrument.htt', song.wave_instruments.map((instr) => this.formatInstrument(instr)).join('\n'));
+    zip.file('noise_instrument.htt', song.noise_instruments.map((instr) => this.formatInstrument(instr)).join('\n'));
     zip.file('wave.htt', song.waves.map((wave) => this.formatWave(wave)).join('\n'));
     for (var idx = 0; idx < 16; idx++) zip.file(`routine${idx}.htt`, '');
 
@@ -99,9 +86,7 @@ order_cnt: db ${song.sequence.length * 2}
   }
 
   getSequenceMappingFor(track) {
-    return (
-      'dw ' + song.sequence.map((n) => `song_pattern_${this.pattern_map[[n, track]]}`).join(', ')
-    );
+    return 'dw ' + song.sequence.map((n) => `song_pattern_${this.pattern_map[[n, track]]}`).join(', ');
   }
 
   formatPatternCell(cell) {
@@ -148,10 +133,7 @@ order_cnt: db ${song.sequence.length * 2}
   }
 
   formatWave(wave) {
-    return (
-      'db ' +
-      Array.from(Array(16).keys(), (n) => asmHex2((wave[n * 2] << 4) | wave[n * 2 + 1])).join(', ')
-    );
+    return 'db ' + Array.from(Array(16).keys(), (n) => asmHex2((wave[n * 2] << 4) | wave[n * 2 + 1])).join(', ');
   }
 
   buildPatterns() {
@@ -159,8 +141,7 @@ order_cnt: db ${song.sequence.length * 2}
       var source_pattern = song.patterns[n];
       for (var track = 0; track < 4; track++) {
         var target_pattern = [];
-        for (var m = 0; m < source_pattern.length; m++)
-          target_pattern.push(source_pattern[m][track]);
+        for (var m = 0; m < source_pattern.length; m++) target_pattern.push(source_pattern[m][track]);
 
         var idx = this.findPattern(target_pattern);
         if (idx !== null) {

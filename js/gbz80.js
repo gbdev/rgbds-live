@@ -43,28 +43,23 @@ const gameboy_hardware_constants = {
       },
       OAMF_PAL0: {
         value: '%00000000',
-        description:
-          'Flag to set on OAM attribute byte to make the sprite use OBP0 in DMG (non-color) mode.',
+        description: 'Flag to set on OAM attribute byte to make the sprite use OBP0 in DMG (non-color) mode.',
       },
       OAMF_PAL1: {
         value: '%00010000',
-        description:
-          'Flag to set on OAM attribute byte to make the sprite use OBP1 in DMG (non-color) mode.',
+        description: 'Flag to set on OAM attribute byte to make the sprite use OBP1 in DMG (non-color) mode.',
       },
       OAMF_BANK0: {
         value: '%00000000',
-        description:
-          'Flag to set on OAM attribute byte to use a sprite graphics from VRAM Bank 0 in GBC mode.',
+        description: 'Flag to set on OAM attribute byte to use a sprite graphics from VRAM Bank 0 in GBC mode.',
       },
       OAMF_BANK1: {
         value: '%00001000',
-        description:
-          'Flag to set on OAM attribute byte to use a sprite graphics from VRAM Bank 1 in GBC mode.',
+        description: 'Flag to set on OAM attribute byte to use a sprite graphics from VRAM Bank 1 in GBC mode.',
       },
       OAMF_PALMASK: {
         value: '%00000111',
-        description:
-          'Mask of the color sprite palette index in the OAM attribute byte. In GBC mode.',
+        description: 'Mask of the color sprite palette index in the OAM attribute byte. In GBC mode.',
       },
 
       OAMB_PRI: {
@@ -74,23 +69,19 @@ const gameboy_hardware_constants = {
       },
       OAMB_YFLIP: {
         value: '6',
-        description:
-          'Bit number to set on OAM attribute byte to make the sprite flip in the Y direction.',
+        description: 'Bit number to set on OAM attribute byte to make the sprite flip in the Y direction.',
       },
       OAMB_XFLIP: {
         value: '5',
-        description:
-          'Bit number to set on OAM attribute byte to make the sprite flip in the X direction.',
+        description: 'Bit number to set on OAM attribute byte to make the sprite flip in the X direction.',
       },
       OAMB_PAL1: {
         value: '4',
-        description:
-          'Bit number to set on OAM attribute byte to make the sprite use OBP1 in DMG (non-color) mode.',
+        description: 'Bit number to set on OAM attribute byte to make the sprite use OBP1 in DMG (non-color) mode.',
       },
       OAMB_BANK1: {
         value: '3',
-        description:
-          'Bit number to set on OAM attribute byte to use a sprite graphics from VRAM Bank 1 in GBC mode.',
+        description: 'Bit number to set on OAM attribute byte to use a sprite graphics from VRAM Bank 1 in GBC mode.',
       },
     },
   },
@@ -273,8 +264,7 @@ const gameboy_hardware_constants = {
   },
 
   rLY: {
-    description:
-      'LCDC Y-Coordinate (R)<br>Values range from 0->153. 144->153 is the VBlank period.',
+    description: 'LCDC Y-Coordinate (R)<br>Values range from 0->153. 144->153 is the VBlank period.',
     value: '$FF44',
   },
 
@@ -765,8 +755,7 @@ Bit 2-0 - Number of envelope sweep (# 0-7)`,
 
 for (var key in gameboy_hardware_constants) {
   if (typeof gameboy_hardware_constants[key].flags == 'string')
-    gameboy_hardware_constants[key].flags =
-      gameboy_hardware_constants[gameboy_hardware_constants[key].flags].flags;
+    gameboy_hardware_constants[key].flags = gameboy_hardware_constants[gameboy_hardware_constants[key].flags].flags;
   if (gameboy_hardware_constants[key].flags) {
     for (var flag in gameboy_hardware_constants[key].flags)
       gameboy_hardware_constants[flag] = gameboy_hardware_constants[key].flags[flag];

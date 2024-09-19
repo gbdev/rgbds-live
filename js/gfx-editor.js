@@ -138,13 +138,7 @@ function updatePalette() {
   var ctx = palette_canvas.getContext('2d');
   for (var n = 0; n < 4; n++) {
     ctx.fillStyle =
-      'rgb(' +
-      (colors[n] & 0xff) +
-      ', ' +
-      ((colors[n] >> 8) & 0xff) +
-      ', ' +
-      ((colors[n] >> 16) & 0xff) +
-      ')';
+      'rgb(' + (colors[n] & 0xff) + ', ' + ((colors[n] >> 8) & 0xff) + ', ' + ((colors[n] >> 16) & 0xff) + ')';
     ctx.fillRect(0, n * 16, 16, 16);
   }
 

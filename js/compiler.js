@@ -21,10 +21,7 @@ var line_nr_regex = /([\w\.]+)[\w\.\:~]*\(([0-9]+)\)/gi;
 function logFunction(str, kind) {
   if (log_callback) log_callback(str, kind);
 
-  if (
-    kind == 'stderr' &&
-    (str.startsWith('error: ') || str.startsWith('ERROR: ') || str.startsWith('warning: '))
-  ) {
+  if (kind == 'stderr' && (str.startsWith('error: ') || str.startsWith('ERROR: ') || str.startsWith('warning: '))) {
     var type = 'error';
     if (str.startsWith('warning: ')) type = 'warning';
 
