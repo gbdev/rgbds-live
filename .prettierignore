@@ -1,0 +1,7 @@
+/www/
+/node_modules/
+/binjgb/
+/hardware.inc/
+/rgbds/
+*.asm
+*.inc
