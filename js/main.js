@@ -36,7 +36,7 @@ function escapeHTML(str) {
 
 compiler.setLogCallback(function (str, kind) {
     var output = document.getElementById("output");
-    if (str === null && kind == null) {
+    if (str == null && kind == null) {
         output.innerHTML = "";
         return;
     }
