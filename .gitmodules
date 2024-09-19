@@ -4,6 +4,7 @@
 [submodule "rgbds"]
 	path = rgbds
 	url = https://github.com/gbdev/rgbds.git
+	ignore = dirty
 [submodule "hardware.inc"]
 	path = hardware.inc
 	url = https://github.com/gbdev/hardware.inc
