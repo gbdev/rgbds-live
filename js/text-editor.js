@@ -134,7 +134,7 @@ function updateCpuLine(scroll_to_line) {
     cpu_line_marker = editors[0].session.addMarker(
       new ace.Range(cpu_line_line_nr - 1, 0, cpu_line_line_nr - 1, 1),
       'cpuLineMarker',
-      'fullLine'
+      'fullLine',
     );
     if (scroll_to_line) editors[0].scrollToLine(cpu_line_line_nr - 1, true, false, function () {});
   }

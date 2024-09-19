@@ -1109,14 +1109,14 @@ var gbz80Completer = {
         null,
         gbz80CompleterInstructions.filter(function (c) {
           return c.value.startsWith(prefix.toLowerCase());
-        })
+        }),
       );
     } else {
       callback(
         null,
         gbz80CompleterConstants.filter(function (c) {
           return c.value.toLowerCase().startsWith(prefix.toLowerCase());
-        })
+        }),
       );
     }
   },

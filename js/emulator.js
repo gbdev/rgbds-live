@@ -196,7 +196,7 @@ function processAudioBuffer() {
   var input_buffer = new Uint8Array(
     Module.HEAP8.buffer,
     Module._get_audio_buffer_ptr(e),
-    Module._get_audio_buffer_capacity(e)
+    Module._get_audio_buffer_capacity(e),
   );
   const volume = 0.5;
   const buffer = audio_ctx.createBuffer(2, audio_buffer_size, audio_ctx.sampleRate);

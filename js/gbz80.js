@@ -763,7 +763,7 @@ for (var key in gameboy_hardware_constants) {
   if (gameboy_hardware_constants[key].alias) {
     gameboy_hardware_constants[gameboy_hardware_constants[key].alias] = Object.assign(
       {},
-      gameboy_hardware_constants[key]
+      gameboy_hardware_constants[key],
     );
     gameboy_hardware_constants[gameboy_hardware_constants[key].alias].alias = key;
   }

@@ -268,7 +268,7 @@ function buildDone(rom_file, map_file) {
             space +
             '  (' +
             ((space / total) * 100).toFixed(1) +
-            '%)'
+            '%)',
         );
       }
     }
