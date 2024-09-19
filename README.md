@@ -21,6 +21,7 @@ git clone https://github.com/gbdev/rgbds-live --recursive
 ```
 
 To start hacking, use the development server:
+
 ```bash
 # Development server with live refresh:
 npm run dev

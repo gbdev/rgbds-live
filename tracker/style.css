@@ -1,144 +1,159 @@
 table {
   border-collapse: collapse;
 }
-table, th, td {
+table,
+th,
+td {
   border: 1px solid black;
   background: white;
-  font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font:
+    12px / normal "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    "Consolas",
+    "source-code-pro",
+    monospace;
 }
 body {
   margin: 0;
-  font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font:
+    12px / normal "Monaco",
+    "Menlo",
+    "Ubuntu Mono",
+    "Consolas",
+    "source-code-pro",
+    monospace;
 }
 
-.instruments input, .instruments select {
-    width: 100%;
+.instruments input,
+.instruments select {
+  width: 100%;
 }
-.instruments input[type=checkbox] {
-    width: unset;
-    float: right;
-    margin: 0;
+.instruments input[type="checkbox"] {
+  width: unset;
+  float: right;
+  margin: 0;
 }
 .instruments tr th {
-    background-color: #a0a0ff;
+  background-color: #a0a0ff;
 }
 
 .sequence {
-    overflow: auto;
-    /* height: fit-content; */
-    width: fit-content;
-    max-width: 100%;
-    max-height: 100%;
+  overflow: auto;
+  /* height: fit-content; */
+  width: fit-content;
+  max-width: 100%;
+  max-height: 100%;
 }
 .sequence table {
-    border: none;
-    width: 100px;
+  border: none;
+  width: 100px;
 }
 .sequence tr th {
-    background-color: #a0a0ff;
-    border-style: none;
+  background-color: #a0a0ff;
+  border-style: none;
 }
 .sequence tr td {
-    background-color: #80c0ff;
-    border-style: none;
-    width: 50%;
+  background-color: #80c0ff;
+  border-style: none;
+  width: 50%;
 }
-.sequence tr:nth-child(2n+2) td {
-    background-color: #70b0f0;
+.sequence tr:nth-child(2n + 2) td {
+  background-color: #70b0f0;
 }
 .sequence tr.highlight td {
-    background-color: #c0c0ff;
+  background-color: #c0c0ff;
 }
 .sequence tr.active td {
-    background-color: #e0e0ff;
+  background-color: #e0e0ff;
 }
 .sequence tr.new td {
-    text-align: center;
+  text-align: center;
 }
 
 .tracker {
-    overflow: auto;
-    /* height: fit-content; */
-    width: fit-content;
-    max-width: 100%;
-    max-height: 100%;
-    position: relative;
+  overflow: auto;
+  /* height: fit-content; */
+  width: fit-content;
+  max-width: 100%;
+  max-height: 100%;
+  position: relative;
 }
 .tracker .muted {
-    color: red;
-    text-decoration: line-through;
+  color: red;
+  text-decoration: line-through;
 }
 .tracker table {
-    border: none;
+  border: none;
 }
 .tracker tr th {
-    background-color: #a0a0ff;
+  background-color: #a0a0ff;
 }
 .tracker tr td {
-    background-color: #80c0ff;
-    padding: 0 5;
-    border-style: none;
-    border-right-style: solid;
-    border-right-color: #808080;
+  background-color: #80c0ff;
+  padding: 0 5;
+  border-style: none;
+  border-right-style: solid;
+  border-right-color: #808080;
 }
 .tracker span {
-    padding: 0 5;
-    user-select: none;
+  padding: 0 5;
+  user-select: none;
 }
-.tracker tr:nth-child(4n+2) td {
-    background-color: #70b0f0;
+.tracker tr:nth-child(4n + 2) td {
+  background-color: #70b0f0;
 }
-.tracker tr:nth-child(16n+2) td {
-    background-color: #60a0e0;
+.tracker tr:nth-child(16n + 2) td {
+  background-color: #60a0e0;
 }
 .tracker .highlight {
-    background-color: #60a0c0;
+  background-color: #60a0c0;
 }
 .tracker .active {
-    background-color: #608080;
+  background-color: #608080;
 }
 .effectpopup {
-    position: absolute;
-    background: white;
-    left: 5;
-    right: 5;
-    padding: 5px;
-    border: solid 1px;
-    display: none;
-    text-align: center;
+  position: absolute;
+  background: white;
+  left: 5;
+  right: 5;
+  padding: 5px;
+  border: solid 1px;
+  display: none;
+  text-align: center;
 }
 .effectpopup input {
-    display: block;
-    margin: 0 auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .controls button {
-    display: block;
+  display: block;
 }
 .controls input {
-    display: block;
+  display: block;
 }
 
 .container {
-    display: grid;
-    grid-template-columns: repeat(4, max-content);
-    grid-template-rows: auto;
-    grid-gap: 10px;
-    height: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  grid-template-rows: auto;
+  grid-gap: 10px;
+  height: 100%;
 }
 .instruments {
-    grid-column: 1;
-    grid-row: 1;
+  grid-column: 1;
+  grid-row: 1;
 }
 .sequence {
-    grid-column: 2;
-    grid-row: 1;
+  grid-column: 2;
+  grid-row: 1;
 }
 .tracker {
-    grid-column: 3;
-    grid-row: 1;
+  grid-column: 3;
+  grid-row: 1;
 }
 .controls {
-    grid-column: 4;
-    grid-row: 1;
+  grid-column: 4;
+  grid-row: 1;
 }

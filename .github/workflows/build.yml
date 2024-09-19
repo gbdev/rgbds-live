@@ -1,5 +1,5 @@
 name: CI
-'on':
+on:
   push:
   pull_request:
 jobs:
@@ -25,10 +25,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
+          node-version: "20.x"
       - name: Install node dependencies
         run: npm ci
-      - name: Build with Vite 
+      - name: Build with Vite
         run: npm run build
       - name: Deploy to GitHub Pages
         # Do not run this unless *pushing* to `master`.
