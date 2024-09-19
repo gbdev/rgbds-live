@@ -27,7 +27,9 @@
   }
 }
 
-* {
+body {
+  color: var(--color);
+  background: var(--background);
   font:
     12px / normal 'Monaco',
     'Menlo',
@@ -35,11 +37,6 @@
     'Consolas',
     'source-code-pro',
     monospace;
-}
-
-body {
-  color: var(--color);
-  background: var(--background);
 }
 
 input,
@@ -324,9 +321,8 @@ canvas {
   width: 512px;
 }
 
-@media only screen and (max-height: 600px) {
+@media only screen and (max-height: 600px), only screen and (max-width: 1024px) {
   .emulator_screen_container {
-    width: 256px;
     height: 256px;
   }
   .emulator_canvas_screen {
