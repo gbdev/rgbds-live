@@ -1,24 +1,29 @@
 :root {
     --selectedfile-background: #ccf;
-    --color:#2D2D2C;
+    --color: #2D2D2C;
     --background: #FAFAFA;
     --background-alt: #EFEFEF;
     --border-color: #D6D6D6;
+    --log-info: #7D7D7C;
+    --log-out: #1D1D1C;
+    --log-err: #FF0000;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
         --selectedfile-background: #557;
-        --color:#CCCCCC;
+        --color: #CCCCCC;
         --background: #2D2D2D;
         --background-alt: #424242;
         --border-color: #575757;
+        --log-info: #999999;
+        --log-out: #FFFFFF;
+        --log-err: #FF0000;
     }
 }
 
-body
-{
-    color:var(--color);
+body {
+    color: var(--color);
     background:var(--background);
 }
 
@@ -236,6 +241,22 @@ canvas {
 .console {
     grid-column: 1 / 3;
     grid-row: 3;
+}
+.output {
+    border: 1px inset #999;
+    padding: 2px;
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+    overflow: auto;
+}
+.output .info {
+    color: var(--log-info);
+}
+.output .stdout {
+	color: var(--log-out);
+}
+.output .stderr {
+    color: var(--log-err);
 }
 
 .emulator_screen_container {

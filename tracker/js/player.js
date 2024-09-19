@@ -7,7 +7,14 @@ class Player {
 
     constructor()
     {
-        compiler.setLogCallback(console.log);
+        compiler.setLogCallback(function (str, kind) {
+            if (kind == "info")
+                console.info(str);
+            else if (kind == "stdout")
+                console.log(str);
+            else if (kind == "stderr")
+                console.error(str);
+        });
         compiler.setLinkOptions(['-t', '-w']);
 
         function getFile(url, name)
