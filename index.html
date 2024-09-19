@@ -46,33 +46,26 @@
                 <a href="https://rgbds.gbdev.io/docs/v0.8.0" target="_blank">rgbds manual</a>
               </li>
               <li>
-                <a href="https://github.com/gbdev/rgbds-live/issues" target="_blank"
-                  >Report a problem</a
-                >
+                <a href="https://github.com/gbdev/rgbds-live/issues" target="_blank">Report a problem</a>
               </li>
               <li>
                 Source:
                 <br />
-                <a href="https://github.com/gbdev/rgbds-live" target="_blank"
-                  >https://github.com/gbdev/rgbds-live</a
-                >
+                <a href="https://github.com/gbdev/rgbds-live" target="_blank">https://github.com/gbdev/rgbds-live</a>
               </li>
               <li>Uses:</li>
               <li>
-                <a href="https://github.com/gbdev/rgbds/" target="_blank">rgbds</a>: Rednex Game Boy
-                Development System
+                <a href="https://github.com/gbdev/rgbds/" target="_blank">rgbds</a>: Rednex Game Boy Development System
                 <br />
                 (MIT License, Copyright © 1997-2024, Carsten Sørensen and RGBDS contributors)
               </li>
               <li>
-                <a href="https://github.com/binji/binjgb" target="_blank">binjgb</a>: Game Boy
-                Emulator
+                <a href="https://github.com/binji/binjgb" target="_blank">binjgb</a>: Game Boy Emulator
                 <br />
                 (MIT License, Copyright © 2016, Ben Smith)
               </li>
               <li>
-                <a href="https://ace.c9.io/" target="_blank">Ace</a>: High performance code editor
-                for web
+                <a href="https://ace.c9.io/" target="_blank">Ace</a>: High performance code editor for web
                 <br />
                 (BSD License, Copyright © 2010, Ajax.org B.V.)
               </li>
@@ -88,12 +81,7 @@
       <div class="editor" id="textEditorDiv" style="display: none"></div>
       <div class="editor" id="gfxEditorDiv">
         <canvas id="gfxEditorDrawCanvas" width="8" height="8" style="width: 256px"></canvas
-        ><canvas
-          id="gfxEditorPalette"
-          width="16"
-          height="64"
-          style="width: 32px; margin-left: 2px"
-        ></canvas>
+        ><canvas id="gfxEditorPalette" width="16" height="64" style="width: 32px; margin-left: 2px"></canvas>
         <div width="100%" style="overflow: scroll; display: None">
           <canvas id="gfxEditorTilesCanvas"></canvas>
         </div>
@@ -104,12 +92,10 @@
           <tr>
             <td colspan="4">
               <div class="tabs">
-                <input
-                  type="radio"
-                  name="emulator_display_mode"
-                  id="emulator_display_screen"
-                  checked
-                /><label for="emulator_display_screen">Screen</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_screen" checked /><label
+                  for="emulator_display_screen"
+                  >Screen</label
+                >
                 <input type="radio" name="emulator_display_mode" id="emulator_display_vram" /><label
                   for="emulator_display_vram"
                   >VRAM</label
@@ -140,12 +126,7 @@
                 >
               </div>
               <div class="emulator_screen_container">
-                <canvas
-                  class="emulator_canvas_screen"
-                  id="emulator_screen_canvas"
-                  width="160"
-                  height="144"
-                ></canvas>
+                <canvas class="emulator_canvas_screen" id="emulator_screen_canvas" width="160" height="144"></canvas>
                 <canvas
                   class="emulator_vram_screen"
                   id="emulator_vram_canvas"
@@ -205,16 +186,16 @@
         <div class="content">
           <span id="infodialogclose" class="close"></span>
           <p>
-            rgbds-live is a Game Boy programming environment allowing for real-time assembly
-            programming for the Game Boy.
+            rgbds-live is a Game Boy programming environment allowing for real-time assembly programming for the Game
+            Boy.
           </p>
           <p>
-            The environment runs 100% in your browser. Your source code does not leave your browser,
-            unless you export it.
+            The environment runs 100% in your browser. Your source code does not leave your browser, unless you export
+            it.
           </p>
           <p>
-            It is powered by the excellent binjgb emulator, the Ace source code editor, and the
-            rgbds assembler/linker compiled for WebAssembly.
+            It is powered by the excellent binjgb emulator, the Ace source code editor, and the rgbds assembler/linker
+            compiled for WebAssembly.
           </p>
         </div>
       </div>
@@ -223,8 +204,7 @@
         <div class="content">
           <span id="newfiledialogclose" class="close"></span>
           <div class="tabs">
-            <input type="radio" name="newfile_mode" id="newfile_mode_empty" checked /><label
-              for="newfile_mode_empty"
+            <input type="radio" name="newfile_mode" id="newfile_mode_empty" checked /><label for="newfile_mode_empty"
               >Empty file</label
             >
             <div>
@@ -232,8 +212,7 @@
               <p>Name: <input id="newfile_name" /></p>
               <p><button id="newfile_empty_create">Create</button></p>
             </div>
-            <input type="radio" name="newfile_mode" id="newfile_mode_upload" /><label
-              for="newfile_mode_upload"
+            <input type="radio" name="newfile_mode" id="newfile_mode_upload" /><label for="newfile_mode_upload"
               >Existing file</label
             >
             <div>
@@ -247,8 +226,7 @@
         <div class="content">
           <span id="importdialogclose" class="close"></span>
           <div class="tabs">
-            <input type="radio" name="import_mode" id="import_mode_gist" checked /><label
-              for="import_mode_gist"
+            <input type="radio" name="import_mode" id="import_mode_gist" checked /><label for="import_mode_gist"
               >GitHub Gist</label
             >
             <div>
@@ -256,18 +234,13 @@
               <p>Gist URL: <input id="import_gist_url" /></p>
               <p><button id="import_gist">Import</button></p>
             </div>
-            <input type="radio" name="import_mode" id="import_mode_github" /><label
-              for="import_mode_github"
+            <input type="radio" name="import_mode" id="import_mode_github" /><label for="import_mode_github"
               >GitHub</label
             >
             <div>
-              <p>
-                At some point in the future you will be able to directly import GitHub repositories
-                here.
-              </p>
+              <p>At some point in the future you will be able to directly import GitHub repositories here.</p>
             </div>
-            <input type="radio" name="import_mode" id="import_mode_upload" /><label
-              for="import_mode_upload"
+            <input type="radio" name="import_mode" id="import_mode_upload" /><label for="import_mode_upload"
               >Load .zip</label
             >
             <div>
@@ -281,8 +254,7 @@
         <div class="content">
           <span id="exportdialogclose" class="close"></span>
           <div class="tabs">
-            <input type="radio" name="export_mode" id="export_mode_url" checked /><label
-              for="export_mode_url"
+            <input type="radio" name="export_mode" id="export_mode_url" checked /><label for="export_mode_url"
               >URL</label
             >
             <div>
@@ -291,8 +263,7 @@
                 <input id="export_hash_url" style="width: 100%" onClick="this.select();" readonly />
               </p>
             </div>
-            <input type="radio" name="export_mode" id="export_mode_gist" /><label
-              for="export_mode_gist"
+            <input type="radio" name="export_mode" id="export_mode_gist" /><label for="export_mode_gist"
               >GitHub Gist</label
             >
             <div>
@@ -309,26 +280,16 @@
               <p>Gist URL: <input id="export_gist_url" /> (leave empty for new gist)</p>
               <p><button id="export_gist">Save</button></p>
               <p>
-                <input
-                  id="export_gist_import_url"
-                  style="width: 100%"
-                  onClick="this.select();"
-                  readonly
-                />
+                <input id="export_gist_import_url" style="width: 100%" onClick="this.select();" readonly />
               </p>
             </div>
-            <input type="radio" name="export_mode" id="export_mode_github" /><label
-              for="export_mode_github"
+            <input type="radio" name="export_mode" id="export_mode_github" /><label for="export_mode_github"
               >GitHub</label
             >
             <div>
-              <p>
-                At some point in the future you will be able to save your code to a GitHub
-                repository here.
-              </p>
+              <p>At some point in the future you will be able to save your code to a GitHub repository here.</p>
             </div>
-            <input type="radio" name="export_mode" id="export_mode_download" /><label
-              for="export_mode_download"
+            <input type="radio" name="export_mode" id="export_mode_download" /><label for="export_mode_download"
               >Download</label
             >
             <div>
