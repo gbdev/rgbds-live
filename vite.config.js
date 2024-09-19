@@ -6,6 +6,7 @@ export default defineConfig({
   build: {
     target: ['chrome109', 'safari15.6', 'firefox102'],
     outDir: 'www',
+    chunkSizeWarningLimit: 1000,
   },
   resolve: {
     alias: {
