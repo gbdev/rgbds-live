@@ -147,11 +147,11 @@
               <button id="download_rom">Download</button>
             </td>
             <td>
-              <button id="cpu_single_step">step</button><button id="cpu_frame_step">frame</button
-              ><input id="cpu_run_check" type="checkbox" />run
+              <button id="cpu_single_step">step</button>
+              <button id="cpu_frame_step">frame</button>
             </td>
+            <td><input id="cpu_run_check" type="checkbox" />run</td>
             <td><button id="cpu_reset">Reset</button></td>
-            <td></td>
           </tr>
           <tr>
             <td class="right">PC:</td>
@@ -309,12 +309,29 @@
               for="settings_mode_compiler"
               >Compiler</label
             >
-            <div>
-              <p>Additional options for</p>
-              <p>RGBASM: <input id="copmpiler_settings_asm" /></p>
-              <p>RGBLINK: <input id="copmpiler_settings_link" /></p>
-              <p>RGBFIX: <input id="copmpiler_settings_fix" /></p>
-              <p><button id="copmpiler_settings_set">Set</button></p>
+            <div class="noborder">
+              <table>
+                <tr>
+                  <td colspan="2">Additional options for</td>
+                </tr>
+                <tr>
+                  <td>RGBASM:</td>
+                  <td><input class="fill" id="copmpiler_settings_asm" /></td>
+                </tr>
+                <tr>
+                  <td>RGBLINK:</td>
+                  <td><input class="fill" id="copmpiler_settings_link" /></td>
+                </tr>
+                <tr>
+                  <td>RGBFIX:</td>
+                  <td><input class="fill" id="copmpiler_settings_fix" /></td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <button class="fill" id="copmpiler_settings_set">Set</button>
+                  </td>
+                </tr>
+              </table>
             </div>
           </div>
         </div>

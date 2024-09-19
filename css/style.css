@@ -53,7 +53,7 @@ textarea {
 button {
   border: 1px solid #555;
   border-radius: 4px;
-  padding: 2px 8px;
+  padding: 4px 16px;
   margin: 2px;
   background-color: var(--background);
   color: var(--color);
@@ -133,6 +133,20 @@ td {
   border: 1px solid var(--border-color);
   background: var(--background);
 }
+
+.noborder table {
+  width: 100%;
+}
+.noborder table,
+.noborder td {
+  border: 0px;
+  padding: 4px;
+}
+
+.noborder .fill {
+  width: 100%;
+}
+
 body {
   margin: 0;
 }
@@ -151,8 +165,10 @@ canvas {
 .menubar li {
   display: block;
   float: left;
-  border: 1px solid var(--background-alt);
-  padding: 0px 15px;
+  border-top: 1px solid var(--background-alt);
+  border-right: 1px solid var(--background-alt);
+  border-left: 1px solid var(--background-alt);
+  padding: 4px 16px;
   position: relative;
   background-color: var(--background);
   cursor: pointer;
@@ -169,6 +185,9 @@ canvas {
 .menubar li ul li {
   width: 100%;
 }
+.menubar li ul li:last-child {
+  border-bottom: 1px solid var(--background-alt);
+}
 .menubar ul li:hover {
   background-color: var(--background-alt);
 }
@@ -184,7 +203,7 @@ canvas {
 .filelist li {
   overflow: auto;
   background: var(--background);
-  padding: 1px;
+  padding: 4px 8px;
   cursor: pointer;
   user-select: none;
 }
@@ -247,7 +266,7 @@ canvas {
 .container {
   display: grid;
   grid-template-columns: 200px auto 520px;
-  grid-template-rows: 21px auto 20%;
+  grid-template-rows: 24px auto 20%;
   grid-gap: 0;
   height: 100%;
 }
@@ -291,26 +310,26 @@ canvas {
 }
 
 .emulator_screen_container {
-  width: 512;
-  height: 512;
+  width: 512px;
+  height: 512px;
 }
 .emulator_canvas_screen {
-  width: 480;
+  width: 480px;
 }
 .emulator_vram_screen {
-  width: 512;
+  width: 512px;
 }
 
 @media only screen and (max-height: 600px) {
   .emulator_screen_container {
-    width: 256;
-    height: 256;
+    width: 256px;
+    height: 256px;
   }
   .emulator_canvas_screen {
-    width: 240;
+    width: 240px;
   }
   .emulator_vram_screen {
-    width: 256;
+    width: 256px;
   }
 }
 
@@ -318,7 +337,7 @@ canvas {
   .container {
     display: grid;
     grid-template-columns: auto;
-    grid-template-rows: 22px 600px auto 100px 300px;
+    grid-template-rows: 24px 600px auto 100px 300px;
     grid-gap: 0;
   }
   .menubar {
