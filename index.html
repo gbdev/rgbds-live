@@ -1,14 +1,15 @@
 <html>
   <head>
-    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google" content="notranslate" />
     
 
     
-    <script type="module" crossorigin src="/rgbds-live/assets/index-26725c13.js"></script>
+    <script type="module" crossorigin src="/rgbds-live/assets/index-7c34eeb1.js"></script>
     <link rel="stylesheet" href="/rgbds-live/assets/index-957178ad.css">
   </head>
+
   <body>
     <div class="container">
       <div class="menubar">
@@ -27,16 +28,12 @@
             Options
             <ul>
               <li>
-                <input type="checkbox" id="auto_url_update" /><label
-                  for="auto_url_update"
-                  >Auto URL update</label
-                >
+                <input type="checkbox" id="auto_url_update" />
+                <label for="auto_url_update">Auto URL update</label>
               </li>
               <li>
-                <input type="checkbox" id="auto_local_storage_update" /><label
-                  for="auto_local_storage_update"
-                  >Store data between sessions</label
-                >
+                <input type="checkbox" id="auto_local_storage_update" />
+                <label for="auto_local_storage_update">Store data between sessions</label>
               </li>
               <li id="settingsmenu">Settings...</li>
             </ul>
@@ -46,41 +43,38 @@
             <ul>
               <li id="infomenu">Info...</li>
               <li>
-                <a href="https://rgbds.gbdev.io/docs/v0.8.0" target="_blank"
-                  >rgbds manual</a
-                >
+                <a href="https://rgbds.gbdev.io/docs/v0.8.0" target="_blank">rgbds manual</a>
               </li>
               <li>
-                <a
-                  href="https://github.com/gbdev/rgbds-live/issues"
-                  target="_blank"
+                <a href="https://github.com/gbdev/rgbds-live/issues" target="_blank"
                   >Report a problem</a
                 >
               </li>
               <li>
-                Source:<br />
+                Source:
+                <br />
                 <a href="https://github.com/gbdev/rgbds-live" target="_blank"
                   >https://github.com/gbdev/rgbds-live</a
                 >
               </li>
               <li>Uses:</li>
               <li>
-                <a href="https://github.com/gbdev/rgbds/" target="_blank"
-                  >rgbds</a
-                >: Rednex Game Boy Development System<br />
-                (MIT License, Copyright (c) 1997-2024, Carsten Sørensen and
-                RGBDS contributors)
+                <a href="https://github.com/gbdev/rgbds/" target="_blank">rgbds</a>: Rednex Game Boy
+                Development System
+                <br />
+                (MIT License, Copyright © 1997-2024, Carsten Sørensen and RGBDS contributors)
               </li>
               <li>
-                <a href="https://github.com/binji/binjgb" target="_blank"
-                  >binjgb</a
-                >: Gameboy Emulator<br />
-                (MIT License, Copyright (C) 2016, Ben Smith)
+                <a href="https://github.com/binji/binjgb" target="_blank">binjgb</a>: Game Boy
+                Emulator
+                <br />
+                (MIT License, Copyright © 2016, Ben Smith)
               </li>
               <li>
-                <a href="https://ace.c9.io/" target="_blank">Ace</a>: High
-                performance code editor for web<br />
-                (BSD License, Copyright (c) 2010, Ajax.org B.V.)
+                <a href="https://ace.c9.io/" target="_blank">Ace</a>: High performance code editor
+                for web
+                <br />
+                (BSD License, Copyright © 2010, Ajax.org B.V.)
               </li>
             </ul>
           </li>
@@ -93,12 +87,7 @@
       </div>
       <div class="editor" id="textEditorDiv" style="display: none"></div>
       <div class="editor" id="gfxEditorDiv">
-        <canvas
-          id="gfxEditorDrawCanvas"
-          width="8"
-          height="8"
-          style="width: 256px"
-        ></canvas
+        <canvas id="gfxEditorDrawCanvas" width="8" height="8" style="width: 256px"></canvas
         ><canvas
           id="gfxEditorPalette"
           width="16"
@@ -121,41 +110,34 @@
                   id="emulator_display_screen"
                   checked
                 /><label for="emulator_display_screen">Screen</label>
-                <input
-                  type="radio"
-                  name="emulator_display_mode"
-                  id="emulator_display_vram"
-                /><label for="emulator_display_vram">VRAM</label>
-                <input
-                  type="radio"
-                  name="emulator_display_mode"
-                  id="emulator_display_bg0"
-                /><label for="emulator_display_bg0">BG0</label>
-                <input
-                  type="radio"
-                  name="emulator_display_mode"
-                  id="emulator_display_bg1"
-                /><label for="emulator_display_bg1">BG1</label>
-                <input
-                  type="radio"
-                  name="emulator_display_mode"
-                  id="emulator_display_rom"
-                /><label for="emulator_display_rom">ROM</label>
-                <input
-                  type="radio"
-                  name="emulator_display_mode"
-                  id="emulator_display_wram"
-                /><label for="emulator_display_wram">WRam</label>
-                <input
-                  type="radio"
-                  name="emulator_display_mode"
-                  id="emulator_display_hram"
-                /><label for="emulator_display_hram">HRam</label>
-                <input
-                  type="radio"
-                  name="emulator_display_mode"
-                  id="emulator_display_io"
-                /><label for="emulator_display_io">IO</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_vram" /><label
+                  for="emulator_display_vram"
+                  >VRAM</label
+                >
+                <input type="radio" name="emulator_display_mode" id="emulator_display_bg0" /><label
+                  for="emulator_display_bg0"
+                  >BG0</label
+                >
+                <input type="radio" name="emulator_display_mode" id="emulator_display_bg1" /><label
+                  for="emulator_display_bg1"
+                  >BG1</label
+                >
+                <input type="radio" name="emulator_display_mode" id="emulator_display_rom" /><label
+                  for="emulator_display_rom"
+                  >ROM</label
+                >
+                <input type="radio" name="emulator_display_mode" id="emulator_display_wram" /><label
+                  for="emulator_display_wram"
+                  >WRam</label
+                >
+                <input type="radio" name="emulator_display_mode" id="emulator_display_hram" /><label
+                  for="emulator_display_hram"
+                  >HRam</label
+                >
+                <input type="radio" name="emulator_display_mode" id="emulator_display_io" /><label
+                  for="emulator_display_io"
+                  >IO</label
+                >
               </div>
               <div class="emulator_screen_container">
                 <canvas
@@ -172,59 +154,46 @@
                   style="display: none"
                 ></canvas>
                 <div
-                  style="
-                    height: 100%;
-                    width: 100%;
-                    display: none;
-                    overflow: scroll;
-                  "
+                  style="height: 100%; width: 100%; display: none; overflow: scroll"
                   id="emulator_display_text"
                 ></div>
               </div>
-              <tr>
-                <td class="right">
-                  <button id="download_rom">Download</button>
-                </td>
-                <td>
-                  <button id="cpu_single_step">step</button
-                  ><button id="cpu_frame_step">frame</button
-                  ><input id="cpu_run_check" type="checkbox" />run
-                </td>
-                <td><button id="cpu_reset">Reset</button></td>
-                <td>
-                  <tr>
-                    <td class="right">PC:</td>
-                    <td id="cpu_pc">-</td>
-                    <td class="right">A:</td>
-                    <td id="cpu_a">
-                      -
-                      <tr>
-                        <td class="right">SP:</td>
-                        <td id="cpu_sp">-</td>
-                        <td class="right">BC:</td>
-                        <td id="cpu_bc">
-                          -
-                          <tr>
-                            <td class="right">Flags:</td>
-                            <td id="cpu_flags">-</td>
-                            <td class="right">DE:</td>
-                            <td id="cpu_de">
-                              -
-                              <tr>
-                                <td class="right"></td>
-                                <td></td>
-                                <td class="right">HL:</td>
-                                <td id="cpu_hl">-</td>
-                              </tr>
-                            </td>
-                          </tr>
-                        </td>
-                      </tr>
-                    </td>
-                  </tr>
-                </td>
-              </tr>
             </td>
+          </tr>
+          <tr>
+            <td class="right">
+              <button id="download_rom">Download</button>
+            </td>
+            <td>
+              <button id="cpu_single_step">step</button><button id="cpu_frame_step">frame</button
+              ><input id="cpu_run_check" type="checkbox" />run
+            </td>
+            <td><button id="cpu_reset">Reset</button></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="right">PC:</td>
+            <td id="cpu_pc">-</td>
+            <td class="right">A:</td>
+            <td id="cpu_a">-</td>
+          </tr>
+          <tr>
+            <td class="right">SP:</td>
+            <td id="cpu_sp">-</td>
+            <td class="right">BC:</td>
+            <td id="cpu_bc">-</td>
+          </tr>
+          <tr>
+            <td class="right">Flags:</td>
+            <td id="cpu_flags">-</td>
+            <td class="right">DE:</td>
+            <td id="cpu_de">-</td>
+          </tr>
+          <tr>
+            <td class="right"></td>
+            <td></td>
+            <td class="right">HL:</td>
+            <td id="cpu_hl">-</td>
           </tr>
         </table>
       </div>
@@ -236,16 +205,16 @@
         <div class="content">
           <span id="infodialogclose" class="close"></span>
           <p>
-            rgbds-live is a Gameboy programming environment. Allowing for
-            realtime assembly programming for the gameboy.
+            rgbds-live is a Game Boy programming environment allowing for real-time assembly
+            programming for the Game Boy.
           </p>
           <p>
-            The environment runs 100% in your browser. Your source code does not
-            leave your browser, unless you export it.
+            The environment runs 100% in your browser. Your source code does not leave your browser,
+            unless you export it.
           </p>
           <p>
-            It is powered by the excelent binjgb emulator, the ace javascript
-            sourcecode editor and rgbds compiled for webassembly.
+            It is powered by the excellent binjgb emulator, the Ace source code editor, and the
+            rgbds assembler/linker compiled for WebAssembly.
           </p>
         </div>
       </div>
@@ -254,22 +223,19 @@
         <div class="content">
           <span id="newfiledialogclose" class="close"></span>
           <div class="tabs">
-            <input
-              type="radio"
-              name="newfile_mode"
-              id="newfile_mode_empty"
-              checked
-            /><label for="newfile_mode_empty">Empty file</label>
+            <input type="radio" name="newfile_mode" id="newfile_mode_empty" checked /><label
+              for="newfile_mode_empty"
+              >Empty file</label
+            >
             <div>
               <p>Create a new empty file.</p>
               <p>Name: <input id="newfile_name" /></p>
               <p><button id="newfile_empty_create">Create</button></p>
             </div>
-            <input
-              type="radio"
-              name="newfile_mode"
-              id="newfile_mode_upload"
-            /><label for="newfile_mode_upload">Existing file</label>
+            <input type="radio" name="newfile_mode" id="newfile_mode_upload" /><label
+              for="newfile_mode_upload"
+              >Existing file</label
+            >
             <div>
               <p>Load a file from your local harddisk</p>
               <p><input type="file" id="newfile_upload" /></p>
@@ -281,33 +247,29 @@
         <div class="content">
           <span id="importdialogclose" class="close"></span>
           <div class="tabs">
-            <input
-              type="radio"
-              name="import_mode"
-              id="import_mode_gist"
-              checked
-            /><label for="import_mode_gist">GitHub Gist</label>
+            <input type="radio" name="import_mode" id="import_mode_gist" checked /><label
+              for="import_mode_gist"
+              >GitHub Gist</label
+            >
             <div>
               <p>Import code from a GitHub Gist:</p>
               <p>Gist URL: <input id="import_gist_url" /></p>
               <p><button id="import_gist">Import</button></p>
             </div>
-            <input
-              type="radio"
-              name="import_mode"
-              id="import_mode_github"
-            /><label for="import_mode_github">GitHub</label>
+            <input type="radio" name="import_mode" id="import_mode_github" /><label
+              for="import_mode_github"
+              >GitHub</label
+            >
             <div>
               <p>
-                At some point in the future you will be able to directly import
-                github repositories here.
+                At some point in the future you will be able to directly import GitHub repositories
+                here.
               </p>
             </div>
-            <input
-              type="radio"
-              name="import_mode"
-              id="import_mode_upload"
-            /><label for="import_mode_upload">Load .zip</label>
+            <input type="radio" name="import_mode" id="import_mode_upload" /><label
+              for="import_mode_upload"
+              >Load .zip</label
+            >
             <div>
               <p>Load a zip file:</p>
               <p><input type="file" id="import_zipfile" /></p>
@@ -319,35 +281,22 @@
         <div class="content">
           <span id="exportdialogclose" class="close"></span>
           <div class="tabs">
-            <input
-              type="radio"
-              name="export_mode"
-              id="export_mode_url"
-              checked
-            /><label for="export_mode_url">URL</label>
+            <input type="radio" name="export_mode" id="export_mode_url" checked /><label
+              for="export_mode_url"
+              >URL</label
+            >
             <div>
+              <p>Export the project as URL. Only suitable for small projects.</p>
               <p>
-                Export the project as URL. Only suitable for small projects.
-              </p>
-              <p>
-                <input
-                  id="export_hash_url"
-                  style="width: 100%"
-                  onClick="this.select();"
-                  readonly
-                />
+                <input id="export_hash_url" style="width: 100%" onClick="this.select();" readonly />
               </p>
             </div>
-            <input
-              type="radio"
-              name="export_mode"
-              id="export_mode_gist"
-            /><label for="export_mode_gist">GitHub Gist</label>
+            <input type="radio" name="export_mode" id="export_mode_gist" /><label
+              for="export_mode_gist"
+              >GitHub Gist</label
+            >
             <div>
-              <p>
-                Export the code as a new GitHub Gist, or update an existing Gist
-                with new code.
-              </p>
+              <p>Export the code as a new GitHub Gist, or update an existing Gist with new code.</p>
               <p>Github username: <input id="export_gist_username" /></p>
               <p>
                 Github personal access token:
@@ -357,10 +306,7 @@
                   >info</a
                 >)
               </p>
-              <p>
-                Gist URL: <input id="export_gist_url" /> (leave empty for new
-                gist)
-              </p>
+              <p>Gist URL: <input id="export_gist_url" /> (leave empty for new gist)</p>
               <p><button id="export_gist">Save</button></p>
               <p>
                 <input
@@ -371,22 +317,20 @@
                 />
               </p>
             </div>
-            <input
-              type="radio"
-              name="export_mode"
-              id="export_mode_github"
-            /><label for="export_mode_github">GitHub</label>
+            <input type="radio" name="export_mode" id="export_mode_github" /><label
+              for="export_mode_github"
+              >GitHub</label
+            >
             <div>
               <p>
-                At some point in the future you will be able to save your code
-                to a github repository here.
+                At some point in the future you will be able to save your code to a GitHub
+                repository here.
               </p>
             </div>
-            <input
-              type="radio"
-              name="export_mode"
-              id="export_mode_download"
-            /><label for="export_mode_download">Download</label>
+            <input type="radio" name="export_mode" id="export_mode_download" /><label
+              for="export_mode_download"
+              >Download</label
+            >
             <div>
               <p>Download your project as a zip archive.</p>
               <p><button id="export_zip">Save</button></p>
@@ -399,12 +343,10 @@
         <div class="content">
           <span id="settingsdialogclose" class="close"></span>
           <div class="tabs">
-            <input
-              type="radio"
-              name="settings_mode"
-              id="settings_mode_compiler"
-              checked
-            /><label for="settings_mode_compiler">Compiler</label>
+            <input type="radio" name="settings_mode" id="settings_mode_compiler" checked /><label
+              for="settings_mode_compiler"
+              >Compiler</label
+            >
             <div>
               <p>Additional options for</p>
               <p>RGBASM: <input id="copmpiler_settings_asm" /></p>
