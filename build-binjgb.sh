@@ -8,6 +8,9 @@ if [[ "$(which emsdk)" == "" ]]; then
 fi
 
 cd binjgb
+
+patch -p1 < ../binjgb.patch
+
 ! mkdir out
 cd out
 cmake -E env LDFLAGS='-s EXPORT_ES6=1' \
