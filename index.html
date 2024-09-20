@@ -136,10 +136,10 @@
                   height="256"
                   style="display: none"
                 ></canvas>
-                <div
+                <pre
                   style="height: 100%; width: 100%; display: none; overflow: scroll"
                   id="emulator_display_text"
-                ></div>
+                ></pre>
               </div>
             </td>
           </tr>
@@ -211,7 +211,7 @@
             >
             <div>
               <p>Create a new empty file.</p>
-              <p>Name: <input id="newfile_name" /></p>
+              <p>Name: <input type="text" id="newfile_name" /></p>
               <p><button id="newfile_empty_create">Create</button></p>
             </div>
             <input type="radio" name="newfile_mode" id="newfile_mode_upload" /><label for="newfile_mode_upload"
@@ -233,7 +233,7 @@
             >
             <div>
               <p>Import code from a GitHub Gist:</p>
-              <p>Gist URL: <input id="import_gist_url" /></p>
+              <p>Gist URL: <input type="text" id="import_gist_url" /></p>
               <p><button id="import_gist">Import</button></p>
             </div>
             <input type="radio" name="import_mode" id="import_mode_github" /><label for="import_mode_github"
@@ -262,7 +262,7 @@
             <div>
               <p>Export the project as URL. Only suitable for small projects.</p>
               <p>
-                <input id="export_hash_url" style="width: 100%" onClick="this.select();" readonly />
+                <input type="text" id="export_hash_url" style="width: 100%" onClick="this.select();" readonly />
               </p>
             </div>
             <input type="radio" name="export_mode" id="export_mode_gist" /><label for="export_mode_gist"
@@ -270,19 +270,19 @@
             >
             <div>
               <p>Export the code as a new GitHub Gist, or update an existing Gist with new code.</p>
-              <p>Github username: <input id="export_gist_username" /></p>
+              <p>Github username: <input type="text" id="export_gist_username" /></p>
               <p>
                 Github personal access token:
-                <input id="export_gist_token" autocomplete="off" /> (<a
+                <input type="text" id="export_gist_token" autocomplete="off" /> (<a
                   href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token"
                   target="_blank"
                   >info</a
                 >)
               </p>
-              <p>Gist URL: <input id="export_gist_url" /> (leave empty for new gist)</p>
+              <p>Gist URL: <input type="text" id="export_gist_url" /> (leave empty for new gist)</p>
               <p><button id="export_gist">Save</button></p>
               <p>
-                <input id="export_gist_import_url" style="width: 100%" onClick="this.select();" readonly />
+                <input type="text" id="export_gist_import_url" style="width: 100%" onClick="this.select();" readonly />
               </p>
             </div>
             <input type="radio" name="export_mode" id="export_mode_github" /><label for="export_mode_github"
@@ -322,15 +322,15 @@
                 </tr>
                 <tr>
                   <td>RGBASM:</td>
-                  <td colspan="2"><input class="fill" id="copmpiler_settings_asm" /></td>
+                  <td colspan="2"><input type="text" class="fill" id="copmpiler_settings_asm" /></td>
                 </tr>
                 <tr>
                   <td>RGBLINK:</td>
-                  <td colspan="2"><input class="fill" id="copmpiler_settings_link" /></td>
+                  <td colspan="2"><input type="text" class="fill" id="copmpiler_settings_link" /></td>
                 </tr>
                 <tr>
                   <td>RGBFIX:</td>
-                  <td colspan="2"><input class="fill" id="copmpiler_settings_fix" /></td>
+                  <td colspan="2"><input type="text" class="fill" id="copmpiler_settings_fix" /></td>
                 </tr>
                 <tr>
                   <td colspan="2"></td>

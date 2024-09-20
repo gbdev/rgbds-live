@@ -30,13 +30,16 @@
 body {
   color: var(--color);
   background: var(--background);
-  font:
-    12px / normal 'Monaco',
-    'Menlo',
-    'Ubuntu Mono',
-    'Consolas',
-    'source-code-pro',
-    monospace;
+  font: 12px / normal sans-serif;
+}
+
+code,
+kbd,
+samp,
+pre,
+textarea,
+input[type='text'] {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 }
 
 input,

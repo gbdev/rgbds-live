@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "format": "prettier --write . --end-of-line auto"
+    "format": "prettier --write --end-of-line auto ."
   },
   "repository": {
     "type": "git",
