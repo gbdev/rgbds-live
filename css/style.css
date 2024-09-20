@@ -42,6 +42,10 @@ input[type='text'] {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 }
 
+pre {
+  margin: 0;
+}
+
 input,
 textarea {
   border: 1px solid #555;
@@ -334,6 +338,12 @@ canvas {
   .emulator_vram_screen {
     width: 256px;
   }
+}
+
+.emulator_display_header {
+  position: sticky;
+  top: 0;
+  background-color: var(--background-alt);
 }
 
 @media only screen and (max-width: 600px) {
