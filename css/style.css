@@ -283,6 +283,7 @@ canvas {
   grid-template-rows: 24px auto 20%;
   grid-gap: 0;
   height: 100vh;
+  overflow: hidden;
 }
 .menubar {
   grid-column: 1 / 4;
@@ -300,6 +301,7 @@ canvas {
 .emulator {
   grid-column: 3;
   grid-row: 2 / 4;
+  overflow: auto;
 }
 .console {
   grid-column: 1 / 3;
