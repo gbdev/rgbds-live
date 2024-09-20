@@ -82,8 +82,8 @@
       </div>
       <div class="editor" id="textEditorDiv" style="display: none"></div>
       <div class="editor" id="gfxEditorDiv">
-        <canvas id="gfxEditorDrawCanvas" width="8" height="8" style="width: 256px"></canvas
-        ><canvas id="gfxEditorPalette" width="16" height="64" style="width: 32px; margin-left: 2px"></canvas>
+        <canvas id="gfxEditorDrawCanvas" width="8" height="8" style="width: 256px"></canvas>
+        <canvas id="gfxEditorPalette" width="16" height="64" style="width: 32px; margin-left: 2px"></canvas>
         <div width="100%" style="overflow: scroll; display: None">
           <canvas id="gfxEditorTilesCanvas"></canvas>
         </div>
@@ -94,38 +94,22 @@
           <tr>
             <td colspan="4">
               <div class="tabs">
-                <input type="radio" name="emulator_display_mode" id="emulator_display_screen" checked /><label
-                  for="emulator_display_screen"
-                  >Screen</label
-                >
-                <input type="radio" name="emulator_display_mode" id="emulator_display_vram" /><label
-                  for="emulator_display_vram"
-                  >VRAM</label
-                >
-                <input type="radio" name="emulator_display_mode" id="emulator_display_bg0" /><label
-                  for="emulator_display_bg0"
-                  >BG0</label
-                >
-                <input type="radio" name="emulator_display_mode" id="emulator_display_bg1" /><label
-                  for="emulator_display_bg1"
-                  >BG1</label
-                >
-                <input type="radio" name="emulator_display_mode" id="emulator_display_rom" /><label
-                  for="emulator_display_rom"
-                  >ROM</label
-                >
-                <input type="radio" name="emulator_display_mode" id="emulator_display_wram" /><label
-                  for="emulator_display_wram"
-                  >WRAM</label
-                >
-                <input type="radio" name="emulator_display_mode" id="emulator_display_hram" /><label
-                  for="emulator_display_hram"
-                  >HRAM</label
-                >
-                <input type="radio" name="emulator_display_mode" id="emulator_display_io" /><label
-                  for="emulator_display_io"
-                  >I/O</label
-                >
+                <input type="radio" name="emulator_display_mode" id="emulator_display_screen" checked />
+                <label for="emulator_display_screen">Screen</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_vram" />
+                <label for="emulator_display_vram">VRAM</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_bg0" />
+                <label for="emulator_display_bg0">BG0</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_bg1" />
+                <label for="emulator_display_bg1">BG1</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_rom" />
+                <label for="emulator_display_rom">ROM</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_wram" />
+                <label for="emulator_display_wram">WRAM</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_hram" />
+                <label for="emulator_display_hram">HRAM</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_io" />
+                <label for="emulator_display_io">I/O</label>
               </div>
               <div class="emulator_screen_container">
                 <canvas class="emulator_canvas_screen" id="emulator_screen_canvas" width="160" height="144"></canvas>
@@ -206,17 +190,15 @@
         <div class="content">
           <span id="newfiledialogclose" class="close"></span>
           <div class="tabs">
-            <input type="radio" name="newfile_mode" id="newfile_mode_empty" checked /><label for="newfile_mode_empty"
-              >Empty file</label
-            >
+            <input type="radio" name="newfile_mode" id="newfile_mode_empty" checked />
+            <label for="newfile_mode_empty">Empty file</label>
             <div>
               <p>Create a new empty file.</p>
               <p>Name: <input type="text" id="newfile_name" /></p>
               <p><button id="newfile_empty_create">Create</button></p>
             </div>
-            <input type="radio" name="newfile_mode" id="newfile_mode_upload" /><label for="newfile_mode_upload"
-              >Existing file</label
-            >
+            <input type="radio" name="newfile_mode" id="newfile_mode_upload" />
+            <label for="newfile_mode_upload">Existing file</label>
             <div>
               <p>Load a file from your local harddisk</p>
               <p><input type="file" id="newfile_upload" /></p>
@@ -228,23 +210,20 @@
         <div class="content">
           <span id="importdialogclose" class="close"></span>
           <div class="tabs">
-            <input type="radio" name="import_mode" id="import_mode_gist" checked /><label for="import_mode_gist"
-              >GitHub Gist</label
-            >
+            <input type="radio" name="import_mode" id="import_mode_gist" checked />
+            <label for="import_mode_gist">GitHub Gist</label>
             <div>
               <p>Import code from a GitHub Gist:</p>
               <p>Gist URL: <input type="text" id="import_gist_url" /></p>
               <p><button id="import_gist">Import</button></p>
             </div>
-            <input type="radio" name="import_mode" id="import_mode_github" /><label for="import_mode_github"
-              >GitHub</label
-            >
+            <input type="radio" name="import_mode" id="import_mode_github" />
+            <label for="import_mode_github">GitHub</label>
             <div>
               <p>At some point in the future you will be able to directly import GitHub repositories here.</p>
             </div>
-            <input type="radio" name="import_mode" id="import_mode_upload" /><label for="import_mode_upload"
-              >Load .zip</label
-            >
+            <input type="radio" name="import_mode" id="import_mode_upload" />
+            <label for="import_mode_upload">Load .zip</label>
             <div>
               <p>Load a zip file:</p>
               <p><input type="file" id="import_zipfile" /></p>
@@ -256,24 +235,23 @@
         <div class="content">
           <span id="exportdialogclose" class="close"></span>
           <div class="tabs">
-            <input type="radio" name="export_mode" id="export_mode_url" checked /><label for="export_mode_url"
-              >URL</label
-            >
+            <input type="radio" name="export_mode" id="export_mode_url" checked />
+            <label for="export_mode_url">URL</label>
             <div>
               <p>Export the project as URL. Only suitable for small projects.</p>
               <p>
                 <input type="text" id="export_hash_url" style="width: 100%" onClick="this.select();" readonly />
               </p>
             </div>
-            <input type="radio" name="export_mode" id="export_mode_gist" /><label for="export_mode_gist"
-              >GitHub Gist</label
-            >
+            <input type="radio" name="export_mode" id="export_mode_gist" />
+            <label for="export_mode_gist">GitHub Gist</label>
             <div>
               <p>Export the code as a new GitHub Gist, or update an existing Gist with new code.</p>
               <p>Github username: <input type="text" id="export_gist_username" /></p>
               <p>
                 Github personal access token:
-                <input type="text" id="export_gist_token" autocomplete="off" /> (<a
+                <input type="text" id="export_gist_token" autocomplete="off" />
+                (<a
                   href="https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token"
                   target="_blank"
                   >info</a
@@ -285,15 +263,13 @@
                 <input type="text" id="export_gist_import_url" style="width: 100%" onClick="this.select();" readonly />
               </p>
             </div>
-            <input type="radio" name="export_mode" id="export_mode_github" /><label for="export_mode_github"
-              >GitHub</label
-            >
+            <input type="radio" name="export_mode" id="export_mode_github" />
+            <label for="export_mode_github">GitHub</label>
             <div>
               <p>At some point in the future you will be able to save your code to a GitHub repository here.</p>
             </div>
-            <input type="radio" name="export_mode" id="export_mode_download" /><label for="export_mode_download"
-              >Download</label
-            >
+            <input type="radio" name="export_mode" id="export_mode_download" />
+            <label for="export_mode_download">Download</label>
             <div>
               <p>Download your project as a zip archive.</p>
               <p><button id="export_zip">Save</button></p>
@@ -306,37 +282,25 @@
         <div class="content">
           <span id="settingsdialogclose" class="close"></span>
           <div class="tabs">
-            <input type="radio" name="settings_mode" id="settings_mode_compiler" checked /><label
-              for="settings_mode_compiler"
-              >Compiler</label
-            >
+            <input type="radio" name="settings_mode" id="settings_mode_compiler" checked />
+            <label for="settings_mode_compiler">Compiler</label>
             <div class="noborder">
+              <p>Additional options for</p>
               <table>
                 <tr>
-                  <td colspan="3">Additional options for</td>
+                  <td><label for="compiler_settings_asm">RGBASM:</label></td>
+                  <td class="fill"><input type="text" class="fill" id="compiler_settings_asm" /></td>
                 </tr>
                 <tr>
-                  <td>&nbsp;</td>
-                  <td class="fill">&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><label for="compiler_settings_link">RGBLINK:</label></td>
+                  <td class="fill"><input type="text" class="fill" id="compiler_settings_link" /></td>
                 </tr>
                 <tr>
-                  <td>RGBASM:</td>
-                  <td colspan="2"><input type="text" class="fill" id="copmpiler_settings_asm" /></td>
+                  <td><label for="compiler_settings_fix">RGBFIX:</label></td>
+                  <td class="fill"><input type="text" class="fill" id="compiler_settings_fix" /></td>
                 </tr>
                 <tr>
-                  <td>RGBLINK:</td>
-                  <td colspan="2"><input type="text" class="fill" id="copmpiler_settings_link" /></td>
-                </tr>
-                <tr>
-                  <td>RGBFIX:</td>
-                  <td colspan="2"><input type="text" class="fill" id="copmpiler_settings_fix" /></td>
-                </tr>
-                <tr>
-                  <td colspan="2"></td>
-                  <td>
-                    <button id="copmpiler_settings_set">Set</button>
-                  </td>
+                  <td colspan="2" style="text-align: right"><button id="compiler_settings_set">Set</button></td>
                 </tr>
               </table>
             </div>

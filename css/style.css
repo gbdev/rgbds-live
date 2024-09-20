@@ -101,10 +101,10 @@ a:active {
   flex-wrap: wrap;
   border-bottom: 1px solid var(--border-color);
 }
-.tabs input[type='radio'] {
+.tabs > input[type='radio'] {
   display: none;
 }
-.tabs label {
+.tabs > label {
   border: 1px solid var(--border-color);
   background: var(--background-alt);
   padding: 4px 12px;
@@ -112,11 +112,11 @@ a:active {
   position: relative;
   top: 1px;
 }
-.tabs input:checked + label {
+.tabs > input:checked + label {
   background: var(--background);
   border-bottom: 1px solid var(--background);
 }
-.tabs input + label + div {
+.tabs > input + label + div {
   order: 99;
   display: none;
   flex-basis: 100%;
@@ -125,7 +125,7 @@ a:active {
   border-left: 1px solid var(--border-color);
   border-right: 1px solid var(--border-color);
 }
-.tabs input:checked + label + div {
+.tabs > input:checked + label + div {
   display: block;
 }
 

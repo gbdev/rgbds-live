@@ -309,17 +309,17 @@ export function init(event) {
   var urlParams = new URLSearchParams(window.location.search);
   const asmOptions = (urlParams.get('asm') ?? '').trim();
   if (asmOptions != '') {
-    document.getElementById('copmpiler_settings_asm').value = asmOptions;
+    document.getElementById('compiler_settings_asm').value = asmOptions;
     compiler.setAsmOptions(asmOptions.split(' '));
   }
   const linkOptions = (urlParams.get('link') ?? '').trim();
   if (linkOptions != '') {
-    document.getElementById('copmpiler_settings_link').value = linkOptions;
+    document.getElementById('compiler_settings_link').value = linkOptions;
     compiler.setLinkOptions(linkOptions.split(' '));
   }
   const fixOptions = (urlParams.get('fix') ?? '').trim();
   if (fixOptions != '') {
-    document.getElementById('copmpiler_settings_fix').value = fixOptions;
+    document.getElementById('compiler_settings_fix').value = fixOptions;
     compiler.setFixOptions(fixOptions.split(' '));
   }
 
@@ -579,9 +579,9 @@ export function init(event) {
   document.getElementById('settingsdialogclose').onclick = function () {
     document.getElementById('settingsdialog').style.display = 'none';
   };
-  document.getElementById('copmpiler_settings_set').onclick = function () {
+  document.getElementById('compiler_settings_set').onclick = function () {
     urlParams = new URLSearchParams(window.location.search);
-    var asmOptions = document.getElementById('copmpiler_settings_asm').value.trim();
+    var asmOptions = document.getElementById('compiler_settings_asm').value.trim();
     if (asmOptions != '') {
       urlParams.set('asm', asmOptions);
       compiler.setAsmOptions(asmOptions.split(' '));
@@ -589,7 +589,7 @@ export function init(event) {
       compiler.setAsmOptions([]);
       urlParams.delete('asm');
     }
-    var linkOptions = document.getElementById('copmpiler_settings_link').value.trim();
+    var linkOptions = document.getElementById('compiler_settings_link').value.trim();
     if (linkOptions != '') {
       urlParams.set('link', linkOptions);
       compiler.setLinkOptions(linkOptions.split(' '));
@@ -597,7 +597,7 @@ export function init(event) {
       compiler.setLinkOptions([]);
       urlParams.delete('link');
     }
-    var fixOptions = document.getElementById('copmpiler_settings_fix').value.trim();
+    var fixOptions = document.getElementById('compiler_settings_fix').value.trim();
     if (fixOptions != '') {
       urlParams.set('fix', fixOptions);
       compiler.setFixOptions(fixOptions.split(' '));
