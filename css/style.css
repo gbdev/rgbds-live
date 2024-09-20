@@ -138,6 +138,8 @@ th,
 td {
   border: 1px solid var(--border-color);
   background: var(--background);
+  font-weight: normal;
+  text-align: left;
 }
 
 .data_table th,
