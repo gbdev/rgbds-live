@@ -28,7 +28,7 @@ diff --git a/src/asm/symbol.cpp b/src/asm/symbol.cpp
 index 8d803a39..be108ae8 100644
 --- a/src/asm/symbol.cpp
 +++ b/src/asm/symbol.cpp
-@@ -597,3 +597,20 @@ void sym_Init(time_t now) {
+@@ -597,3 +597,24 @@ void sym_Init(time_t now) {
  	sym_AddEqu("__UTC_MINUTE__"s, time_utc->tm_min)->isBuiltin = true;
  	sym_AddEqu("__UTC_SECOND__"s, time_utc->tm_sec)->isBuiltin = true;
  }
@@ -38,7 +38,11 @@ index 8d803a39..be108ae8 100644
 +       Symbol *sym;
 +       char name[256];
 +       secret_counter += 1;
-+       sprintf(name, "__SEC_%x_%x_%s", secret_counter, lexer_GetLineNo(), fstk_GetFileStack()->name().c_str());
++       std::shared_ptr<FileStackNode> fstk = fstk_GetFileStack();
++       while(fstk->type == NODE_REPT) {
++         fstk = fstk->parent;
++       }
++       sprintf(name, "__SEC_%x_%x_%s", secret_counter, lexer_GetLineNo(), fstk->name().c_str());
 +
 +       sym = &createSymbol(name);
 +       sym->type = SYM_LABEL;
