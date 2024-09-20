@@ -7,8 +7,8 @@
     
 
     
-    <script type="module" crossorigin src="/rgbds-live/assets/index-731e7bbb.js"></script>
-    <link rel="stylesheet" href="/rgbds-live/assets/index-70bef3cd.css">
+    <script type="module" crossorigin src="/rgbds-live/assets/index-8fe308e6.js"></script>
+    <link rel="stylesheet" href="/rgbds-live/assets/index-5ca1c5f7.css">
   </head>
 
   <body>
@@ -29,12 +29,16 @@
             Options
             <ul>
               <li>
-                <input type="checkbox" id="auto_url_update" />
-                <label for="auto_url_update">Auto URL update</label>
+                <label>
+                  <input type="checkbox" id="auto_url_update" />
+                  Auto URL update
+                </label>
               </li>
               <li>
-                <input type="checkbox" id="auto_local_storage_update" />
-                <label for="auto_local_storage_update">Store data between sessions</label>
+                <label>
+                  <input type="checkbox" id="auto_local_storage_update" />
+                  Store data between sessions
+                </label>
               </li>
               <li id="settingsmenu">Settings...</li>
             </ul>
@@ -83,7 +87,7 @@
       <div class="editor" id="gfxEditorDiv">
         <canvas id="gfxEditorDrawCanvas" width="8" height="8" style="width: 256px"></canvas>
         <canvas id="gfxEditorPalette" width="16" height="64" style="width: 32px; margin-left: 2px"></canvas>
-        <div width="100%" style="overflow: scroll; display: None">
+        <div width="100%" style="overflow: scroll; display: none">
           <canvas id="gfxEditorTilesCanvas"></canvas>
         </div>
       </div>
@@ -91,7 +95,7 @@
       <div class="emulator">
         <table>
           <tr>
-            <td colspan="4">
+            <td>
               <div class="tabs">
                 <input type="radio" name="emulator_display_mode" id="emulator_display_screen" checked />
                 <label for="emulator_display_screen">Screen</label>
@@ -127,39 +131,51 @@
             </td>
           </tr>
           <tr>
-            <td class="right">
-              <button id="download_rom">Download</button>
-            </td>
             <td>
-              <button id="cpu_single_step">step</button>
-              <button id="cpu_frame_step">frame</button>
+              <button id="download_rom">Download</button>
+              <button id="cpu_single_step">Step</button>
+              <button id="cpu_frame_step">Frame</button>
+              <label style="padding: 4px 16px">
+                <input id="cpu_run_check" type="checkbox" />
+                Run
+              </label>
+              <button id="cpu_reset">Reset</button>
             </td>
-            <td><input id="cpu_run_check" type="checkbox" />run</td>
-            <td><button id="cpu_reset">Reset</button></td>
           </tr>
           <tr>
-            <td class="right">PC:</td>
-            <td id="cpu_pc">-</td>
-            <td class="right">A:</td>
-            <td id="cpu_a">-</td>
-          </tr>
-          <tr>
-            <td class="right">SP:</td>
-            <td id="cpu_sp">-</td>
-            <td class="right">BC:</td>
-            <td id="cpu_bc">-</td>
-          </tr>
-          <tr>
-            <td class="right">Flags:</td>
-            <td id="cpu_flags">-</td>
-            <td class="right">DE:</td>
-            <td id="cpu_de">-</td>
-          </tr>
-          <tr>
-            <td class="right"></td>
-            <td></td>
-            <td class="right">HL:</td>
-            <td id="cpu_hl">-</td>
+            <td>
+              <table class="data_table" style="width: 50%">
+                <colgroup>
+                  <col />
+                  <col style="width: 50%" />
+                  <col />
+                  <col style="width: 50%" />
+                </colgroup>
+                <tr>
+                  <th class="right">PC:</th>
+                  <td id="cpu_pc">-</td>
+                  <th class="right">A:</th>
+                  <td id="cpu_a">-</td>
+                </tr>
+                <tr>
+                  <th class="right">SP:</th>
+                  <td id="cpu_sp">-</td>
+                  <th class="right">BC:</th>
+                  <td id="cpu_bc">-</td>
+                </tr>
+                <tr>
+                  <th class="right">Flags:</th>
+                  <td id="cpu_flags">-</td>
+                  <th class="right">DE:</th>
+                  <td id="cpu_de">-</td>
+                </tr>
+                <tr>
+                  <td colspan="2"></td>
+                  <th class="right">HL:</th>
+                  <td id="cpu_hl">-</td>
+                </tr>
+              </table>
+            </td>
           </tr>
         </table>
       </div>
@@ -299,7 +315,7 @@
                   <td class="fill"><input type="text" class="fill" id="compiler_settings_fix" /></td>
                 </tr>
                 <tr>
-                  <td colspan="2" style="text-align: right"><button id="compiler_settings_set">Set</button></td>
+                  <td colspan="2" class="right"><button id="compiler_settings_set">Set</button></td>
                 </tr>
               </table>
             </div>
