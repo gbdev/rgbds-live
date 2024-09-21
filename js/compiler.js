@@ -224,7 +224,7 @@ function buildDone(rom_file, map_file) {
         var addr = parseInt(m[1], 16);
         var sym = m[2];
 
-        if (sym.startsWith('__SEC_')) {
+        if (sym.startsWith('~~SEC_')) {
           sym = sym.substr(6);
           var file = sym.substr(sym.indexOf('_') + 1);
           file = file.substr(file.indexOf('_') + 1);
