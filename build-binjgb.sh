@@ -9,7 +9,7 @@ fi
 
 cd binjgb
 
-patch -p1 < ../binjgb.patch
+patch -p1 < ../patches/binjgb.patch
 
 ! mkdir out
 cd out
