@@ -9,7 +9,7 @@ fi
 
 cd rgbds
 
-patch -p1 < ../rgbds.patch
+patch -p1 < ../patches/rgbds.patch
 
 
 MAKE_ARGS="Q= PNGCFLAGS= PNGLDFLAGS= PNGLDLIBS="
