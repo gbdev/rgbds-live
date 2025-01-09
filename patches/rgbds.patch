@@ -2,9 +2,9 @@ diff --git a/include/asm/symbol.hpp b/include/asm/symbol.hpp
 index 409e2ba5..58b78ba0 100644
 --- a/include/asm/symbol.hpp
 +++ b/include/asm/symbol.hpp
-@@ -100,4 +100,6 @@ void sym_Init(time_t now);
- std::optional<std::string> const &sym_GetCurrentSymbolScope();
- void sym_SetCurrentSymbolScope(std::optional<std::string> const &newScope);
+@@ -104,4 +104,6 @@ std::pair<Symbol const *, Symbol const *> sym_GetCurrentLabelScopes();
+ void sym_SetCurrentLabelScopes(std::pair<Symbol const *, Symbol const *> newScopes);
+ void sym_ResetCurrentLabelScopes();
  
 +Symbol *sym_AddSecret();
 +
@@ -13,7 +13,7 @@ diff --git a/src/asm/parser.y b/src/asm/parser.y
 index 55044bfc..94ec183d 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
-@@ -429,7 +429,9 @@ else:
+@@ -503,7 +509,9 @@ else:
  
  plain_directive:
  	  label
@@ -28,7 +28,7 @@ diff --git a/src/asm/symbol.cpp b/src/asm/symbol.cpp
 index 8d803a39..be108ae8 100644
 --- a/src/asm/symbol.cpp
 +++ b/src/asm/symbol.cpp
-@@ -597,3 +597,24 @@ void sym_Init(time_t now) {
+@@ -669,3 +669,24 @@ void sym_Init(time_t now) {
  	sym_AddEqu("__UTC_MINUTE__"s, time_utc->tm_min)->isBuiltin = true;
  	sym_AddEqu("__UTC_SECOND__"s, time_utc->tm_sec)->isBuiltin = true;
  }
