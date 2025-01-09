@@ -1,55 +1,60 @@
-diff --git a/include/asm/symbol.hpp b/include/asm/symbol.hpp
-index 9aec7195..4b6f6388 100644
---- a/include/asm/symbol.hpp
-+++ b/include/asm/symbol.hpp
-@@ -104,4 +104,6 @@ std::pair<Symbol const *, Symbol const *> sym_GetCurrentLabelScopes();
- void sym_SetCurrentLabelScopes(std::pair<Symbol const *, Symbol const *> newScopes);
- void sym_ResetCurrentLabelScopes();
- 
-+Symbol *sym_AddSecret();
-+
- #endif // RGBDS_ASM_SYMBOL_HPP
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index 437c6afa..19307c5c 100644
+index 437c6afa..61be7ae4 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
-@@ -503,7 +503,9 @@ else:
+@@ -86,7 +86,7 @@
+ 	static void compoundAssignment(std::string const &symName, RPNCommand op, int32_t constValue);
+ 	static void failAssert(AssertionType type);
+ 	static void failAssertMsg(AssertionType type, std::string const &message);
+-
++	Symbol *sym_AddSecret();
+ 	// The CPU encodes instructions in a logical way, so most instructions actually follow patterns.
+ 	// These enums thus help with bit twiddling to compute opcodes.
+ 	enum { REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_HL_IND, REG_A };
+@@ -503,7 +503,7 @@ else:
  
  plain_directive:
  	  label
 -	| label cpu_commands
-+	| label {
-+	       sym_AddSecret();
-+	} cpu_commands
++	| label { sym_AddSecret(); } cpu_commands
  	| label macro
  	| label directive
  ;
 diff --git a/src/asm/symbol.cpp b/src/asm/symbol.cpp
-index 1ae86aba..a68e5472 100644
+index 1ae86aba..3ed2dcd4 100644
 --- a/src/asm/symbol.cpp
 +++ b/src/asm/symbol.cpp
-@@ -669,3 +669,24 @@ void sym_Init(time_t now) {
+@@ -669,3 +669,33 @@ void sym_Init(time_t now) {
  	sym_AddEqu("__UTC_MINUTE__"s, time_utc->tm_min)->isBuiltin = true;
  	sym_AddEqu("__UTC_SECOND__"s, time_utc->tm_sec)->isBuiltin = true;
  }
 +
-+static uint32_t secret_counter = 0;
 +Symbol *sym_AddSecret() {
-+       Symbol *sym;
-+       char name[256];
-+       secret_counter += 1;
-+       std::shared_ptr<FileStackNode> fstk = fstk_GetFileStack();
-+       while(fstk->type == NODE_REPT) {
-+         fstk = fstk->parent;
-+       }
-+       sprintf(name, "__SEC_%x_%x_%s", secret_counter, lexer_GetLineNo(), fstk->name().c_str());
++	static uint64_t secretCounter = 1;
 +
-+       sym = &createSymbol(name);
-+       sym->type = SYM_LABEL;
-+       sym->data = (int32_t)sect_GetSymbolOffset();
-+       sym->isExported = true;
-+       sym->section = sect_GetSymbolSection();
++	std::shared_ptr<FileStackNode> fstk = fstk_GetFileStack();
++	while (fstk->type == NODE_REPT) {
++		fstk = fstk->parent;
++	}
 +
-+       updateSymbolFilename(*sym);
-+       return sym;
++	char valueBuf[64];
++	snprintf(
++	    valueBuf,
++	    sizeof(valueBuf),
++	    "__SEC_%" PRIx64 "_%" PRIx32 "_",
++	    secretCounter++,
++	    lexer_GetLineNo()
++	);
++
++	std::string name = valueBuf;
++	name += fstk->name();
++
++	Symbol *sym = &createSymbol(name);
++	sym->type = SYM_LABEL;
++	sym->data = static_cast<int32_t>(sect_GetSymbolOffset());
++	sym->isExported = true;
++	sym->section = sect_GetSymbolSection();
++
++	updateSymbolFilename(*sym);
++	return sym;
 +}
