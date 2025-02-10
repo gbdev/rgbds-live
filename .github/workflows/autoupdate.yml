@@ -1,0 +1,45 @@
+# Creates PR for updating RGBDS version automatcally
+# put RGBDS version as "version" parameter like "v0.9.1"
+name: Create PR for new RGBDS version
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+jobs:
+  build:
+    name: Create PR for new RGBDS version
+    runs-on: ubuntu-latest
+    env:
+        VERSION: ${{github.event.inputs.version}}
+        BRANCH_NAME: autoupdate_rgbds_${{github.event.inputs.version}}
+        # this is used as autoupdate commit message, PR's title and body
+        COMMIT_MESSAGE: Autoupdate RGBDS to ${{github.event.inputs.version}}
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: '0'
+      - name: Create autoupdate branch
+        run: |
+          git checkout -b feature/${{env.BRANCH_NAME}}
+      - name: Checkout new RGBDS version (and recreate patch)
+        run: |
+          cd rgbds
+          git checkout ${{env.VERSION}}
+          patch -p1 --no-backup-if-mismatch < ../patches/rgbds.patch
+          git diff --patch > ../patches/rgbds.patch
+          git clean -fd && git reset --hard
+          cd ..
+      - name: Commit autoupdate
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git commit -am "${{env.COMMIT_MESSAGE}}"
+          git push origin feature/${{env.BRANCH_NAME}}
+      - name: Create pull request
+        run: |
+          gh pr create -H feature/${{env.BRANCH_NAME}} -B master --title '${{env.COMMIT_MESSAGE}}' --body '${{env.COMMIT_MESSAGE}}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
