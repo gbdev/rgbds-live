@@ -1,0 +1,49 @@
+# Creates a PR for updating RGBDS version automatcally
+# Trigger it and put the desired RGBDS version as the "version" 
+# parameter. Must match one of the available tags: https://github.com/gbdev/rgbds/tags
+name: Create PR for new RGBDS version
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+jobs:
+  build:
+    name: Create PR for new RGBDS version
+    runs-on: ubuntu-latest
+    env:
+        VERSION: ${{github.event.inputs.version}}
+        BRANCH_NAME: autoupdate_rgbds_${{github.event.inputs.version}}
+        COMMIT_MESSAGE: "dep: update RGBDS to ${{github.event.inputs.version}}"
+        PR_TITLE: Update RGBDS to ${{github.event.inputs.version}}
+        PR_BODY: This is an automated PR to bump the RGBDS dependency to version ${{github.event.inputs.version}}. |
+         The patch was also tentatively updated and applied. Double check that this succeded. |
+         This Pull Request was created automatically by the 'autoupdate.yml' pipeline.
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: '0'
+      - name: Create autoupdate branch
+        run: |
+          git checkout -b feature/${{env.BRANCH_NAME}}
+      - name: Checkout new RGBDS version (and recreate patch)
+        run: |
+          cd rgbds
+          git checkout ${{env.VERSION}}
+          patch -p1 --no-backup-if-mismatch < ../patches/rgbds.patch
+          git diff --patch > ../patches/rgbds.patch
+          git clean -fd && git reset --hard
+          cd ..
+      - name: Commit the changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git commit -am "${{env.COMMIT_MESSAGE}}"
+          git push origin feature/${{env.BRANCH_NAME}}
+      - name: Create pull request
+        run: |
+          gh pr create -H feature/${{env.BRANCH_NAME}} -B master --title '${{env.PR_TITLE}}' --body '${{env.PR_BODY}}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
