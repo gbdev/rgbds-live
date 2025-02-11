@@ -32,7 +32,7 @@ jobs:
           git diff --patch > ../patches/rgbds.patch
           git clean -fd && git reset --hard
           cd ..
-      - name: Commit autoupdate
+      - name: Commit the changes
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
