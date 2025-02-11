@@ -1,6 +1,8 @@
 # Creates a PR for updating RGBDS version automatcally
 # Trigger it and put the desired RGBDS version as the "version" 
-# parameter. Must match one of the available tags: https://github.com/gbdev/rgbds/tags
+# parameter. "version" must be a valid git ref for the RGBDS repository.
+# You'll normally want one of the available tags: https://github.com/gbdev/rgbds/tags
+
 name: Create PR to update RGBDS
 on:
   workflow_dispatch:
