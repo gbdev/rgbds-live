@@ -3,6 +3,7 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { execSync } from 'node:child_process';
 
 export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
+  // Extract the RGBDS version we're using and set it as an env variable
   process.env.VITE_RGBDS_VERSION = execSync(
     "git --git-dir=rgbds/.git -c safe.directory='*' describe --tags --always",
   ).toString('utf8');
