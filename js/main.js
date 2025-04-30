@@ -5,6 +5,8 @@ import * as editors from './editors.js';
 import * as textEditor from './text-editor.js';
 import * as gfxEditor from './gfx-editor.js';
 
+globalThis.emulator = emulator;
+
 if (import.meta.env.DEV) {
   globalThis._rgbdsDebug = {
     compiler,
