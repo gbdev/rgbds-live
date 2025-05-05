@@ -9,7 +9,7 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
   ).toString('utf8');
   console.log("VITE_RGBDS_VERSION set to", process.env.VITE_RGBDS_VERSION)
   return {
-    base: '/rgbds-live/',
+    base: '',
     build: {
       target: ['chrome109', 'safari15.6', 'firefox102'],
       outDir: 'www',
