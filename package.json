@@ -24,7 +24,7 @@
     "jszip": "^3.10.1",
     "lz-string": "^1.5.0",
     "prettier": "3.3.3",
-    "vite": "^4.5.5",
-    "vite-plugin-static-copy": "^0.17.1"
+    "vite": "^6.3.5",
+    "vite-plugin-static-copy": "^2.3.1"
   }
 }
