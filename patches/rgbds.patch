@@ -1,8 +1,8 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 24b6d087..302126a2 100644
+index c62a0e9d..39d357b2 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -75,7 +75,7 @@ endif()
+@@ -74,7 +74,7 @@ endif()
  
  find_program(GIT git)
  if(GIT)
@@ -12,32 +12,31 @@ index 24b6d087..302126a2 100644
                    OUTPUT_VARIABLE GIT_REV OUTPUT_STRIP_TRAILING_WHITESPACE
                    ERROR_QUIET)
 diff --git a/Makefile b/Makefile
-index 611b9a54..d68fc410 100644
+index 0fd21b8e..1f756b9f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -24,7 +24,7 @@ PNGLDFLAGS	:= `${PKG_CONFIG} --libs-only-L libpng`
- PNGLDLIBS	:= `${PKG_CONFIG} --libs-only-l libpng`
+@@ -24,7 +24,7 @@ PNGLDFLAGS := `${PKG_CONFIG} --libs-only-L libpng`
+ PNGLDLIBS  := `${PKG_CONFIG} --libs-only-l libpng`
  
  # Note: if this comes up empty, `version.cpp` will automatically fall back to last release number
--VERSION_STRING	:= `git --git-dir=.git -c safe.directory='*' describe --tags --dirty --always 2>/dev/null`
-+VERSION_STRING	:= `git --git-dir=.git -c safe.directory='*' describe --tags --always 2>/dev/null`
+-VERSION_STRING := `git --git-dir=.git -c safe.directory='*' describe --tags --dirty --always 2>/dev/null`
++VERSION_STRING := `git --git-dir=.git -c safe.directory='*' describe --tags --dirty 2>/dev/null`
  
- WARNFLAGS	:= -Wall -pedantic -Wno-unknown-warning-option -Wno-gnu-zero-variadic-macro-arguments
+ WARNFLAGS := -Wall -pedantic -Wno-unknown-warning-option -Wno-gnu-zero-variadic-macro-arguments
  
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index 279cd7d9..01c180da 100644
+index 275e4585..926b2b19 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
-@@ -84,7 +84,7 @@
- 	static void compoundAssignment(std::string const &symName, RPNCommand op, int32_t constValue);
- 	static void failAssert(AssertionType type);
- 	static void failAssertMsg(AssertionType type, std::string const &message);
--
+@@ -62,6 +62,7 @@
+ 	yy::parser::symbol_type yylex(); // Provided by lexer.cpp
+ 
+ 	static uint32_t strToNum(std::vector<int32_t> const &s);
 +	Symbol *sym_AddSecret();
- 	// The CPU encodes instructions in a logical way, so most instructions actually follow patterns.
- 	// These enums thus help with bit twiddling to compute opcodes.
- 	enum { REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_HL_IND, REG_A };
-@@ -502,7 +502,7 @@ else:
+ 	static void errorInvalidUTF8Byte(uint8_t byte, char const *functionName);
+ 	static size_t strlenUTF8(std::string const &str, bool printErrors);
+ 	static std::string strsliceUTF8(std::string const &str, uint32_t start, uint32_t stop);
+@@ -520,7 +521,7 @@ else:
  
  plain_directive:
  	  label
@@ -47,10 +46,10 @@ index 279cd7d9..01c180da 100644
  	| label directive
  ;
 diff --git a/src/asm/symbol.cpp b/src/asm/symbol.cpp
-index 0d81f331..e420cb2f 100644
+index 53159dea..16bce6f5 100644
 --- a/src/asm/symbol.cpp
 +++ b/src/asm/symbol.cpp
-@@ -698,3 +698,33 @@ void sym_Init(time_t now) {
+@@ -692,3 +692,33 @@ void sym_Init(time_t now) {
  	sym_AddEqu("__UTC_MINUTE__"s, time_utc->tm_min)->isBuiltin = true;
  	sym_AddEqu("__UTC_SECOND__"s, time_utc->tm_sec)->isBuiltin = true;
  }
