@@ -45,14 +45,16 @@ compiler.setLogCallback(function (str, kind) {
   output.innerHTML += '<span class="' + kind + '">' + escapeHTML(str) + '</span>\n';
   output.scrollTop = output.scrollHeight;
 });
+
+const serial_log_buffer = [];
+const serial_log_buffer_size = 256;
 emulator.setSerialCallback(function (value) {
-  var output = document.getElementById('output');
-  if ((value >= 32 && value < 128) || value == 13) {
-    output.innerHTML += escapeHTML(String.fromCharCode(value));
-  } else {
-    output.innerHTML += '<u>' + escapeHTML('[' + ('00' + value.toString(16)).slice(-2) + ']') + '</u>';
+  var formatted_value = ('00' + value.toString(16)).slice(-2);
+  document.getElementById('serial_log').innerText = '$' + formatted_value;
+  serial_log_buffer.unshift(formatted_value);
+  if (serial_log_buffer.length > serial_log_buffer_size) {
+    serial_log_buffer.length = serial_log_buffer_size;
   }
-  output.scrollTop = output.scrollHeight;
 });
 
 export function compileCode() {
@@ -232,6 +234,14 @@ function updateTextView() {
     display_text.innerHTML = text;
     return;
   }
+  if (emu_view == 'serial') {
+    var text = '';
+    for (var n = 0; n < serial_log_buffer.length; n += 16) {
+      text += serial_log_buffer.slice(n, n + 16).join(' ') + '\n';
+    }
+    display_text.textContent = text;
+    return;
+  }
   if (typeof data == 'undefined') return;
 
   var text =
@@ -302,6 +312,13 @@ function deleteFile(name) {
   storage.update(name, null);
   if (editors.getCurrentFilename() == name) editors.setCurrentFile(Object.keys(storage.getFiles()).sort()[0]);
   updateFileList();
+}
+
+function showTabType(type) {
+  const tabTypes = ['emulator_screen_canvas', 'emulator_vram_canvas', 'emulator_display_text'];
+  tabTypes.forEach((tabType) => {
+    document.getElementById(tabType).style.display = type == tabType ? '' : 'none';
+  });
 }
 
 export function init(event) {
@@ -426,58 +443,47 @@ export function init(event) {
   };
 
   document.getElementById('emulator_display_screen').onclick = function () {
-    document.getElementById('emulator_screen_canvas').style.display = '';
-    document.getElementById('emulator_vram_canvas').style.display = 'none';
-    document.getElementById('emulator_display_text').style.display = 'none';
+    showTabType('emulator_screen_canvas');
     emu_view = 'display';
   };
   document.getElementById('emulator_display_vram').onclick = function () {
-    document.getElementById('emulator_screen_canvas').style.display = 'none';
-    document.getElementById('emulator_vram_canvas').style.display = '';
-    document.getElementById('emulator_display_text').style.display = 'none';
+    showTabType('emulator_vram_canvas');
     emu_view = 'vram';
     updateVRamCanvas();
   };
   document.getElementById('emulator_display_bg0').onclick = function () {
-    document.getElementById('emulator_screen_canvas').style.display = 'none';
-    document.getElementById('emulator_vram_canvas').style.display = '';
-    document.getElementById('emulator_display_text').style.display = 'none';
+    showTabType('emulator_vram_canvas');
     emu_view = 'bg0';
     updateVRamCanvas();
   };
   document.getElementById('emulator_display_bg1').onclick = function () {
-    document.getElementById('emulator_screen_canvas').style.display = 'none';
-    document.getElementById('emulator_vram_canvas').style.display = '';
-    document.getElementById('emulator_display_text').style.display = 'none';
+    showTabType('emulator_vram_canvas');
     emu_view = 'bg1';
     updateVRamCanvas();
   };
   document.getElementById('emulator_display_rom').onclick = function () {
-    document.getElementById('emulator_screen_canvas').style.display = 'none';
-    document.getElementById('emulator_vram_canvas').style.display = 'none';
-    document.getElementById('emulator_display_text').style.display = '';
+    showTabType('emulator_display_text');
     emu_view = 'rom';
     updateTextView();
   };
   document.getElementById('emulator_display_wram').onclick = function () {
-    document.getElementById('emulator_screen_canvas').style.display = 'none';
-    document.getElementById('emulator_vram_canvas').style.display = 'none';
-    document.getElementById('emulator_display_text').style.display = '';
+    showTabType('emulator_display_text');
     emu_view = 'wram';
     updateTextView();
   };
   document.getElementById('emulator_display_hram').onclick = function () {
-    document.getElementById('emulator_screen_canvas').style.display = 'none';
-    document.getElementById('emulator_vram_canvas').style.display = 'none';
-    document.getElementById('emulator_display_text').style.display = '';
+    showTabType('emulator_display_text');
     emu_view = 'hram';
     updateTextView();
   };
   document.getElementById('emulator_display_io').onclick = function () {
-    document.getElementById('emulator_screen_canvas').style.display = 'none';
-    document.getElementById('emulator_vram_canvas').style.display = 'none';
-    document.getElementById('emulator_display_text').style.display = '';
+    showTabType('emulator_display_text');
     emu_view = 'io';
+    updateTextView();
+  };
+  document.getElementById('emulator_display_serial').onclick = function () {
+    showTabType('emulator_display_text');
+    emu_view = 'serial';
     updateTextView();
   };
 
