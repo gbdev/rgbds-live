@@ -9,7 +9,7 @@ Try online at [gbdev.io/rgbds-live](https://gbdev.io/rgbds-live/).
 System requirements:
 
 - bison, cmake
-- [emscripten](https://emscripten.org/docs/getting_started/downloads.html)
+- [emscripten](https://emscripten.org/docs/getting_started/downloads.html) working with 4.0.8 (you can change version with `emsdk install 4.0.8 && emsdk activate 4.0.8`)
 
 Make sure you initialize submodules to be able to build the WebAssembly modules:
 
