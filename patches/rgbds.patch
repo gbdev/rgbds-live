@@ -12,7 +12,7 @@ index c62a0e9d..39d357b2 100644
                    OUTPUT_VARIABLE GIT_REV OUTPUT_STRIP_TRAILING_WHITESPACE
                    ERROR_QUIET)
 diff --git a/Makefile b/Makefile
-index 0fd21b8e..1f756b9f 100644
+index 0fd21b8e..f608a632 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -24,7 +24,7 @@ PNGLDFLAGS := `${PKG_CONFIG} --libs-only-L libpng`
@@ -20,7 +20,7 @@ index 0fd21b8e..1f756b9f 100644
  
  # Note: if this comes up empty, `version.cpp` will automatically fall back to last release number
 -VERSION_STRING := `git --git-dir=.git -c safe.directory='*' describe --tags --dirty --always 2>/dev/null`
-+VERSION_STRING := `git --git-dir=.git -c safe.directory='*' describe --tags --dirty 2>/dev/null`
++VERSION_STRING := `git --git-dir=.git -c safe.directory='*' describe --tags --always 2>/dev/null`
  
  WARNFLAGS := -Wall -pedantic -Wno-unknown-warning-option -Wno-gnu-zero-variadic-macro-arguments
  
