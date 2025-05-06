@@ -115,6 +115,8 @@
                 <label for="emulator_display_hram">HRAM</label>
                 <input type="radio" name="emulator_display_mode" id="emulator_display_io" />
                 <label for="emulator_display_io">I/O</label>
+                <input type="radio" name="emulator_display_mode" id="emulator_display_serial" />
+                <label for="emulator_display_serial">Serial</label>
               </div>
               <div class="emulator_screen_container">
                 <canvas class="emulator_canvas_screen" id="emulator_screen_canvas" width="160" height="144"></canvas>
@@ -172,7 +174,8 @@
                   <td id="cpu_de">-</td>
                 </tr>
                 <tr>
-                  <td colspan="2"></td>
+                  <th class="right">Serial:</th>
+                  <td id="serial_log">-</td>
                   <th class="right">HL:</th>
                   <td id="cpu_hl">-</td>
                 </tr>
