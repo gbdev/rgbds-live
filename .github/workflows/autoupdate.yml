@@ -1,5 +1,5 @@
 # Creates a PR for updating RGBDS version automatcally
-# Trigger it and put the desired RGBDS version as the "version" 
+# Trigger it and put the desired RGBDS version as the "version"
 # parameter. "version" must be a valid git ref for the RGBDS repository.
 # You'll normally want one of the available tags: https://github.com/gbdev/rgbds/tags
 
@@ -14,14 +14,14 @@ jobs:
     name: Create PR to update RGBDS
     runs-on: ubuntu-latest
     env:
-        VERSION: ${{github.event.inputs.version}}
-        BRANCH_NAME: autoupdate_rgbds_${{github.event.inputs.version}}
-        COMMIT_MESSAGE: "dep: update RGBDS to ${{github.event.inputs.version}}"
-        PR_TITLE: Update RGBDS to ${{github.event.inputs.version}}
-        PR_BODY: |
-         This is an automated PR to bump the RGBDS dependency to version ${{github.event.inputs.version}}.
-         The patch was also tentatively updated and applied. Double check that this succeded.
-         This Pull Request was created by triggering the [autoupdate.yml](https://github.com/gbdev/rgbds-live/blob/master/.github/workflows/autoupdate.yml) pipeline.
+      VERSION: ${{github.event.inputs.version}}
+      BRANCH_NAME: autoupdate_rgbds_${{github.event.inputs.version}}
+      COMMIT_MESSAGE: 'dep: update RGBDS to ${{github.event.inputs.version}}'
+      PR_TITLE: Update RGBDS to ${{github.event.inputs.version}}
+      PR_BODY: |
+        This is an automated PR to bump the RGBDS dependency to version ${{github.event.inputs.version}}.
+        The patch was also tentatively updated and applied. Double check that this succeded.
+        This Pull Request was created by triggering the [autoupdate.yml](https://github.com/gbdev/rgbds-live/blob/master/.github/workflows/autoupdate.yml) pipeline.
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v2
