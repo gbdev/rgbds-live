@@ -12,7 +12,7 @@ index c62a0e9d..39d357b2 100644
                    OUTPUT_VARIABLE GIT_REV OUTPUT_STRIP_TRAILING_WHITESPACE
                    ERROR_QUIET)
 diff --git a/Makefile b/Makefile
-index 0fd21b8e..f608a632 100644
+index f6a76b72..b61be233 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -24,7 +24,7 @@ PNGLDFLAGS := `${PKG_CONFIG} --libs-only-L libpng`
@@ -25,7 +25,7 @@ index 0fd21b8e..f608a632 100644
  WARNFLAGS := -Wall -pedantic -Wno-unknown-warning-option -Wno-gnu-zero-variadic-macro-arguments
  
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index 275e4585..926b2b19 100644
+index 3712b3df..4cd075c9 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
 @@ -62,6 +62,7 @@
@@ -36,7 +36,7 @@ index 275e4585..926b2b19 100644
  	static void errorInvalidUTF8Byte(uint8_t byte, char const *functionName);
  	static size_t strlenUTF8(std::string const &str, bool printErrors);
  	static std::string strsliceUTF8(std::string const &str, uint32_t start, uint32_t stop);
-@@ -520,7 +521,7 @@ else:
+@@ -524,7 +525,7 @@ else:
  
  plain_directive:
  	  label
@@ -46,10 +46,10 @@ index 275e4585..926b2b19 100644
  	| label directive
  ;
 diff --git a/src/asm/symbol.cpp b/src/asm/symbol.cpp
-index 53159dea..16bce6f5 100644
+index 9510a8d8..3ae164f0 100644
 --- a/src/asm/symbol.cpp
 +++ b/src/asm/symbol.cpp
-@@ -692,3 +692,33 @@ void sym_Init(time_t now) {
+@@ -708,3 +708,33 @@ void sym_Init(time_t now) {
  	sym_AddEqu("__UTC_MINUTE__"s, time_utc->tm_min)->isBuiltin = true;
  	sym_AddEqu("__UTC_SECOND__"s, time_utc->tm_sec)->isBuiltin = true;
  }
