@@ -1,4 +1,4 @@
-; From https://gbdev.io/gb-asm-tutorial/part1/hello_world.html
+; Adapted from https://gbdev.io/gb-asm-tutorial/part1/hello_world.html
 
 INCLUDE "hardware.inc"
 
@@ -10,56 +10,52 @@ SECTION "Header", ROM0[$100]
 
 EntryPoint:
   ; Shut down audio circuitry
-  ld a, 0
-  ld [rNR52], a
+  xor a
+  ldh [rAUDENA], a
 
   ; Do not turn the LCD off outside of VBlank
-WaitVBlank:
-  ld a, [rLY]
-  cp 144
-  jp c, WaitVBlank
+.wait_vblank
+  ldh a, [rLY]
+  cp LY_VBLANK
+  jr c, .wait_vblank
 
   ; Turn the LCD off
-  ld a, 0
-  ld [rLCDC], a
+  ld a, LCDC_OFF
+  ldh [rLCDC], a
 
   ; Copy the tile data
   ld de, Tiles
-  ld hl, $9000
-  ld bc, TilesEnd - Tiles
-CopyTiles:
-  ld a, [de]
-  ld [hli], a
-  inc de
-  dec bc
-  ld a, b
-  or a, c
-  jp nz, CopyTiles
+  ld hl, STARTOF(VRAM) + $100 * TILE_SIZE
+  ld bc, Tiles.end - Tiles
+  call Copy
 
   ; Copy the tilemap
   ld de, Tilemap
-  ld hl, $9800
-  ld bc, TilemapEnd - Tilemap
-CopyTilemap:
+  ld hl, TILEMAP0
+  ld bc, Tilemap.end - Tilemap
+  call Copy
+
+  ; Turn the LCD on
+  ld a, LCDC_ON | LCDC_BG_ON
+  ldh [rLCDC], a
+
+  ; During the first (blank) frame, initialize display registers
+  ld a, %11_10_01_00
+  ldh [rBGP], a
+
+.done
+  jr .done
+
+; Subroutine to copy bc bytes from de to hl
+Copy:
   ld a, [de]
   ld [hli], a
   inc de
   dec bc
   ld a, b
   or a, c
-  jp nz, CopyTilemap
-
-  ; Turn the LCD on
-  ld a, LCDCF_ON | LCDCF_BGON
-  ld [rLCDC], a
-
-  ; During the first (blank) frame, initialize display registers
-  ld a, %11100100
-  ld [rBGP], a
-
-Done:
-  jp Done
-
+  jr nz, Copy
+  ret
 
 SECTION "Tile data", ROM0
 
@@ -134,7 +130,7 @@ Tiles:
   db $54,$ff, $aa,$ff, $54,$ff, $aa,$ff, $54,$ff, $aa,$ff, $54,$ff, $00,$ff
   db $15,$ff, $2a,$ff, $15,$ff, $0a,$ff, $15,$ff, $0a,$ff, $01,$ff, $00,$ff
   db $01,$ff, $80,$ff, $01,$ff, $80,$ff, $01,$ff, $80,$ff, $01,$ff, $00,$ff
-TilesEnd:
+.end
 
 SECTION "Tilemap", ROM0
 
@@ -157,4 +153,4 @@ Tilemap:
   db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,  0,0,0,0,0,0,0,0,0,0,0,0
   db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,  0,0,0,0,0,0,0,0,0,0,0,0
   db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,  0,0,0,0,0,0,0,0,0,0,0,0
-TilemapEnd:
+.end
