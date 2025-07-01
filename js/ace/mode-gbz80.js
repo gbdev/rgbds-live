@@ -14,18 +14,18 @@ export class GBZ80HighlightRules extends TextHighlightRules {
         {
           token: 'keyword.control.assembly',
           regex:
-            '\\b(?:ADC|ADD|AND|CP|DEC|INC|OR|SBC|SUB|XOR|BIT|RES|SET|SWAP|RL|RLA|RLC|RLCA|RR|RRA|RRC|RRCA|SLA|SRA|SRL|LD|LDH|CALL|JP|JR|RET|RETI|RST|POP|PUSH|CCF|CPL|DAA|DI|EI|HALT|NOP|SCF|STOP)\\b',
+            '\\b(?:ADC|ADD|AND|BIT|CALL|CCF|CP|CPL|DAA|DEC|DI|EI|HALT|INC|JP|JR|LD|LDD|LDH|LDI|LDIO|NOP|OR|POP|PUSH|RES|RET|RETI|RL|RLA|RLC|RLCA|RR|RRA|RRC|RRCA|RST|SBC|SCF|SET|SLA|SRA|SRL|STOP|SUB|SWAP|XOR)\\b',
           caseInsensitive: true,
         },
         {
           token: 'keyword.control.sections',
-          regex: '\\b(?:ROM0|ROMX|VRAM|WRAM0|WRAMX|OAM|HRAM)\\b',
+          regex: '\\b(?:HRAM|OAM|ROM0|ROMX|SRAM|VRAM|WRAM0|WRAMX)\\b',
           caseInsensitive: true,
         },
         {
           token: 'keyword.control.reserved',
           regex:
-            '\\b(?:SECTION|INCLUDE|BANK|ALIGN|PURGE|INCBIN|CHARMAP|NEWCHARMAP|SETCHARMAP|PUSHC|POPC|FAIL|WARN|FATAL|ASSERT|STATIC_ASSERT|MACRO|ENDM|SHIFT|REPT|ENDR|LOAD|ENDL|IF|ELSE|ELIF|ENDC|UNION|NEXTU|EQU|EQUS|PUSHS|POPS|PUSHO|POPO|OPT)\\b',
+            '\\b(?:ACOS|ALIGN|ASIN|ASSERT|ATAN|ATAN2|BANK|BITWIDTH|BREAK|CEIL|CHARCMP|CHARLEN|CHARMAP|CHARSIZE|CHARSUB|CHARVAL|COS|DB|DEF|DIV|DL|DS|DW|ELIF|ELSE|ENDC|ENDL|ENDM|ENDR|ENDSECTION|ENDU|EQU|EQUS|EXPORT|FAIL|FATAL|FLOOR|FMOD|FOR|FRAGMENT|HIGH|IF|INCBIN|INCHARMAP|INCLUDE|ISCONST|LOAD|LOG|LOW|MACRO|MUL|NEWCHARMAP|NEXTU|OPT|POPC|POPO|POPS|POW|PRINT|PRINTLN|PURGE|PUSHC|PUSHO|PUSHS|RB|REDEF|REPT|REVCHAR|ROUND|RSRESET|RSSET|RW|SECTION|SETCHARMAP|SHIFT|SIN|SIZEOF|STARTOF|STATIC_ASSERT|STRCAT|STRCHAR|STRCMP|STRFIND|STRFMT|STRIN|STRLEN|STRLWR|STRRFIND|STRRIN|STRRPL|STRSLICE|STRSUB|STRUPR|TAN|TZCOUNT|UNION|WARN)\\b',
           caseInsensitive: true,
         },
         {
@@ -35,21 +35,34 @@ export class GBZ80HighlightRules extends TextHighlightRules {
         },
         {
           token: 'variable.parameter.register.assembly',
-          regex: '\\b(?:A|B|C|D|E|H|L|AF|BC|DE|HL)\\b',
+          regex: '\\b(?:A|B|C|D|E|H|L|AF|BC|DE|HL|HLD|HLI|SP)\\b',
           caseInsensitive: true,
         },
-        { token: 'constant.character.decimal.assembly', regex: '\\b[0-9]+\\b' },
-        { token: 'constant.character.binary.assembly', regex: '\\%[0-1]+\\b' },
         {
-          token: 'constant.character.quaternary.assembly',
+          token: 'variable.parameter.condition.assembly',
+          regex: '\\b(?:Z|NZ|NC)\\b',
+          caseInsensitive: true,
+        },
+        { token: 'constant.numeric.decimal.assembly', regex: '\\b[0-9]+\\b' },
+        {
+          token: 'constant.numeric.binary.assembly',
+          regex: '(?:\\%|\\b0B)[0-1]+\\b',
+          caseInsensitive: true,
+        },
+        {
+          token: 'constant.numeric.quaternary.assembly',
           regex: '\\`[0-3]+\\b',
         },
         {
-          token: 'constant.character.hexadecimal.assembly',
-          regex: '\\$[A-F0-9]+\\b',
+          token: 'constant.numeric.octal.assembly',
+          regex: '(?:\\&|\\b0O)[0-7]+\\b',
           caseInsensitive: true,
         },
-        { token: 'string.assembly', regex: /'([^\\']|\\.)*'/ },
+        {
+          token: 'constant.numeric.hexadecimal.assembly',
+          regex: '\\(?:$|\\b0X)[A-F0-9]+\\b',
+          caseInsensitive: true,
+        },
         { token: 'string.assembly', regex: /"([^\\"]|\\.)*"/ },
         { token: 'entity.name.function.assembly', regex: '^\\s*%%[\\w.]+?:$' },
         {
