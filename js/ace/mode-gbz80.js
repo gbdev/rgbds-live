@@ -44,23 +44,30 @@ export class GBZ80HighlightRules extends TextHighlightRules {
           caseInsensitive: true,
         },
         { token: 'constant.numeric.decimal.assembly', regex: '\\b[0-9]+\\b' },
+        { token: 'constant.numeric.binary.assembly', regex: '\\%[0-1]+\\b' },
         {
           token: 'constant.numeric.binary.assembly',
-          regex: '(?:\\%|\\b0B)[0-1]+\\b',
+          regex: '\\b0b[0-1]+\\b',
           caseInsensitive: true,
         },
         {
           token: 'constant.numeric.quaternary.assembly',
           regex: '\\`[0-3]+\\b',
         },
+        { token: 'constant.numeric.octal.assembly', regex: '\\&[0-7]+\\b' },
         {
           token: 'constant.numeric.octal.assembly',
-          regex: '(?:\\&|\\b0O)[0-7]+\\b',
+          regex: '\\b0o[0-7]+\\b',
           caseInsensitive: true,
         },
         {
           token: 'constant.numeric.hexadecimal.assembly',
-          regex: '\\(?:$|\\b0X)[A-F0-9]+\\b',
+          regex: '\\$[0-9A-F]+\\b',
+          caseInsensitive: true,
+        },
+        {
+          token: 'constant.numeric.hexadecimal.assembly',
+          regex: '\\b0x[0-9A-F]+\\b',
           caseInsensitive: true,
         },
         { token: 'string.assembly', regex: /"([^\\"]|\\.)*"/ },
