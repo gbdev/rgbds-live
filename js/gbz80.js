@@ -62,7 +62,7 @@ const gameboy_hardware_constants = {
         value: "0"
       },
       JOYP_INPUTS: {
-        description: "",
+        description: "0 bits are pressed (if reading inputs)",
         value: "%0000_1111"
       },
       JOYP_START: {
@@ -361,7 +361,7 @@ const gameboy_hardware_constants = {
         value: "%10000000"
       },
       AUD1HIGH_LENGTH_OFF: {
-        description: "",
+        description: "do not reset the channel after the length timer expires",
         value: "%00000000"
       },
       AUD1HIGH_LENGTH_ON: {
@@ -459,7 +459,7 @@ const gameboy_hardware_constants = {
         value: "%10000000"
       },
       AUD2HIGH_LENGTH_OFF: {
-        description: "",
+        description: "do not reset the channel after the length timer expires",
         value: "%00000000"
       },
       AUD2HIGH_LENGTH_ON: {
@@ -546,7 +546,7 @@ const gameboy_hardware_constants = {
         value: "%10000000"
       },
       AUD3HIGH_LENGTH_OFF: {
-        description: "",
+        description: "do not reset the channel after the length timer expires",
         value: "%00000000"
       },
       AUD3HIGH_LENGTH_ON: {
@@ -646,7 +646,7 @@ const gameboy_hardware_constants = {
         value: "%10000000"
       },
       AUD4GO_LENGTH_OFF: {
-        description: "",
+        description: "do not reset the channel after the length timer expires",
         value: "%00000000"
       },
       AUD4GO_LENGTH_ON: {
@@ -829,71 +829,71 @@ const gameboy_hardware_constants = {
     description: "Audio channel 3 wave pattern RAM [r/w]",
     flags: {
       rAUD3WAVE_0: {
-        description: "",
+        description: "wave pattern RAM byte 0",
         value: "$FF30"
       },
       rAUD3WAVE_1: {
-        description: "",
+        description: "wave pattern RAM byte 1",
         value: "$FF31"
       },
       rAUD3WAVE_2: {
-        description: "",
+        description: "wave pattern RAM byte 2",
         value: "$FF32"
       },
       rAUD3WAVE_3: {
-        description: "",
+        description: "wave pattern RAM byte 3",
         value: "$FF33"
       },
       rAUD3WAVE_4: {
-        description: "",
+        description: "wave pattern RAM byte 4",
         value: "$FF34"
       },
       rAUD3WAVE_5: {
-        description: "",
+        description: "wave pattern RAM byte 5",
         value: "$FF35"
       },
       rAUD3WAVE_6: {
-        description: "",
+        description: "wave pattern RAM byte 6",
         value: "$FF36"
       },
       rAUD3WAVE_7: {
-        description: "",
+        description: "wave pattern RAM byte 7",
         value: "$FF37"
       },
       rAUD3WAVE_8: {
-        description: "",
+        description: "wave pattern RAM byte 8",
         value: "$FF38"
       },
       rAUD3WAVE_9: {
-        description: "",
+        description: "wave pattern RAM byte 9",
         value: "$FF39"
       },
       rAUD3WAVE_A: {
-        description: "",
+        description: "wave pattern RAM byte 10",
         value: "$FF3A"
       },
       rAUD3WAVE_B: {
-        description: "",
+        description: "wave pattern RAM byte 11",
         value: "$FF3B"
       },
       rAUD3WAVE_C: {
-        description: "",
+        description: "wave pattern RAM byte 12",
         value: "$FF3C"
       },
       rAUD3WAVE_D: {
-        description: "",
+        description: "wave pattern RAM byte 13",
         value: "$FF3D"
       },
       rAUD3WAVE_E: {
-        description: "",
+        description: "wave pattern RAM byte 14",
         value: "$FF3E"
       },
       rAUD3WAVE_F: {
-        description: "",
+        description: "wave pattern RAM byte 15",
         value: "$FF3F"
       },
       AUD3WAVE_SIZE: {
-        description: "",
+        description: "wave pattern RAM size in bytes",
         value: "16"
       }
     }
@@ -1738,7 +1738,7 @@ const gameboy_hardware_constants = {
     description: "(MBC7 only) Latch accelerometer start [wo]",
     flags: {
       ACCLATCH0_START: {
-        description: "",
+        description: "Write $55 to ACCLATCH0 to erase the latched data",
         value: "$55"
       }
     }
@@ -1748,7 +1748,7 @@ const gameboy_hardware_constants = {
     description: "(MBC7 only) Latch accelerometer finish [wo]",
     flags: {
       ACCLATCH1_FINISH: {
-        description: "",
+        description: "Write $AA to ACCLATCH1 to latch the accelerometer and update ACCEL*",
         value: "$AA"
       }
     }
@@ -1778,11 +1778,11 @@ const gameboy_hardware_constants = {
     description: "(HuC1 only) IR register [r/w]",
     flags: {
       IR_LED_OFF: {
-        description: "",
+        description: "(HuC1 only) the IR transmitter does not see light",
         value: "$C0"
       },
       IR_LED_ON: {
-        description: "",
+        description: "(HuC1 only) the IR transmitter sees light",
         value: "$C1"
       }
     }
@@ -2084,147 +2084,147 @@ const gameboy_hardware_constants = {
 
   // Combined input bytes
   B_PAD_DOWN: {
-    description: "",
+    description: "whether Down is pressed",
     value: "7"
   },
   B_PAD_UP: {
-    description: "",
+    description: "whether Up is pressed",
     value: "6"
   },
   B_PAD_LEFT: {
-    description: "",
+    description: "whether Left is pressed",
     value: "5"
   },
   B_PAD_RIGHT: {
-    description: "",
+    description: "whether Right is pressed",
     value: "4"
   },
   B_PAD_START: {
-    description: "",
+    description: "whether Start is pressed",
     value: "3"
   },
   B_PAD_SELECT: {
-    description: "",
+    description: "whether Select is pressed",
     value: "2"
   },
   B_PAD_B: {
-    description: "",
+    description: "whether B is pressed",
     value: "1"
   },
   B_PAD_A: {
-    description: "",
+    description: "whether A is pressed",
     value: "0"
   },
   PAD_CTRL_PAD: {
-    description: "",
+    description: "whether any Control Pad directions are pressed",
     value: "%1111_0000"
   },
   PAD_BUTTONS: {
-    description: "",
+    description: "whether any buttons are pressed",
     value: "%0000_1111"
   },
   PAD_DOWN: {
-    description: "1 << B_PAD_DOWN",
+    description: "whether Down is pressed",
     value: "%10000000"
   },
   PAD_UP: {
-    description: "1 << B_PAD_UP",
+    description: "whether Up is pressed",
     value: "%01000000"
   },
   PAD_LEFT: {
-    description: "1 << B_PAD_LEFT",
+    description: "whether Left is pressed",
     value: "%00100000"
   },
   PAD_RIGHT: {
-    description: "1 << B_PAD_RIGHT",
+    description: "whether Right is pressed",
     value: "%00010000"
   },
   PAD_START: {
-    description: "1 << B_PAD_START",
+    description: "whether Start is pressed",
     value: "%00001000"
   },
   PAD_SELECT: {
-    description: "1 << B_PAD_SELECT",
+    description: "whether Select is pressed",
     value: "%00000100"
   },
   PAD_B: {
-    description: "1 << B_PAD_B",
+    description: "whether B is pressed",
     value: "%00000010"
   },
   PAD_A: {
-    description: "1 << B_PAD_A",
+    description: "whether A is pressed",
     value: "%00000001"
   },
   B_PAD_SWAP_START: {
-    description: "",
+    description: "whether Start is pressed",
     value: "7"
   },
   B_PAD_SWAP_SELECT: {
-    description: "",
+    description: "whether Select is pressed",
     value: "6"
   },
   B_PAD_SWAP_B: {
-    description: "",
+    description: "whether B is pressed",
     value: "5"
   },
   B_PAD_SWAP_A: {
-    description: "",
+    description: "whether A is pressed",
     value: "4"
   },
   B_PAD_SWAP_DOWN: {
-    description: "",
+    description: "whether Down is pressed",
     value: "3"
   },
   B_PAD_SWAP_UP: {
-    description: "",
+    description: "whether Up is pressed",
     value: "2"
   },
   B_PAD_SWAP_LEFT: {
-    description: "",
+    description: "whether Left is pressed",
     value: "1"
   },
   B_PAD_SWAP_RIGHT: {
-    description: "",
+    description: "whether Right is pressed",
     value: "0"
   },
   PAD_SWAP_CTRL_PAD: {
-    description: "",
+    description: "whether any Control Pad directions are pressed",
     value: "%0000_1111"
   },
   PAD_SWAP_BUTTONS: {
-    description: "",
+    description: "whether any buttons are pressed",
     value: "%1111_0000"
   },
   PAD_SWAP_START: {
-    description: "1 << B_PAD_SWAP_START",
+    description: "whether Start is pressed",
     value: "%10000000"
   },
   PAD_SWAP_SELECT: {
-    description: "1 << B_PAD_SWAP_SELECT",
+    description: "whether Select is pressed",
     value: "%01000000"
   },
   PAD_SWAP_B: {
-    description: "1 << B_PAD_SWAP_B",
+    description: "whether B is pressed",
     value: "%00100000"
   },
   PAD_SWAP_A: {
-    description: "1 << B_PAD_SWAP_A",
+    description: "whether A is pressed",
     value: "%00010000"
   },
   PAD_SWAP_DOWN: {
-    description: "1 << B_PAD_SWAP_DOWN",
+    description: "whether Down is pressed",
     value: "%00001000"
   },
   PAD_SWAP_UP: {
-    description: "1 << B_PAD_SWAP_UP",
+    description: "whether Up is pressed",
     value: "%00000100"
   },
   PAD_SWAP_LEFT: {
-    description: "1 << B_PAD_SWAP_LEFT",
+    description: "whether Left is pressed",
     value: "%00000010"
   },
   PAD_SWAP_RIGHT: {
-    description: "1 << B_PAD_SWAP_RIGHT",
+    description: "whether Right is pressed",
     value: "%00000001"
   },
 };
