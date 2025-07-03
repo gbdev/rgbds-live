@@ -1,11 +1,11 @@
 import { require } from './loader.js';
-import { gameboy_hardware_constants } from '../gbz80.js';
+import { gameboy_hardware_constants } from '../sm83.js';
 
 const { TextHighlightRules } = await require('ace/mode/text_highlight_rules');
 
 const constants_re = '\\b(?:' + Object.keys(gameboy_hardware_constants).join('|') + ')\\b';
 
-export class GBZ80HighlightRules extends TextHighlightRules {
+export class SM83HighlightRules extends TextHighlightRules {
   constructor() {
     super();
 
@@ -164,16 +164,16 @@ class FoldMode extends BaseFoldMode {
 }
 
 const { Mode: TextMode } = await require('ace/mode/text');
-export class GBZ80Mode extends TextMode {
+export class SM83Mode extends TextMode {
   static lineCommentStart = [';'];
-  static $id = 'ace/mode/gbz80';
+  static $id = 'ace/mode/sm83';
 
   constructor() {
     super();
-    this.HighlightRules = GBZ80HighlightRules;
+    this.HighlightRules = SM83HighlightRules;
     this.foldingRules = new FoldMode();
     this.$behaviour = this.$defaultBehaviour;
   }
 }
 
-ace.define('ace/mode/gbz80', ['exports'], (exports) => Object.assign(exports, { Mode: GBZ80Mode }));
+ace.define('ace/mode/sm83', ['exports'], (exports) => Object.assign(exports, { Mode: SM83Mode }));

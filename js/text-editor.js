@@ -2,12 +2,12 @@ import ace from './ace/loader.js';
 import * as compiler from './compiler.js';
 import * as storage from './storage.js';
 import * as main from './main.js';
-import './ace/mode-gbz80.js';
+import './ace/mode-sm83.js';
 
 ace.config.set('basePath', `assets/ace`);
 
-import { TokenTooltip } from './ace/gbz80tooltip.js';
-import { gbz80Completer } from './ace/complete-gbz80.js';
+import { TokenTooltip } from './ace/sm83tooltip.js';
+import { sm83Completer } from './ace/complete-sm83.js';
 
 var editors = [];
 var current_file = null;
@@ -33,7 +33,7 @@ export function register(div_id, compileCode) {
   runColorMode((isDarkMode) => {
     e.setTheme(isDarkMode ? 'ace/theme/tomorrow_night_eighties' : 'ace/theme/tomorrow');
   });
-  e.session.setMode('ace/mode/gbz80');
+  e.session.setMode('ace/mode/sm83');
   e.setOptions({
     tabSize: 2,
     useSoftTabs: true,
@@ -41,7 +41,7 @@ export function register(div_id, compileCode) {
     enableLiveAutocompletion: true,
     enableSnippets: true,
   });
-  e.completers = [gbz80Completer];
+  e.completers = [sm83Completer];
 
   e.session.on('change', function (delta) {
     if (e.curOp && e.curOp.command.name) {

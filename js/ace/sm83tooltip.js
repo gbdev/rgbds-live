@@ -1,4 +1,4 @@
-import { gameboy_hardware_constants } from '../gbz80.js';
+import { gameboy_hardware_constants } from '../sm83.js';
 import ace, { require } from './loader.js';
 
 const { Tooltip } = await require('ace/tooltip');

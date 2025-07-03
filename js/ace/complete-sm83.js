@@ -1,6 +1,6 @@
-import { gameboy_hardware_constants } from '../gbz80.js';
+import { gameboy_hardware_constants } from '../sm83.js';
 
-var gbz80Instructions = [
+var sm83Instructions = [
   {
     name: 'adc a, r8',
     description: 'a = a + r8 + carry',
@@ -1057,8 +1057,8 @@ var gbz80Instructions = [
   },
 ];
 
-var gbz80CompleterInstructions = [];
-gbz80Instructions.forEach(function (instr) {
+var sm83CompleterInstructions = [];
+sm83Instructions.forEach(function (instr) {
   var doc = '<table><tr><td colspan=2>' + instr['description'];
   doc += '<tr><td>cycles:<td>' + instr['cycles'];
   doc += '<tr><td>size:<td>' + instr['bytes'];
@@ -1078,9 +1078,9 @@ gbz80Instructions.forEach(function (instr) {
       //editor.selection.selectTo(editor.selection.cursor.row, editor.selection.cursor.column - offset);
     },
   };
-  gbz80CompleterInstructions.push(i);
+  sm83CompleterInstructions.push(i);
 });
-var gbz80CompleterConstants = [];
+var sm83CompleterConstants = [];
 for (var key in gameboy_hardware_constants) {
   var constant = gameboy_hardware_constants[key];
   var doc = '';
@@ -1096,10 +1096,10 @@ for (var key in gameboy_hardware_constants) {
     meta: '',
     docHTML: doc,
   };
-  gbz80CompleterConstants.push(i);
+  sm83CompleterConstants.push(i);
 }
 
-var gbz80Completer = {
+var sm83Completer = {
   getCompletions: function (editor, session, pos, prefix, callback) {
     var line = session.getLine(pos.row);
     // Check if we are possibly typing an instruction.
@@ -1107,14 +1107,14 @@ var gbz80Completer = {
     if (before.trim() == '' || before.trim().endsWith(':')) {
       callback(
         null,
-        gbz80CompleterInstructions.filter(function (c) {
+        sm83CompleterInstructions.filter(function (c) {
           return c.value.startsWith(prefix.toLowerCase());
         }),
       );
     } else {
       callback(
         null,
-        gbz80CompleterConstants.filter(function (c) {
+        sm83CompleterConstants.filter(function (c) {
           return c.value.toLowerCase().startsWith(prefix.toLowerCase());
         }),
       );
@@ -1122,4 +1122,4 @@ var gbz80Completer = {
   },
 };
 
-export { gbz80Completer };
+export { sm83Completer };
