@@ -25,7 +25,8 @@ export function reset() {
   };
 }
 
-function getHardwareFiles() { return { 
+function getHardwareFiles() {
+  return { 
     'hardware.inc': HARDWARE_INC, 
     'hardware_compat.inc' : HARDWARE_COMPAT_INC
   }
