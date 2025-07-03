@@ -5,6 +5,7 @@ import * as editors from './editors.js';
 import * as main from './main.js';
 
 import HARDWARE_INC from '../hardware.inc/hardware.inc?raw';
+import HARDWARE_COMPAT_INC from '../hardware.inc/hardware_compat.inc?raw';
 import MAIN_ASM from '../starting_project/main.asm?raw';
 
 export const config = {
@@ -19,8 +20,15 @@ reset();
 export function reset() {
   files = {
     'hardware.inc': HARDWARE_INC,
+    'hardware_compat.inc': HARDWARE_COMPAT_INC,
     'main.asm': MAIN_ASM,
   };
+}
+
+function getHardwareFiles() { return { 
+    'hardware.inc': HARDWARE_INC, 
+    'hardware_compat.inc' : HARDWARE_COMPAT_INC
+  }
 }
 
 export function autoLoad() {
@@ -36,7 +44,7 @@ export function autoLoad() {
       config.autoUrl = true;
     }
   } else if ('rgbds_storage' in localStorage) {
-    files = { 'hardware.inc': HARDWARE_INC };
+    files = getHardwareFiles();
     for (var [filename, data] of Object.entries(JSON.parse(localStorage['rgbds_storage']))) {
       if (data instanceof Object) data = Uint8Array.from(Object.values(data));
       files[filename] = data;
@@ -69,7 +77,7 @@ export function loadUrlHash() {
     return true;
   }
   all_code = all_code.split('\0');
-  files = { 'hardware.inc': HARDWARE_INC };
+  files = getHardwareFiles();
   for (var idx = 0; idx < all_code.length - 1; idx += 2) {
     files[all_code[idx]] = all_code[idx + 1];
   }
@@ -104,7 +112,7 @@ export function loadGithubGist(url) {
   JSON.parse(req.response);
 
   var result = JSON.parse(req.responseText);
-  files = { 'hardware.inc': HARDWARE_INC };
+  files = getHardwareFiles();
   for (var [name, data] of Object.entries(result.files)) {
     files[name] = data.content;
   }
@@ -159,7 +167,7 @@ export function downloadZip() {
 }
 
 export function loadZip(file) {
-  files = { 'hardware.inc': HARDWARE_INC };
+  files = getHardwareFiles();
   JSZip.loadAsync(file).then(function (zip) {
     var entries = Object.values(zip.files);
     function loadNextFile() {
@@ -177,7 +185,7 @@ export function loadZip(file) {
 }
 
 export function loadSingleUrl(url) {
-  files = { 'hardware.inc': HARDWARE_INC };
+  files = getHardwareFiles();
   var req = new XMLHttpRequest();
   req.open('GET', url, false);
   req.send();
