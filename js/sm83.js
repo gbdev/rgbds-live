@@ -62,7 +62,7 @@ const gameboy_hardware_constants = {
         value: '0',
       },
       JOYP_INPUTS: {
-        description: '0 bits are pressed (if reading inputs)',
+        description: 'bits equal to 0 indicate pressed (if reading inputs)',
         value: '%0000_1111',
       },
       JOYP_START: {
@@ -96,6 +96,30 @@ const gameboy_hardware_constants = {
       JOYP_RIGHT: {
         description: 'Right is pressed (if reading Control Pad)',
         value: '%00000001',
+      },
+      B_JOYP_SGB_ONE: {
+        description: '0 = sending 1 bit (for SGB command packet transfer)',
+        value: '5',
+      },
+      B_JOYP_SGB_ZERO: {
+        description: '0 = sending 0 bit (for SGB command packet transfer)',
+        value: '4',
+      },
+      JOYP_SGB_START: {
+        description: 'start SGB packet transfer (if SGB)',
+        value: '%00_00_0000',
+      },
+      JOYP_SGB_ONE: {
+        description: 'send 1 bit (if SGB)',
+        value: '%00_01_0000',
+      },
+      JOYP_SGB_ZERO: {
+        description: 'send 0 bit (if SGB)',
+        value: '%00_10_0000',
+      },
+      JOYP_SGB_FINISH: {
+        description: 'finish SGB packet transfer (if SGB)',
+        value: '%00_11_0000',
       },
     },
   },
@@ -341,7 +365,7 @@ const gameboy_hardware_constants = {
   rAUD1LOW: {
     value: '$FF13',
     alias: 'rNR13',
-    description: 'Audio channel 1 period (low 8 bits) [r/w]',
+    description: 'Audio channel 1 period (low 8 bits) [wo]',
   },
   rAUD1HIGH: {
     value: '$FF14',
@@ -439,7 +463,7 @@ const gameboy_hardware_constants = {
   rAUD2LOW: {
     value: '$FF18',
     alias: 'rNR23',
-    description: 'Audio channel 2 period (low 8 bits) [r/w]',
+    description: 'Audio channel 2 period (low 8 bits) [wo]',
   },
   rAUD2HIGH: {
     value: '$FF19',
@@ -526,7 +550,7 @@ const gameboy_hardware_constants = {
   rAUD3LOW: {
     value: '$FF1D',
     alias: 'rNR33',
-    description: 'Audio channel 3 period (low 8 bits) [r/w]',
+    description: 'Audio channel 3 period (low 8 bits) [wo]',
   },
   rAUD3HIGH: {
     value: '$FF1E',
@@ -823,6 +847,26 @@ const gameboy_hardware_constants = {
         value: '%00000001',
       },
     },
+  },
+  AUD1RAM: {
+    description: 'Audio channel 1 RAM address',
+    value: '$FF10',
+  },
+  AUD2RAM: {
+    description: 'Audio channel 2 RAM address',
+    value: '$FF15',
+  },
+  AUD3RAM: {
+    description: 'Audio channel 3 RAM address',
+    value: '$FF1A',
+  },
+  AUD4RAM: {
+    description: 'Audio channel 4 RAM address',
+    value: '$FF1F',
+  },
+  AUDRAM_SIZE: {
+    description: 'size of each audio channel RAM in bytes',
+    value: '5',
   },
   _AUD3WAVERAM: {
     value: '$FF30',
@@ -1175,7 +1219,7 @@ const gameboy_hardware_constants = {
     description: "X coordinate of the Window's top-left pixel, plus 7 (7-166) [r/w]",
     flags: {
       WX_OFS: {
-        description: 'subtract this to get the actual Window Y coordinate',
+        description: 'subtract this to get the actual Window X coordinate',
         value: '7',
       },
     },
@@ -1845,6 +1889,22 @@ const gameboy_hardware_constants = {
     description: 'size of color in bytes (little-endian BGR555)',
     value: '2',
   },
+  PAL_COLORS: {
+    description: 'colors per palette',
+    value: '4',
+  },
+  PAL_SIZE: {
+    description: 'size of palette in bytes',
+    value: '8',
+  },
+  COLOR_CH_WIDTH: {
+    description: 'bits per RGB color channel',
+    value: '5',
+  },
+  COLOR_CH_MAX: {
+    description: 'maximum value of RGB color channel',
+    value: '31',
+  },
   B_COLOR_RED: {
     description: 'color bits 4-0',
     value: '0',
@@ -1873,13 +1933,21 @@ const gameboy_hardware_constants = {
     description: 'for the high color byte',
     value: '%0_11111_00',
   },
-  PAL_COLORS: {
-    description: 'colors per palette',
-    value: '4',
+  SHADE_WHITE: {
+    description: '(DMG only) grayscale shade index 0 (for BGP, OBP0, and OBP1)',
+    value: '%00',
   },
-  PAL_SIZE: {
-    description: 'size of palette in bytes',
-    value: '8',
+  SHADE_LIGHT: {
+    description: '(DMG only) grayscale shade index 1 (for BGP, OBP0, and OBP1)',
+    value: '%01',
+  },
+  SHADE_DARK: {
+    description: '(DMG only) grayscale shade index 2 (for BGP, OBP0, and OBP1)',
+    value: '%10',
+  },
+  SHADE_BLACK: {
+    description: '(DMG only) grayscale shade index 3 (for BGP, OBP0, and OBP1)',
+    value: '%11',
   },
   TILEMAP0: {
     description: '$9800-$9BFF',
@@ -2080,6 +2148,46 @@ const gameboy_hardware_constants = {
   BOOTUP_B_AGB: {
     description: 'Register B = CPU qualifier (if A is BOOTUP_A_CGB)',
     value: '%00000001',
+  },
+  BOOTUP_C_DMG: {
+    description: 'Register C = CPU qualifier',
+    value: '$13',
+  },
+  BOOTUP_C_SGB: {
+    description: 'Register C = CPU qualifier',
+    value: '$14',
+  },
+  BOOTUP_C_CGB: {
+    description: 'Register C = CPU qualifier (CGB or AGB)',
+    value: '$00',
+  },
+  BOOTUP_D_MONO: {
+    description: 'Register D = color qualifier (DMG, MGB, SGB, or CGB or AGB in DMG mode)',
+    value: '$00',
+  },
+  BOOTUP_D_COLOR: {
+    description: 'Register D = color qualifier (CGB or AGB)',
+    value: '$FF',
+  },
+  BOOTUP_E_DMG0: {
+    description: 'Register E = CPU qualifier',
+    value: '$C1',
+  },
+  BOOTUP_E_DMG: {
+    description: 'Register E = CPU qualifier',
+    value: '$C8',
+  },
+  BOOTUP_E_SGB: {
+    description: 'Register E = CPU qualifier',
+    value: '$00',
+  },
+  BOOTUP_E_CGB_DMGMODE: {
+    description: 'Register E = CPU qualifier (CGB or AGB in DMG mode)',
+    value: '$08',
+  },
+  BOOTUP_E_CGB: {
+    description: 'Register E = CPU qualifier (CGB or AGB)',
+    value: '$56',
   },
 
   // Combined input bytes
