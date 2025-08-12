@@ -12,7 +12,7 @@ index c62a0e9d..39d357b2 100644
                    OUTPUT_VARIABLE GIT_REV OUTPUT_STRIP_TRAILING_WHITESPACE
                    ERROR_QUIET)
 diff --git a/Makefile b/Makefile
-index f6a76b72..b61be233 100644
+index 6a0da441..792ac504 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -24,7 +24,7 @@ PNGLDFLAGS := `${PKG_CONFIG} --libs-only-L libpng`
@@ -25,18 +25,19 @@ index f6a76b72..b61be233 100644
  WARNFLAGS := -Wall -pedantic -Wno-unknown-warning-option -Wno-gnu-zero-variadic-macro-arguments
  
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index 3712b3df..4cd075c9 100644
+index d22f1557..e9d9f94a 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
-@@ -62,6 +62,7 @@
+@@ -62,6 +62,8 @@
+ 
  	yy::parser::symbol_type yylex(); // Provided by lexer.cpp
  
- 	static uint32_t strToNum(std::vector<int32_t> const &s);
 +	Symbol *sym_AddSecret();
- 	static void errorInvalidUTF8Byte(uint8_t byte, char const *functionName);
- 	static size_t strlenUTF8(std::string const &str, bool printErrors);
- 	static std::string strsliceUTF8(std::string const &str, uint32_t start, uint32_t stop);
-@@ -524,7 +525,7 @@ else:
++
+ 	template <typename N, typename S>
+ 	static auto handleSymbolByType(std::string const &symName, N numCallback, S strCallback) {
+ 		if (Symbol *sym = sym_FindScopedSymbol(symName); sym && sym->type == SYM_EQUS) {
+@@ -514,7 +516,7 @@ else:
  
  plain_directive:
  	  label
@@ -46,10 +47,10 @@ index 3712b3df..4cd075c9 100644
  	| label directive
  ;
 diff --git a/src/asm/symbol.cpp b/src/asm/symbol.cpp
-index 9510a8d8..3ae164f0 100644
+index 59aaccae..b143b0fb 100644
 --- a/src/asm/symbol.cpp
 +++ b/src/asm/symbol.cpp
-@@ -708,3 +708,33 @@ void sym_Init(time_t now) {
+@@ -718,3 +718,33 @@ void sym_Init(time_t now) {
  	sym_AddEqu("__UTC_MINUTE__"s, time_utc->tm_min)->isBuiltin = true;
  	sym_AddEqu("__UTC_SECOND__"s, time_utc->tm_sec)->isBuiltin = true;
  }
@@ -65,7 +66,7 @@ index 9510a8d8..3ae164f0 100644
 +	char valueBuf[64];
 +	snprintf(
 +	    valueBuf,
-+	    sizeof(valueBuf),
++	    std::size(valueBuf),
 +	    "__SEC_%" PRIx64 "_%" PRIx32 "_",
 +	    secretCounter++,
 +	    lexer_GetLineNo()
