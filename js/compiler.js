@@ -101,12 +101,11 @@ function startCompile() {
 
 function runRgbAsm(targets, obj_files) {
   var target = targets.pop();
-  var args = [target, '-o', 'output.o', '-Wall'].concat(asm_options);
+  var args = ['-Wall', ...asm_options, '--color', 'never', '-o', 'output.o', '--', target];
   infoFunction('Running: rgbasm ' + args.join(' '));
   createRgbAsm({
     arguments: args,
     preRun: function (m) {
-      m.ENV = { NO_COLOR: '1' };
       var FS = m.FS;
       for (const [key, value] of Object.entries(storage.getFiles())) {
         FS.writeFile(key, value);
@@ -133,13 +132,14 @@ function runRgbAsm(targets, obj_files) {
 }
 
 function runRgbLink(obj_files) {
-  var args = ['-o', 'output.gb', '--map', 'output.map'].concat(link_options);
-  for (var name in obj_files) args.push(name + '.o');
+  var args = ['--color', 'never', '-o', 'output.gb', ...link_options, '-m', 'output.map', '--'];
+  for (var name in obj_files) {
+    args.push(name + '.o');
+  }
   infoFunction('Running: rgblink ' + args.join(' '));
   createRgbLink({
     arguments: args,
     preRun: function (m) {
-      m.ENV = { NO_COLOR: '1' };
       var FS = m.FS;
       for (var name in obj_files) FS.writeFile(name + '.o', obj_files[name]);
     },
@@ -169,12 +169,11 @@ function runRgbLink(obj_files) {
 }
 
 function runRgbFix(input_rom_file, map_file) {
-  var args = ['-v', 'output.gb', '-p', '0xff'].concat(fix_options);
+  var args = ['--color', 'never', '-p', '0xff', '-v', ...fix_options, '--', 'output.gb'];
   infoFunction('Running: rgbfix ' + args.join(' '));
   createRgbFix({
     arguments: args,
     preRun: function (m) {
-      m.ENV = { NO_COLOR: '1' };
       var FS = m.FS;
       FS.writeFile('output.gb', input_rom_file);
     },
