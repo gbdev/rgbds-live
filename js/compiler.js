@@ -106,6 +106,7 @@ function runRgbAsm(targets, obj_files) {
   createRgbAsm({
     arguments: args,
     preRun: function (m) {
+      ENV.NO_COLOR = "1";
       var FS = m.FS;
       for (const [key, value] of Object.entries(storage.getFiles())) {
         FS.writeFile(key, value);
@@ -138,6 +139,7 @@ function runRgbLink(obj_files) {
   createRgbLink({
     arguments: args,
     preRun: function (m) {
+      ENV.NO_COLOR = "1";
       var FS = m.FS;
       for (var name in obj_files) FS.writeFile(name + '.o', obj_files[name]);
     },
@@ -172,6 +174,7 @@ function runRgbFix(input_rom_file, map_file) {
   createRgbFix({
     arguments: args,
     preRun: function (m) {
+      ENV.NO_COLOR = "1";
       var FS = m.FS;
       FS.writeFile('output.gb', input_rom_file);
     },
