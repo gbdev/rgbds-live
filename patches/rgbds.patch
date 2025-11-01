@@ -12,7 +12,7 @@ index c62a0e9d..39d357b2 100644
                    OUTPUT_VARIABLE GIT_REV OUTPUT_STRIP_TRAILING_WHITESPACE
                    ERROR_QUIET)
 diff --git a/Makefile b/Makefile
-index 6a0da441..792ac504 100644
+index a0e7a07c..8bf8921f 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -24,7 +24,7 @@ PNGLDFLAGS := `${PKG_CONFIG} --libs-only-L libpng`
@@ -25,32 +25,32 @@ index 6a0da441..792ac504 100644
  WARNFLAGS := -Wall -pedantic -Wno-unknown-warning-option -Wno-gnu-zero-variadic-macro-arguments
  
 diff --git a/src/asm/parser.y b/src/asm/parser.y
-index d22f1557..e9d9f94a 100644
+index 1e2c7780..3ad648a8 100644
 --- a/src/asm/parser.y
 +++ b/src/asm/parser.y
-@@ -62,6 +62,8 @@
+@@ -57,6 +57,8 @@
  
  	yy::parser::symbol_type yylex(); // Provided by lexer.cpp
  
 +	Symbol *sym_AddSecret();
 +
- 	template <typename N, typename S>
- 	static auto handleSymbolByType(std::string const &symName, N numCallback, S strCallback) {
- 		if (Symbol *sym = sym_FindScopedSymbol(symName); sym && sym->type == SYM_EQUS) {
-@@ -514,7 +516,7 @@ else:
+ 	template<typename NumCallbackFnT, typename StrCallbackFnT>
+ 	static auto handleSymbolByType(
+ 	    std::string const &symName, NumCallbackFnT numCallback, StrCallbackFnT strCallback
+@@ -489,7 +491,7 @@ else:
  
  plain_directive:
  	  label
--	| label cpu_commands
-+	| label { sym_AddSecret(); } cpu_commands
- 	| label macro
+-	| label data
++	| label { sym_AddSecret(); } data
+ 	| label macro_invocation
  	| label directive
  ;
 diff --git a/src/asm/symbol.cpp b/src/asm/symbol.cpp
-index 59aaccae..b143b0fb 100644
+index 571dd2f3..e9dd14ff 100644
 --- a/src/asm/symbol.cpp
 +++ b/src/asm/symbol.cpp
-@@ -718,3 +718,33 @@ void sym_Init(time_t now) {
+@@ -776,3 +776,33 @@ void sym_Init(time_t now) {
  	sym_AddEqu("__UTC_MINUTE__"s, time_utc->tm_min)->isBuiltin = true;
  	sym_AddEqu("__UTC_SECOND__"s, time_utc->tm_sec)->isBuiltin = true;
  }
