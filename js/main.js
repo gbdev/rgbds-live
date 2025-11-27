@@ -353,6 +353,9 @@ export function init(event) {
     updateFileList();
     updateCpuState();
   };
+  document.getElementById('hamburger-container').onclick = function () {
+    document.querySelector('body .container:first-child').classList.toggle('filelist-open');
+  };
   document.getElementById('newfile').onclick = function () {
     document.getElementById('newfiledialog').style.display = 'block';
   };

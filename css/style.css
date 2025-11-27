@@ -188,6 +188,28 @@ canvas {
   white-space: nowrap;
 }
 
+.menubar li#hamburger-container {
+  margin-top: -2px;
+  padding-top: 0;
+}
+
+.menubar li#hamburger-container:active {
+  background-color: var(--selectedfile-background);
+}
+
+.menubar li#hamburger-container:hover {
+  cursor: pointer;
+  background-color: default;
+}
+
+.menubar li#hamburger-container .hamburger {
+  display: block;
+  font-size: 16px;
+  transform: scale(1.5);
+  position: relative;
+  top: 1px;
+}
+
 .menubar li ul {
   display: none;
   position: absolute;
@@ -201,7 +223,8 @@ canvas {
 .menubar li ul li:last-child {
   border-bottom: 1px solid var(--background-alt);
 }
-.menubar ul li:hover {
+.menubar ul li:hover,
+.filelist-open li#hamburger-container {
   background-color: var(--background-alt);
 }
 .menubar li:hover ul,
@@ -291,15 +314,23 @@ canvas {
   grid-column: 1 / 4;
   grid-row: 1;
 }
+
+.editor {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row: 2;
+}
+
+.filelist-open .editor {
+  grid-column: 2;
+}
+
 .sidebar {
   grid-column: 1;
   grid-row: 2;
   overflow: auto;
 }
-.editor {
-  grid-column: 2;
-  grid-row: 2;
-}
+
 .emulator {
   grid-column: 3;
   grid-row: 2 / 4;
