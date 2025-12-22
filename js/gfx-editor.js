@@ -15,8 +15,6 @@ export function register(div_id) {
   tile_canvas = document.getElementById('gfxEditorTilesCanvas');
   draw_canvas = document.getElementById('gfxEditorDrawCanvas');
   palette_canvas = document.getElementById('gfxEditorPalette');
-  new ResizeObserver(function () {
-  }).observe(main_div);
 
   draw_canvas.onmousemove = function (e) {
     var rect = e.target.getBoundingClientRect();
