@@ -16,9 +16,6 @@ export function register(div_id) {
   draw_canvas = document.getElementById('gfxEditorDrawCanvas');
   palette_canvas = document.getElementById('gfxEditorPalette');
   new ResizeObserver(function () {
-    tile_canvas.parentElement.style.maxWidth = main_div.clientWidth;
-    tile_canvas.parentElement.style.maxHeight = main_div.clientHeight - 300;
-    tile_canvas.parentElement.style.display = '';
   }).observe(main_div);
 
   draw_canvas.onmousemove = function (e) {
