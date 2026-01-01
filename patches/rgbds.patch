@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index c62a0e9d..39d357b2 100644
+index 25852c02..c8ad3e66 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -74,7 +74,7 @@ endif()
@@ -12,7 +12,7 @@ index c62a0e9d..39d357b2 100644
                    OUTPUT_VARIABLE GIT_REV OUTPUT_STRIP_TRAILING_WHITESPACE
                    ERROR_QUIET)
 diff --git a/Makefile b/Makefile
-index a0e7a07c..8bf8921f 100644
+index 3908ee03..7eeb4ee0 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -24,7 +24,7 @@ PNGLDFLAGS := `${PKG_CONFIG} --libs-only-L libpng`
@@ -47,10 +47,10 @@ index 1e2c7780..3ad648a8 100644
  	| label directive
  ;
 diff --git a/src/asm/symbol.cpp b/src/asm/symbol.cpp
-index 571dd2f3..e9dd14ff 100644
+index 5c26f010..d613886c 100644
 --- a/src/asm/symbol.cpp
 +++ b/src/asm/symbol.cpp
-@@ -776,3 +776,33 @@ void sym_Init(time_t now) {
+@@ -782,3 +782,33 @@ void sym_Init(time_t now) {
  	sym_AddEqu("__UTC_MINUTE__"s, time_utc->tm_min)->isBuiltin = true;
  	sym_AddEqu("__UTC_SECOND__"s, time_utc->tm_sec)->isBuiltin = true;
  }
