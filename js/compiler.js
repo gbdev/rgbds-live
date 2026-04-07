@@ -231,7 +231,7 @@ function buildDone(rom_file, map_file) {
           var file = sym.substr(sym.indexOf('_') + 1);
           file = file.substr(file.indexOf('_') + 1);
           var line_nr = parseInt(sym.split('_')[1], 16);
-          addr = (addr & 0x3fff) | (bank_nr << 14);
+          addr = addr | (bank_nr << 14);
           addr_to_line[addr] = [file, line_nr];
         } else if (sym == 'emustart' || sym == 'emuStart' || sym == 'emu_start') {
           start_address = addr;
