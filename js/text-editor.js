@@ -74,6 +74,7 @@ export function setCurrentFile(filename) {
   editors[0].focus();
   updateErrors();
   updateCpuLine();
+  updateBreakpoints();
 }
 
 export function updateErrors() {
