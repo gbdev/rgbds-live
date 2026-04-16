@@ -424,13 +424,13 @@ export function init(event) {
       requestAnimationFrame(runFunction);
     }
   };
-  var canvas = document.getElementById('emulator_screen_canvas');
-  canvas.tabIndex = -1;
-  canvas.onkeydown = function (e) {
+  var keyboardInput = document.getElementById('emulator_screen_container');
+  keyboardInput.tabIndex = -1;
+  keyboardInput.onkeydown = function (e) {
     handleGBKey(e.code, true);
     e.preventDefault();
   };
-  canvas.onkeyup = function (e) {
+  keyboardInput.onkeyup = function (e) {
     handleGBKey(e.code, false);
     e.preventDefault();
   };
