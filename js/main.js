@@ -49,7 +49,7 @@ compiler.setLogCallback(function (str, kind) {
 const serial_log_buffer = [];
 const serial_log_buffer_size = 256;
 emulator.setSerialCallback(function (value) {
-  var formatted_value = ('00' + value.toString(16)).slice(-2);
+  var formatted_value = toHex2(value);
   document.getElementById('serial_log').innerText = '$' + formatted_value;
   serial_log_buffer.unshift(formatted_value);
   if (serial_log_buffer.length > serial_log_buffer_size) {
@@ -138,21 +138,39 @@ function handleGBKey(code, down) {
   }
 }
 
+const hexTable = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, '0'));
+const toHex2 = (num) => hexTable[num & 0xff];
+const toHex4 = (num) => hexTable[(num >> 8) & 0xff] + hexTable[num & 0xff];
+
 function toHex(num, digits) {
-  return '$' + ('0000' + num.toString(16)).slice(-digits);
+  if (digits === 2) {
+    return '$' + toHex2(num);
+  } else {
+    return '$' + toHex4(num);
+  }
 }
+
+const cpuDom = {
+  pc: document.getElementById('cpu_pc'),
+  sp: document.getElementById('cpu_sp'),
+  a: document.getElementById('cpu_a'),
+  bc: document.getElementById('cpu_bc'),
+  de: document.getElementById('cpu_de'),
+  hl: document.getElementById('cpu_hl'),
+  flags: document.getElementById('cpu_flags'),
+};
 
 function updateCpuState(afterSingleStep) {
   emulator.renderScreen();
 
   var pc = emulator.getPC();
-  document.getElementById('cpu_pc').innerHTML = toHex(pc, 4);
-  document.getElementById('cpu_sp').innerHTML = toHex(emulator.getSP(), 4);
-  document.getElementById('cpu_a').innerHTML = toHex(emulator.getA(), 2);
-  document.getElementById('cpu_bc').innerHTML = toHex(emulator.getBC(), 4);
-  document.getElementById('cpu_de').innerHTML = toHex(emulator.getDE(), 4);
-  document.getElementById('cpu_hl').innerHTML = toHex(emulator.getHL(), 4);
-  document.getElementById('cpu_flags').innerHTML = emulator.getFlags();
+  cpuDom.pc.innerText = toHex(pc, 4);
+  cpuDom.sp.innerText = toHex(emulator.getSP(), 4);
+  cpuDom.a.innerText = toHex(emulator.getA(), 2);
+  cpuDom.bc.innerText = toHex(emulator.getBC(), 4);
+  cpuDom.de.innerText = toHex(emulator.getDE(), 4);
+  cpuDom.hl.innerText = toHex(emulator.getHL(), 4);
+  cpuDom.flags.innerText = emulator.getFlags();
 
   var file_line_nr = addr_to_line[pc];
   if (typeof file_line_nr == 'undefined') file_line_nr = addr_to_line[pc - 1];
@@ -228,7 +246,7 @@ function updateTextView() {
         "<span style='float: left; width: 50px'>" +
         reg_info.name +
         ':</span>' +
-        ('00' + emulator.readMem(reg_info.value).toString(16)).slice(-2) +
+        toHex2(emulator.readMem(reg_info.value)) +
         '<br/>';
     }
     display_text.innerHTML = text;
@@ -250,11 +268,11 @@ function updateTextView() {
   var span = false;
   var span_color = 0;
   for (var n = 0; n < data.length; n += 16) {
-    var hex = Array.prototype.map.call(data.slice(n, n + 16), (x) => ('00' + x.toString(16)).slice(-2));
+    var hex = Array.prototype.map.call(data.slice(n, n + 16), (x) => toHex2(x));
     var bank = ~~(n / bank_size);
     var addr = n & (bank_size - 1);
     if (bank > 0) addr += bank_size;
-    text += ('00' + bank.toString(16)).slice(-2) + ':' + ('0000' + (addr + offset).toString(16)).slice(-4);
+    text += toHex2(bank) + ':' + toHex4(addr + offset);
     for (var idx = 0; idx < hex.length; idx++) {
       text += ' ';
       var new_symbol = symbols[n + idx + offset];
