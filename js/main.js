@@ -163,7 +163,7 @@ const cpuDom = {
 function updateCpuState(afterSingleStep) {
   emulator.renderScreen();
 
-  var pc = emulator.getPC();
+  var pc = emulator.getBankedPC();
   cpuDom.pc.innerText = toHex(pc, 4);
   cpuDom.sp.innerText = toHex(emulator.getSP(), 4);
   cpuDom.a.innerText = toHex(emulator.getA(), 2);
