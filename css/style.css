@@ -14,16 +14,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --selectedfile-background: #335;
-    --color: #d4d4d4;
-    --background: #1e1e1e;
-    --background-alt: #2d2d2d;
-    --border-color: #404040;
-    --link: #6699ff;
-    --active-link: #ff6666;
-    --log-info: #888888;
-    --log-out: #d4d4d4;
-    --log-err: #ff4444;
+    color-scheme: dark;
+    --selectedfile-background: #557;
+    --color: #cccccc;
+    --background: #2d2d2d;
+    --background-alt: #424242;
+    --border-color: #575757;
+    --link: #8888ff;
+    --active-link: #ff8888;
+    --log-info: #999999;
+    --log-out: #ffffff;
+    --log-err: #ff0000;
   }
 }
 
