@@ -644,4 +644,76 @@ export function init(event) {
     document.getElementById('cpu_run_check').checked = true;
     document.getElementById('cpu_run_check').onclick();
   }
+
+  (function () {
+    var DEFAULT_SIZE = 12;
+    var MIN_SIZE = 8;
+    var MAX_SIZE = 32;
+    var STORAGE_KEY = 'editorFontSize';
+
+    var btnDecrease = document.getElementById('font-decrease');
+    var btnIncrease = document.getElementById('font-increase');
+    var btnReset = document.getElementById('font-reset');
+    var display = document.getElementById('font-size-display');
+
+    var currentSize = parseInt(localStorage.getItem(STORAGE_KEY)) || DEFAULT_SIZE;
+
+    function applyFontSize(size) {
+      if (size < MIN_SIZE) size = MIN_SIZE;
+      if (size > MAX_SIZE) size = MAX_SIZE;
+      currentSize = size;
+
+      var editorDiv = document.getElementById('textEditorDiv');
+      if (editorDiv) {
+        editorDiv.style.fontSize = size + 'px';
+      }
+
+      if (typeof textEditor !== 'undefined' && textEditor.getEditor) {
+        var ace = textEditor.getEditor();
+        if (ace && ace.setFontSize) {
+          ace.setFontSize(size);
+        }
+      }
+
+      if (display) display.textContent = size + 'px';
+      localStorage.setItem(STORAGE_KEY, size);
+    }
+
+    applyFontSize(currentSize);
+
+    if (btnIncrease) {
+      btnIncrease.onclick = function (e) {
+        e.stopPropagation();
+        applyFontSize(currentSize + 1);
+      };
+    }
+    if (btnDecrease) {
+      btnDecrease.onclick = function (e) {
+        e.stopPropagation();
+        applyFontSize(currentSize - 1);
+      };
+    }
+    if (btnReset) {
+      btnReset.onclick = function (e) {
+        e.stopPropagation();
+        applyFontSize(DEFAULT_SIZE);
+      };
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === '=' || e.key === '+') {
+          e.preventDefault();
+          applyFontSize(currentSize + 1);
+        } else if (e.key === '-') {
+          e.preventDefault();
+          applyFontSize(currentSize - 1);
+        } else if (e.key === '0') {
+          e.preventDefault();
+          applyFontSize(DEFAULT_SIZE);
+        }
+      }
+    });
+  })();
+
 }
