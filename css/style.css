@@ -1,4 +1,5 @@
 :root {
+  --base-font-size: 12px;
   --selectedfile-background: #ccf;
   --color: #2d2d2c;
   --background: #fafafa;
@@ -13,25 +14,73 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    color-scheme: dark;
-    --selectedfile-background: #557;
-    --color: #cccccc;
-    --background: #2d2d2d;
-    --background-alt: #424242;
-    --border-color: #575757;
-    --link: #8888ff;
-    --active-link: #ff8888;
-    --log-info: #999999;
-    --log-out: #ffffff;
-    --log-err: #ff0000;
+    --selectedfile-background: #335;
+    --color: #d4d4d4;
+    --background: #1e1e1e;
+    --background-alt: #2d2d2d;
+    --border-color: #404040;
+    --link: #6699ff;
+    --active-link: #ff6666;
+    --log-info: #888888;
+    --log-out: #d4d4d4;
+    --log-err: #ff4444;
   }
 }
 
 body {
   color: var(--color);
   background: var(--background);
-  font: 12px / normal sans-serif;
+  font-family: sans-serif;
+  font-size: var(--base-font-size);
+  line-height: normal;
+  margin: 0;
 }
+
+.container {
+  display: grid;
+  grid-template-columns: 200px auto 520px;
+  grid-template-rows: 24px auto 20%;
+  grid-gap: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+
+.font-size-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.font-size-control button {
+  padding: 0px 5px;
+  margin: 0;
+  font-size: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  background-color: var(--background);
+  color: var(--color);
+  cursor: pointer;
+  line-height: 16px;
+  min-width: 20px;
+  height: 18px;
+}
+
+.font-size-control button:hover {
+  background-color: var(--background-alt);
+}
+
+.font-size-control .font-size-display {
+  font-size: 9px;
+  color: var(--log-info);
+  min-width: 26px;
+  text-align: center;
+  user-select: none;
+  line-height: 16px;
+}
+
 
 code,
 kbd,
@@ -160,9 +209,6 @@ td {
   width: 100%;
 }
 
-body {
-  margin: 0;
-}
 canvas {
   image-rendering: pixelated;
 }
@@ -170,6 +216,8 @@ canvas {
 .menubar {
   background: var(--background);
   border-bottom: 1px solid var(--border-color);
+  overflow: hidden;
+  line-height: 16px;
 }
 .menubar ul {
   padding: 0;
@@ -302,14 +350,6 @@ canvas {
   text-align: center;
 }
 
-.container {
-  display: grid;
-  grid-template-columns: 200px auto 520px;
-  grid-template-rows: 24px auto 20%;
-  grid-gap: 0;
-  height: 100vh;
-  overflow: hidden;
-}
 .menubar {
   grid-column: 1 / 4;
   grid-row: 1;
