@@ -1,2 +1,4 @@
 /www/
 /node_modules/
+.DS_Store
+Dockerfile
