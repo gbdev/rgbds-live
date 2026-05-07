@@ -30,11 +30,15 @@ jobs:
         with:
           version: ${{env.EM_VERSION}}
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+      - name: Configure emscripten builds
+        run: |
+          [ -d build ] || emcmake cmake -B build
+        shell: bash
       - name: Build RGBDS
-        run: ./build-rgbds.sh
+        run: cmake --build build --target rgbds
         shell: bash
       - name: Build binjgb
-        run: ./build-binjgb.sh
+        run: cmake --build build --target binjgb
         shell: bash
       - name: Install node dependencies
         run: npm ci

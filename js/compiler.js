@@ -1,8 +1,8 @@
 import * as storage from './storage.js';
 
-import createRgbAsm from '../rgbds/rgbasm';
-import createRgbLink from '../rgbds/rgblink';
-import createRgbFix from '../rgbds/rgbfix';
+import createRgbAsm from '../build/out/rgbasm.js';
+import createRgbLink from '../build/out/rgblink.js';
+import createRgbFix from '../build/out/rgbfix.js';
 
 var busy = false;
 var repeat = false;
