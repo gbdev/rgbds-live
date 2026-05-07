@@ -111,9 +111,9 @@ endforeach()
 add_dependencies(rgbds_live rgbds)
 
 # those need to be set before importing binjgb
-set(WERROR ON)
-set(WASM TRUE)
-set(RGBDS_LIVE ON)
+set(WERROR ON CACHE BOOL "" FORCE)
+set(WASM TRUE CACHE BOOL "" FORCE)
+set(RGBDS_LIVE ON CACHE BOOL "" FORCE)
 
 # importing binjgb
 add_subdirectory(binjgb EXCLUDE_FROM_ALL)
