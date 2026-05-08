@@ -32,7 +32,7 @@ jobs:
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
       - name: Configure emscripten builds
         run: |
-          [ -d build ] || emcmake cmake -B build
+          emcmake cmake -B build
         shell: bash
       - name: Build RGBDS
         run: cmake --build build --target rgbds
