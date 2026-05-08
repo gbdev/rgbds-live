@@ -8,7 +8,11 @@ if [[ "$(which emsdk)" == "" ]]; then
 fi
 
 [ -d build ] || emcmake cmake -B build
-[ -d node_modules ] && [ package.json -ot node_modules ] || npm ci && touch node_modules
+# Only update node_modules if older than the package file.
+if ! [[ -d node_modules && package.json -ot node_modules ]]; then
+    npm ci
+    touch node_modules
+fi
 
 cmake --build build
 npm run build
