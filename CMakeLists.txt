@@ -1,8 +1,4 @@
 cmake_minimum_required(VERSION 3.13)
-# binjgb is using minimum 2.8 ... new cmake doesn't like it those lines silencing it
-set(CMAKE_POLICY_DEFAULT_CMP0000 NEW)
-set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
-set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 
 project(rgbds_live)
 
