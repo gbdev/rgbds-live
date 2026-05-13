@@ -1066,18 +1066,22 @@ sm83Instructions.forEach(function (instr) {
   doc += '<tr><td>Flag N:<td>' + instr['flags']['n'];
   doc += '<tr><td>Flag H:<td>' + instr['flags']['H'];
   doc += '<tr><td>Flag C:<td>' + instr['flags']['C'];
-  var i = {
+
+  // 助记符条目（仅插入助记符第一词）
+  sm83CompleterInstructions.push({
+    caption: instr['name'].split(" ")[0],
+    value: instr['name'].split(" ")[0] + " ",
+    meta: '',
+    docHTML: '',
+  });
+
+  // 完整模板条目（插入完整指令名）
+  sm83CompleterInstructions.push({
     caption: instr['name'],
     value: instr['name'],
     meta: '',
     docHTML: doc,
-  };
-  i.completer = {
-    insertMatch: function (editor, data) {
-      editor.completer.insertMatch({value: data.value.split(" ")[0] + " "});
-    },
-  };
-  sm83CompleterInstructions.push(i);
+  });
 });
 var sm83CompleterConstants = [];
 for (var key in gameboy_hardware_constants) {
