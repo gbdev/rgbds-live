@@ -1074,8 +1074,7 @@ sm83Instructions.forEach(function (instr) {
   };
   i.completer = {
     insertMatch: function (editor, data) {
-      //editor.completer.insertMatch({value: data.value.split(" ")[0]});
-      //editor.selection.selectTo(editor.selection.cursor.row, editor.selection.cursor.column - offset);
+      editor.completer.insertMatch({value: data.value.split(" ")[0] + " "});
     },
   };
   sm83CompleterInstructions.push(i);
