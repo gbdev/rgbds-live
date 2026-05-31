@@ -404,18 +404,17 @@ export function init(event) {
     document.getElementById('newfiledialog').style.display = 'none';
   };
   document.getElementById('newfile_upload').onchange = function (e) {
-    var files = e.target.files;
+    const files = Array.from(e.target.files);
     if (files.length === 0) return;
-    var loadPromises = [];
-    for (var i = 0; i < files.length; i++) {
-      (function (file) {
-        var p = editors.getFileType(file.name) == 'text' ? file.text() : file.arrayBuffer();
-        loadPromises.push(p.then(function (data) {
-          storage.update(file.name, data);
-        }));
-      })(files[i]);
-    }
+    // Read all selected files in parallel and store them as they complete.
+    const loadPromises = files.map(function (file) {
+      const readPromise = editors.getFileType(file.name) === 'text' ? file.text() : file.arrayBuffer();
+      return readPromise.then(function (data) {
+        storage.update(file.name, data);
+      });
+    });
     Promise.all(loadPromises).then(function () {
+      // Keep the previous behavior of selecting the last uploaded file.
       editors.setCurrentFile(files[files.length - 1].name);
       updateFileList();
     });
