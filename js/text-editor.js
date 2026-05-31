@@ -42,8 +42,6 @@ export function register(div_id, compileCode) {
     enableSnippets: true,
   });
 
-  // e.completers = [sm83Completer];
-
   // Live autocomplete (auto-popup) disabled by default; toggle via View menu checkbox
   // Basic completion (Ctrl+Space) is always available
   e.setOption('enableLiveAutocompletion', false);
