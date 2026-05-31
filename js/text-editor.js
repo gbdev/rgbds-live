@@ -6,6 +6,8 @@ import './ace/mode-sm83.js';
 
 ace.config.set('basePath', `assets/ace`);
 
+import 'ace-builds/src-noconflict/theme-tomorrow_night_eighties';
+import 'ace-builds/src-noconflict/theme-tomorrow';
 import { TokenTooltip } from './ace/sm83tooltip.js';
 import { sm83Completer } from './ace/complete-sm83.js';
 

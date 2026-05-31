@@ -26,10 +26,10 @@ export function reset() {
 }
 
 function getHardwareFiles() {
-  return { 
-    'hardware.inc': HARDWARE_INC, 
-    'hardware_compat.inc' : HARDWARE_COMPAT_INC
-  }
+  return {
+    'hardware.inc': HARDWARE_INC,
+    'hardware_compat.inc': HARDWARE_COMPAT_INC,
+  };
 }
 
 export function autoLoad() {
