@@ -58,6 +58,70 @@ export function register(div_id, compileCode) {
     event.stop();
   });
 
+  // Font size control via keyboard shortcuts (Ctrl+=/-, Ctrl+0) and View menu buttons
+  // The variable of font size is saved in the local storage with limit 8 to 32.
+  // It is implemented through ACE editor functions
+  (function () {
+    var DEFAULT_SIZE = 14;
+    var MIN_SIZE = 8;
+    var MAX_SIZE = 32;
+    var STORAGE_KEY = 'aceFontSize';
+
+    var currentSize = parseInt(localStorage.getItem(STORAGE_KEY)) || DEFAULT_SIZE;
+    e.setFontSize(currentSize + 'px');
+
+    function applyFontSize(size) {
+      e.setFontSize(size + 'px');
+      var display = document.getElementById('view_font_size_display');
+      if (display) display.textContent = size;
+    }
+
+    window.changeEditorFontSize = function (delta) {
+      var newSize = currentSize + delta;
+      if (newSize < MIN_SIZE || newSize > MAX_SIZE) return;
+      currentSize = newSize;
+      applyFontSize(currentSize);
+      localStorage.setItem(STORAGE_KEY, currentSize);
+    };
+
+    // Initialize display
+    applyFontSize(currentSize);
+
+    e.commands.addCommand({
+      name: 'increaseFontSize',
+      bindKey: { win: 'Ctrl-=', mac: 'Command-=' },
+      exec: function () {
+        window.changeEditorFontSize(1);
+      },
+    });
+
+    e.commands.addCommand({
+      name: 'decreaseFontSize',
+      bindKey: { win: 'Ctrl--', mac: 'Command--' },
+      exec: function () {
+        window.changeEditorFontSize(-1);
+      },
+    });
+
+    e.commands.addCommand({
+      name: 'resetFontSize',
+      bindKey: { win: 'Ctrl-0', mac: 'Command-0' },
+      exec: function () {
+        currentSize = DEFAULT_SIZE;
+        applyFontSize(currentSize);
+        localStorage.setItem(STORAGE_KEY, currentSize);
+      },
+    });
+  })();
+
+  // Bind View menu buttons
+  (function () {
+    var decrBtn = document.getElementById('view_font_decrease');
+    var incrBtn = document.getElementById('view_font_increase');
+    if (decrBtn) decrBtn.addEventListener('click', function () { window.changeEditorFontSize(-1); });
+    if (incrBtn) incrBtn.addEventListener('click', function () { window.changeEditorFontSize(1); });
+  })();
+
   editors.push(e);
 }
 
