@@ -396,17 +396,23 @@ export function init(event) {
     document.getElementById('newfiledialog').style.display = 'none';
   };
   document.getElementById('newfile_upload').onchange = function (e) {
-    if (e.target.files.length > 0) {
-      var name = e.target.files[0].name;
-      var p = editors.getFileType(name) == 'text' ? e.target.files[0].text() : e.target.files[0].arrayBuffer();
-      p.then(function (data) {
-        storage.update(name, data);
-        editors.setCurrentFile(name);
-        updateFileList();
-      });
-      e.target.value = '';
-      document.getElementById('newfiledialog').style.display = 'none';
+    var files = e.target.files;
+    if (files.length === 0) return;
+    var loadPromises = [];
+    for (var i = 0; i < files.length; i++) {
+      (function (file) {
+        var p = editors.getFileType(file.name) == 'text' ? file.text() : file.arrayBuffer();
+        loadPromises.push(p.then(function (data) {
+          storage.update(file.name, data);
+        }));
+      })(files[i]);
     }
+    Promise.all(loadPromises).then(function () {
+      editors.setCurrentFile(files[files.length - 1].name);
+      updateFileList();
+    });
+    e.target.value = '';
+    document.getElementById('newfiledialog').style.display = 'none';
   };
 
   document.getElementById('delfile').onclick = function () {
