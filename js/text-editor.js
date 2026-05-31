@@ -38,7 +38,6 @@ export function register(div_id, compileCode) {
     tabSize: 2,
     useSoftTabs: true,
     navigateWithinSoftTabs: true,
-    // enableLiveAutocompletion: true,
     enableBasicAutocompletion: true,
     enableSnippets: true,
   });
