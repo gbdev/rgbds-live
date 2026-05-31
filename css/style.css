@@ -360,6 +360,15 @@ canvas {
   color: var(--log-err);
 }
 
+.error-link {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.error-link:hover {
+  text-decoration: underline;
+}
+
 .emulator_screen_container {
   width: 512px;
   height: 512px;

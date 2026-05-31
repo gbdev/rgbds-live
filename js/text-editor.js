@@ -148,6 +148,14 @@ export function getBreakpoints() {
   return breakpoints;
 }
 
+export function gotoLine(line_nr) {
+  //The line of ace start with 1
+  editors[0].gotoLine(line_nr, 0, true);
+  //Forced center display
+  editors[0].scrollToLine(line_nr - 1, true, true, function() {});
+  editors[0].focus();
+}
+
 export function hide() {
   editors[0].renderer.getContainerElement().style.display = 'none';
 }

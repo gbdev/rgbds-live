@@ -16,19 +16,44 @@ var asm_options = [];
 var fix_options = [];
 var link_options = [];
 
+var last_error_type = 'error';
+var last_error_message = '';
 var line_nr_regex = /([\w\.]+)[\w\.\:~]*\(([0-9]+)\)/gi;
 
 function logFunction(str, kind) {
   if (log_callback) log_callback(str, kind);
 
-  if (kind == 'stderr' && (str.startsWith('error: ') || str.startsWith('ERROR: ') || str.startsWith('warning: '))) {
-    var type = 'error';
-    if (str.startsWith('warning: ')) type = 'warning';
+  if (kind == 'stderr') {
+    var lower_str = str.toLowerCase();
+    
+    // recognize：warning / error / fatal / panic
+    var has_warning = lower_str.includes('warning: ');
+    var has_error = lower_str.includes('error: ') 
+                 || lower_str.includes('fatal: ') 
+                 || lower_str.includes('panic: ');
+    
+    // if there is an error or warning, update the last_error_type and last_error_message
+    if (has_error || has_warning) {
+      last_error_type = has_warning ? 'warning' : 'error';
+      //extract the message after the error type for better error reporting, if possible
+      const msgMatch = str.match(/(?:warning|error|fatal|panic): (.*)/i);
+      last_error_message = msgMatch ? msgMatch[1] : str;
+    }
 
+    // extract line number and filename using regex
     var line_nr_match = str.matchAll(line_nr_regex);
     for (var m of line_nr_match) {
       var error_line = parseInt(m[2]);
-      error_list.push([type, m[1], error_line, str]);
+      var filename = m[1];
+      
+      // bind the error to the corresponding file and line number
+      // if the current line does not contain the error text (it's an "at" line), use the cached title message
+      error_list.push([
+        last_error_type, 
+        filename, 
+        error_line, 
+        (has_error || has_warning) ? str : (last_error_message || str)
+      ]);
     }
   }
 }
@@ -91,11 +116,15 @@ function trigger() {
 function startCompile() {
   if (log_callback) log_callback(null, null);
   error_list = [];
+  last_error_type = 'error';//reset error type to default for new compilation
+  last_error_message = ''; //clean up last error message for new compilation
   rom_symbols = [];
   ram_symbols = [];
 
   var targets = [];
-  for (const name of Object.keys(storage.getFiles())) if (name.endsWith('.asm')) targets.push(name);
+  for (const name of Object.keys(storage.getFiles())) {
+    if (name.endsWith('.asm')) targets.push(name);
+  }
   runRgbAsm(targets, {});
 }
 
