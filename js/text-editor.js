@@ -61,7 +61,7 @@ export function register(div_id, compileCode) {
     event.stop();
   });
 
-  // Bind View menu: "Enable autocomplete" checkbox (default: off)
+  // Bind Options menu: "Enable autocomplete" checkbox (default: off)
   (function () {
     var cb = document.getElementById('view_enable_autocomplete');
     if (cb) {
