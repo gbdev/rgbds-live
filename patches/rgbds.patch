@@ -1,29 +1,3 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 25852c02..c8ad3e66 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -74,7 +74,7 @@ endif()
- 
- find_program(GIT git)
- if(GIT)
--  execute_process(COMMAND ${GIT} --git-dir=.git -c safe.directory='*' describe --tags --dirty --always
-+  execute_process(COMMAND ${GIT} --git-dir=.git -c safe.directory='*' describe --tags --always
-                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                   OUTPUT_VARIABLE GIT_REV OUTPUT_STRIP_TRAILING_WHITESPACE
-                   ERROR_QUIET)
-diff --git a/Makefile b/Makefile
-index 3908ee03..7eeb4ee0 100644
---- a/Makefile
-+++ b/Makefile
-@@ -24,7 +24,7 @@ PNGLDFLAGS := `${PKG_CONFIG} --libs-only-L libpng`
- PNGLDLIBS  := `${PKG_CONFIG} --libs-only-l libpng`
- 
- # Note: if this comes up empty, `version.cpp` will automatically fall back to last release number
--VERSION_STRING := `git --git-dir=.git -c safe.directory='*' describe --tags --dirty --always 2>/dev/null`
-+VERSION_STRING := `git --git-dir=.git -c safe.directory='*' describe --tags --always 2>/dev/null`
- 
- WARNFLAGS := -Wall -pedantic -Wno-unknown-warning-option -Wno-gnu-zero-variadic-macro-arguments
- 
 diff --git a/src/asm/parser.y b/src/asm/parser.y
 index 1e2c7780..3ad648a8 100644
 --- a/src/asm/parser.y
