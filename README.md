@@ -4,6 +4,50 @@ A live RGBDS programming environment in the browser, allowing for realtime assem
 
 Try online at [gbdev.io/rgbds-live](https://gbdev.io/rgbds-live/).
 
+## Local file upload
+
+The `rgbds-live` npm package provides a CLI tool that lets you upload your local Game Boy assembly project files directly from your terminal to the web IDE, bypassing the URL hash size limit (2 KB).
+
+### Install
+
+```bash
+npm install -g rgbds-live
+```
+
+### Usage
+
+```bash
+# Upload all .asm and .inc files in the current directory
+rgbds-live
+
+# Upload a specific file and auto-detect its INCLUDE/INCBIN dependencies
+rgbds-live main.asm
+
+# Upload multiple files
+rgbds-live main.asm data.inc
+```
+
+This will start a local HTTP server on your machine and automatically open the web IDE at [gbdev.io/rgbds-live](https://gbdev.io/rgbds-live/), with your local files loaded directly into the editor. There is no file size limit since the data stays on your local machine.
+
+
+### Development
+
+For local testing without deploying to GitHub, use the `--dev` flag to connect to a local Vite dev server:
+
+```bash
+# Terminal 1: Start the Vite dev server (from the rgbds-live repo)
+npm run dev
+
+# Terminal 2: Start the CLI with --dev flag
+cd /path/to/your/project
+
+# Option A: If you've installed the package locally
+rgbds-live --dev main.asm
+
+# Option B: Run directly with Node.js (no installation needed)
+node /path/to/rgbds-live/cli.js --dev main.asm
+```
+
 ## Build
 
 System requirements:
