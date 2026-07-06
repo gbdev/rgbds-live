@@ -36,13 +36,21 @@ function escapeHTML(str) {
   return escapedHTML.innerHTML;
 }
 
+const line_nr_regex = /([\w\-\.\/]+\.(?:asm|inc))\((\d+)\)/gi;
+
 compiler.setLogCallback(function (str, kind) {
   var output = document.getElementById('output');
   if (str == null && kind == null) {
     output.innerHTML = '';
     return;
   }
-  output.innerHTML += '<span class="' + kind + '">' + escapeHTML(str) + '</span>\n';
+
+  var html = escapeHTML(str);
+  html = html.replace(line_nr_regex, function (match, file, line) {
+    return '<a class="error-link" data-file="' + file + '" data-line="' + line + '">' + match + '</a>';
+  });
+
+  output.innerHTML += '<span class="' + kind + '">' + html + '</span>\n';
   output.scrollTop = output.scrollHeight;
 });
 
@@ -396,17 +404,22 @@ export function init(event) {
     document.getElementById('newfiledialog').style.display = 'none';
   };
   document.getElementById('newfile_upload').onchange = function (e) {
-    if (e.target.files.length > 0) {
-      var name = e.target.files[0].name;
-      var p = editors.getFileType(name) == 'text' ? e.target.files[0].text() : e.target.files[0].arrayBuffer();
-      p.then(function (data) {
-        storage.update(name, data);
-        editors.setCurrentFile(name);
-        updateFileList();
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    // Read all selected files in parallel and store them as they complete.
+    const loadPromises = files.map(function (file) {
+      const readPromise = editors.getFileType(file.name) === 'text' ? file.text() : file.arrayBuffer();
+      return readPromise.then(function (data) {
+        storage.update(file.name, data);
       });
-      e.target.value = '';
-      document.getElementById('newfiledialog').style.display = 'none';
-    }
+    });
+    Promise.all(loadPromises).then(function () {
+      // Keep the previous behavior of selecting the last uploaded file.
+      editors.setCurrentFile(files[files.length - 1].name);
+      updateFileList();
+    });
+    e.target.value = '';
+    document.getElementById('newfiledialog').style.display = 'none';
   };
 
   document.getElementById('delfile').onclick = function () {
@@ -421,6 +434,20 @@ export function init(event) {
   };
 
   compileCode();
+
+  document.getElementById('output').onclick = function (e) {
+    var target = e.target;
+    if (target.classList.contains('error-link')) {
+      var file = target.getAttribute('data-file');
+      var line = parseInt(target.getAttribute('data-line'));
+      //check if the file exists and line is a number before navigating
+      if (file && !isNaN(line) && storage.getFiles()[file] !== undefined) {
+        editors.setCurrentFile(file);
+        updateFileList();
+        textEditor.gotoLine(line);
+      }
+    }
+  };
 
   document.getElementById('cpu_single_step').onclick = function () {
     stepEmulator('single');

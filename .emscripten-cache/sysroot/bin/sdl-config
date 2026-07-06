@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "emscripten sdl-config called with $*" >&2
+
+for arg in "$@"; do
+  case "$arg" in
+    --cflags|--libs)
+      echo "-sUSE_SDL"
+      ;;
+    --version)
+      echo "1.3.0"
+      ;;
+  esac
+done
+

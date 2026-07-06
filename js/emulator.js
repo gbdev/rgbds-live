@@ -1,4 +1,4 @@
-import Binjgb from '../binjgb/out/binjgb.js';
+import Binjgb from '../build/out/binjgb.js';
 
 const Module = await Binjgb();
 

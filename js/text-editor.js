@@ -6,6 +6,8 @@ import './ace/mode-sm83.js';
 
 ace.config.set('basePath', `assets/ace`);
 
+import 'ace-builds/src-noconflict/theme-tomorrow_night_eighties';
+import 'ace-builds/src-noconflict/theme-tomorrow';
 import { TokenTooltip } from './ace/sm83tooltip.js';
 import { sm83Completer } from './ace/complete-sm83.js';
 
@@ -38,10 +40,13 @@ export function register(div_id, compileCode) {
     tabSize: 2,
     useSoftTabs: true,
     navigateWithinSoftTabs: true,
-    enableLiveAutocompletion: true,
+    enableBasicAutocompletion: true,
     enableSnippets: true,
   });
-  e.completers = [sm83Completer];
+
+  // Live autocomplete (auto-popup) disabled by default; toggle via View menu checkbox
+  // Basic completion (Ctrl+Space) is always available
+  e.setOption('enableLiveAutocompletion', false);
 
   e.session.on('change', function (delta) {
     if (e.curOp && e.curOp.command.name) {
@@ -120,6 +125,19 @@ export function register(div_id, compileCode) {
     var incrBtn = document.getElementById('view_font_increase');
     if (decrBtn) decrBtn.addEventListener('click', function () { window.changeEditorFontSize(-1); });
     if (incrBtn) incrBtn.addEventListener('click', function () { window.changeEditorFontSize(1); });
+  })();
+
+  // Bind Options menu: "Enable autocomplete" checkbox (default: off)
+  (function () {
+    var cb = document.getElementById('view_enable_autocomplete');
+    if (cb) {
+      cb.checked = localStorage.getItem('enableAutocomplete') === 'true';
+      e.setOption('enableLiveAutocompletion', cb.checked);
+      cb.addEventListener('change', function () {
+        localStorage.setItem('enableAutocomplete', cb.checked);
+        e.setOption('enableLiveAutocompletion', cb.checked);
+      });
+    }
   })();
 
   editors.push(e);
@@ -210,6 +228,14 @@ export function getCurrentFilename() {
 
 export function getBreakpoints() {
   return breakpoints;
+}
+
+export function gotoLine(line_nr) {
+  //The line of ace start with 1
+  editors[0].gotoLine(line_nr, 0, true);
+  //Forced center display
+  editors[0].scrollToLine(line_nr - 1, true, true, function() {});
+  editors[0].focus();
 }
 
 export function hide() {
