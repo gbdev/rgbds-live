@@ -1,1 +1,0 @@
-5.0.7-git|/opt/homebrew/Cellar/emscripten/5.0.7/libexec/llvm/bin
