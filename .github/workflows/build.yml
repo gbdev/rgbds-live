@@ -37,7 +37,7 @@ jobs:
         run: sudo apt install -Uyq bison libpng-dev pkgconf
         shell: bash
       - name: Build RGBDS
-        run: cmake --build build --target rgbds
+        run: cmake --build build --target rgbds -DCMAKE_BUILD_TYPE=Release
         shell: bash
       - name: Build binjgb
         run: cmake --build build --target binjgb
