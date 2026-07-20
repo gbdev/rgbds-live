@@ -10,14 +10,14 @@ jobs:
     name: WASM Build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository and submodules
-        uses: actions/checkout@v4
+      - name: Check out repository and submodules
+        uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-tags: true
           fetch-depth: 0
-      - name: Setup cache
-        uses: actions/cache@v4
+      - name: Set up cache
+        uses: actions/cache@v5
         with:
           path: ${{env.EM_CACHE_FOLDER}}
           key: ${{env.EM_VERSION}}-${{ runner.os }}
@@ -25,14 +25,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-      - name: Setup emscripten
-        uses: mymindstorm/setup-emsdk@v14
+      - name: Set up emscripten
+        uses: emscripten-core/setup-emsdk@v16
         with:
           version: ${{env.EM_VERSION}}
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
       - name: Configure emscripten builds
-        run: |
-          emcmake cmake -B build
+        run: emcmake cmake -B build
+        shell: bash
+      - name: Install RGBDS dependencies
+        run: sudo apt install -Uyq bison libpng-dev pkgconf
         shell: bash
       - name: Build RGBDS
         run: cmake --build build --target rgbds
@@ -47,7 +49,7 @@ jobs:
       - name: Deploy to GitHub Pages
         # Do not run this unless *pushing* to `master`.
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Build output to publish to the `gh-pages` branch:
