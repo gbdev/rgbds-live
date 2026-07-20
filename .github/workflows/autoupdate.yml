@@ -1,4 +1,4 @@
-# Creates a PR for updating RGBDS version automatcally
+# Creates a PR for updating RGBDS version automatically
 # Trigger it and put the desired RGBDS version as the "version"
 # parameter. "version" must be a valid git ref for the RGBDS repository.
 # You'll normally want one of the available tags: https://github.com/gbdev/rgbds/tags
@@ -24,7 +24,7 @@ jobs:
         This Pull Request was created by triggering the [autoupdate.yml](https://github.com/gbdev/rgbds-live/blob/master/.github/workflows/autoupdate.yml) pipeline.
     steps:
       - name: Checkout repository and submodules
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-depth: '0'
