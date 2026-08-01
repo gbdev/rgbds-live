@@ -21,7 +21,7 @@ index 1f801952..d05a1edc 100644
  	| label directive
  ;
 diff --git a/src/asm/symbol.cpp b/src/asm/symbol.cpp
-index b21c9d62..6a634926 100644
+index b21c9d62..56f4a13e 100644
 --- a/src/asm/symbol.cpp
 +++ b/src/asm/symbol.cpp
 @@ -801,3 +801,33 @@ void sym_Init(time_t now) {
@@ -49,7 +49,7 @@ index b21c9d62..6a634926 100644
 +	std::string name = valueBuf;
 +	name += fstk->name();
 +
-+	Symbol *sym = &createSymbol(name);
++	Symbol *sym = &createSymbol(intern(name));
 +	sym->type = SYM_LABEL;
 +	sym->data = static_cast<int32_t>(sect_GetSymbolOffset());
 +	sym->isExported = true;
