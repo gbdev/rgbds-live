@@ -130,6 +130,9 @@ if(TARGET binjgb)
     LINK_FLAGS ""
     RUNTIME_OUTPUT_DIRECTORY "${RGBDS_LIVE_OUT_DIR}"
   )
+  target_compile_definitions(binjgb PRIVATE
+    "-DBREAKPOINTS_MAX_BANKS_NUMBER=256"
+  )
   target_link_options(binjgb PRIVATE
     "-sMALLOC=emmalloc"
     "-sEXIT_RUNTIME=0"
