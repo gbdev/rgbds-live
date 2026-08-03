@@ -45,6 +45,15 @@ set(ZLIB_LIBRARY "z" CACHE STRING "" FORCE)
 set(PNG_FOUND TRUE CACHE BOOL "" FORCE)
 set(PNG_PNG_INCLUDE_DIR "${EMSCRIPTEN_SYSROOT}/include" CACHE PATH "" FORCE)
 set(PNG_LIBRARY "png" CACHE STRING "" FORCE)
+# ZLIB and LIBPNG are parts of emsdk .. just define libraries
+# expected by rgbds build system
+add_library(ZLIB::ZLIB INTERFACE IMPORTED GLOBAL)
+target_compile_options(ZLIB::ZLIB INTERFACE "-sUSE_ZLIB=1")
+target_link_options(ZLIB::ZLIB INTERFACE "-sUSE_ZLIB=1")
+
+add_library(PNG::PNG INTERFACE IMPORTED GLOBAL)
+target_compile_options(PNG::PNG INTERFACE "-sUSE_LIBPNG=1")
+target_link_options(PNG::PNG INTERFACE "-sUSE_LIBPNG=1")
 
 # silencing PkgConfig this project doesn't need this
 set(CMAKE_DISABLE_FIND_PACKAGE_PkgConfig ON CACHE BOOL "" FORCE)
@@ -79,11 +88,28 @@ execute_process(
 
 # we need only those targets from rgbds
 set(RGBDS_TARGETS rgbasm rgblink rgbfix)
+
+# no git for you rgbds
+# this hack will stop rgbds build from obtain rgbds-live version from git
+# it will be passed via BUILD_VERSION_STRING
+macro(execute_process)
+    if("${ARGV}" MATCHES "describe")
+        set(result 1)
+    else()
+        _execute_process(${ARGV})
+    endif()
+endmacro()
+
 # and we will put em into this target
 add_custom_target(rgbds)
 
 # importing rgbds
 add_subdirectory(rgbds EXCLUDE_FROM_ALL)
+
+# restore execute_process
+macro(execute_process)
+    _execute_process(${ARGV})
+endmacro()
 
 # target specific configuration for rgbds
 foreach(TGT ${RGBDS_TARGETS})
