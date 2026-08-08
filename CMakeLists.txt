@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 
 project(rgbds_live)
 
-find_package(Git REQUIRED)
+find_program(_GIT_EXECUTABLE NAMES git)
 
 # it will apply patches/xxx.patch to xxx project (submodule)
 function(apply_git_patch PROJECT_NAME)
@@ -10,7 +10,7 @@ function(apply_git_patch PROJECT_NAME)
     set(PATCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/patches/${PROJECT_NAME}.patch")
 
     execute_process(
-        COMMAND ${GIT_EXECUTABLE} apply 
+        COMMAND ${_GIT_EXECUTABLE} apply 
             --ignore-space-change 
             --ignore-whitespace 
             --whitespace=nowarn    
@@ -23,7 +23,7 @@ function(apply_git_patch PROJECT_NAME)
 
     if(PATCH_NEEDED EQUAL 0)
         execute_process(
-            COMMAND ${GIT_EXECUTABLE} apply 
+            COMMAND ${_GIT_EXECUTABLE} apply 
                 --ignore-space-change 
                 --ignore-whitespace 
                 --whitespace=nowarn
@@ -79,7 +79,7 @@ set(RGBDS_LIVE_OUT_DIR "${CMAKE_BINARY_DIR}/out")
 
 # get rgbds version for build
 execute_process(
-    COMMAND ${GIT_EXECUTABLE} describe --tags --always
+    COMMAND ${_GIT_EXECUTABLE} describe --tags --always
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/rgbds"
     OUTPUT_VARIABLE RGBDS_VERSION_FROM_GIT
     OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -90,15 +90,9 @@ execute_process(
 set(RGBDS_TARGETS rgbasm rgblink rgbfix)
 
 # no git for you rgbds
-# this hack will stop rgbds build from obtain rgbds-live version from git
+# this will stop rgbds to find git package
 # it will be passed via BUILD_VERSION_STRING
-macro(execute_process)
-    if("${ARGV}" MATCHES "describe")
-        set(result 1)
-    else()
-        _execute_process(${ARGV})
-    endif()
-endmacro()
+set(CMAKE_DISABLE_FIND_PACKAGE_Git ON)
 
 # and we will put em into this target
 add_custom_target(rgbds)
@@ -106,10 +100,8 @@ add_custom_target(rgbds)
 # importing rgbds
 add_subdirectory(rgbds EXCLUDE_FROM_ALL)
 
-# restore execute_process
-macro(execute_process)
-    _execute_process(${ARGV})
-endmacro()
+# restore finding git package
+unset(CMAKE_DISABLE_FIND_PACKAGE_Git)
 
 # target specific configuration for rgbds
 foreach(TGT ${RGBDS_TARGETS})
