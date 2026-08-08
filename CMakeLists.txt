@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.13)
 
 project(rgbds_live)
 
+# we need to use find_program() instead find_package()
+# in other case set(CMAKE_DISABLE_FIND_PACKAGE_Git ON) for rgbds
+# will not work (Git_FOUND will be set already)
 find_program(_GIT_EXECUTABLE NAMES git)
 
 # it will apply patches/xxx.patch to xxx project (submodule)
