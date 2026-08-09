@@ -2,10 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 
 project(rgbds_live)
 
-# we need to use find_program() instead find_package()
-# in other case set(CMAKE_DISABLE_FIND_PACKAGE_Git ON) for rgbds
-# will not work (Git_FOUND will be set already)
-find_program(_GIT_EXECUTABLE NAMES git)
+find_package(Git REQUIRED)
 
 # it will apply patches/xxx.patch to xxx project (submodule)
 function(apply_git_patch PROJECT_NAME)
@@ -13,7 +10,7 @@ function(apply_git_patch PROJECT_NAME)
     set(PATCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/patches/${PROJECT_NAME}.patch")
 
     execute_process(
-        COMMAND ${_GIT_EXECUTABLE} apply 
+        COMMAND ${GIT_EXECUTABLE} apply 
             --ignore-space-change 
             --ignore-whitespace 
             --whitespace=nowarn    
@@ -26,7 +23,7 @@ function(apply_git_patch PROJECT_NAME)
 
     if(PATCH_NEEDED EQUAL 0)
         execute_process(
-            COMMAND ${_GIT_EXECUTABLE} apply 
+            COMMAND ${GIT_EXECUTABLE} apply 
                 --ignore-space-change 
                 --ignore-whitespace 
                 --whitespace=nowarn
@@ -82,7 +79,7 @@ set(RGBDS_LIVE_OUT_DIR "${CMAKE_BINARY_DIR}/out")
 
 # get rgbds version for build
 execute_process(
-    COMMAND ${_GIT_EXECUTABLE} describe --tags --always
+    COMMAND ${GIT_EXECUTABLE} describe --tags --always
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/rgbds"
     OUTPUT_VARIABLE RGBDS_VERSION_FROM_GIT
     OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -92,19 +89,17 @@ execute_process(
 # we need only those targets from rgbds
 set(RGBDS_TARGETS rgbasm rgblink rgbfix)
 
-# no git for you rgbds
-# this will stop rgbds to find git package
-# it will be passed via BUILD_VERSION_STRING
-set(CMAKE_DISABLE_FIND_PACKAGE_Git ON)
-
 # and we will put em into this target
 add_custom_target(rgbds)
 
 # importing rgbds
 add_subdirectory(rgbds EXCLUDE_FROM_ALL)
 
-# restore finding git package
-unset(CMAKE_DISABLE_FIND_PACKAGE_Git)
+# setting version in common target sets it globaly
+if(TARGET common)
+    target_compile_definitions(common PRIVATE "BUILD_VERSION_STRING=\"${RGBDS_VERSION_FROM_GIT}\"")
+    target_compile_options(common PRIVATE -Wno-macro-redefined)
+endif()
 
 # target specific configuration for rgbds
 foreach(TGT ${RGBDS_TARGETS})
@@ -117,7 +112,6 @@ foreach(TGT ${RGBDS_TARGETS})
         elseif("${TGT}" STREQUAL "rgbfix")
             set(EXP_NAME "createRgbFix")
         endif()
-        target_compile_definitions(${TGT} PRIVATE BUILD_VERSION_STRING="${RGBDS_VERSION_FROM_GIT}")
         target_link_options(${TGT} PRIVATE 
             "-sEXPORT_NAME=${EXP_NAME}"
             "-sEXPORTED_RUNTIME_METHODS=['FS']"
