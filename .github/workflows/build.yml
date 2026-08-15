@@ -32,8 +32,6 @@ jobs:
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
       - name: Configure emscripten builds
         run: emcmake cmake -B build -G Ninja
-      - name: Install RGBDS dependencies
-        run: sudo apt install -Uyq bison libpng-dev pkgconf
       - name: Build RGBDS and binjgb
         run: cmake --build build
       - name: Install node dependencies
