@@ -11,9 +11,8 @@ option(BUILD_TESTING "Build the testing tree." OFF)
 ## Patch third-party subprojects as necessary.
 
 find_package(Git REQUIRED)
-# The last three options are mostly for users' sake, but should preferably be removed during development to ensure the patches are clean.
 set(patching_failed 0)
-foreach(subproject rgbds)
+foreach(subproject rgbds) # Only one subproject needs patching so far, but `foreach` is future-proof.
   # Since it is a Git submodule, Git commands executed in that directory will remain scoped to it.
   set(git "${GIT_EXECUTABLE}" -C "${CMAKE_CURRENT_SOURCE_DIR}/${subproject}")
   set(PATCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/patches/${subproject}.patch")
