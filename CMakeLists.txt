@@ -1,6 +1,12 @@
+## Global configuration.
+
 cmake_minimum_required(VERSION 3.16...4.4 FATAL_ERROR)
 
 project(rgbds_live)
+
+# Disable testing by default.
+option(BUILD_TESTING "Build the testing tree." OFF)
+
 
 ## Patch third-party subprojects as necessary.
 
@@ -37,21 +43,22 @@ if(patching_failed)
 endif()
 
 
-# this will stop cmake from searching for zlib and pnglib
-# those libs are by default in emsdk so even if we would compile rgbgfx some day this should work
-set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
-set(ZLIB_USE_STATIC_LIBS ON CACHE BOOL "" FORCE)
-set(ZLIB_INCLUDE_DIR "${EMSCRIPTEN_SYSROOT}/include" CACHE PATH "" FORCE)
-set(ZLIB_LIBRARY "z" CACHE STRING "" FORCE)
-set(PNG_FOUND TRUE CACHE BOOL "" FORCE)
-set(PNG_PNG_INCLUDE_DIR "${EMSCRIPTEN_SYSROOT}/include" CACHE PATH "" FORCE)
-set(PNG_LIBRARY "png" CACHE STRING "" FORCE)
+## Manually `find_package()`-like some libs our subprojects depend on.
+# Some libraries are not compiled in a traditional sense, but are instead provided by Emscripten
+# via its "ports" system. The `--use-port` option sets up everything (include dirs, etc.).
+# We set `*_FOUND` so `find_package` assumes that its job has already been (successfully) done,
+# and do as little work is necessary to get our dependencies to successfully build.
 
-# silencing PkgConfig this project doesn't need this
-set(CMAKE_DISABLE_FIND_PACKAGE_PkgConfig ON CACHE BOOL "" FORCE)
+set(ZLIB_FOUND TRUE)
+add_library(ZLIB::ZLIB INTERFACE IMPORTED GLOBAL)
+target_compile_options(ZLIB::ZLIB INTERFACE "--use-port=zlib")
+target_link_options(ZLIB::ZLIB INTERFACE "--use-port=zlib")
 
-# disable testing
-set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(PNG_FOUND TRUE)
+add_library(PNG::PNG INTERFACE IMPORTED GLOBAL)
+target_compile_options(PNG::PNG INTERFACE "--use-port=libpng")
+target_link_options(PNG::PNG INTERFACE "--use-port=libpng")
+
 
 # those are global flags for all projects compiled with emscripten
 set(RGBDS_LIVE_C_OPT_FLAGS "-O3;-flto")
