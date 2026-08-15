@@ -56,9 +56,9 @@ set(RGBDS_LIVE_C_COMMON_FLAGS "${RGBDS_LIVE_C_OPT_FLAGS};-msimd128;-ffast-math;-
 add_compile_options(${RGBDS_LIVE_C_COMMON_FLAGS})
 add_link_options(
     ${RGBDS_LIVE_C_OPT_FLAGS}
-    "-sEXPORT_ES6=1" 
-    "-sALLOW_MEMORY_GROWTH=1" 
-    "-sENVIRONMENT=web" 
+    "-sEXPORT_ES6=1"
+    "-sALLOW_MEMORY_GROWTH=1"
+    "-sENVIRONMENT=web"
     "-sMODULARIZE=1"
 )
 
@@ -97,7 +97,7 @@ foreach(TGT ${RGBDS_TARGETS})
             set(EXP_NAME "createRgbFix")
         endif()
         target_compile_definitions(${TGT} PRIVATE BUILD_VERSION_STRING="${RGBDS_VERSION_FROM_GIT}")
-        target_link_options(${TGT} PRIVATE 
+        target_link_options(${TGT} PRIVATE
             "-sEXPORT_NAME=${EXP_NAME}"
             "-sEXPORTED_RUNTIME_METHODS=['FS']"
             )
@@ -121,7 +121,7 @@ if(TARGET binjgb)
     # binjgb sets EXPORTED_JSON as LINK_DEPENDS
     # we need to get it back to after ...(next comment)
     get_target_property(EXPORTED_JSON binjgb LINK_DEPENDS)
-    set_target_properties(binjgb PROPERTIES 
+    set_target_properties(binjgb PROPERTIES
         # removing original LINK_FLAGS
         LINK_FLAGS ""
         RUNTIME_OUTPUT_DIRECTORY "${RGBDS_LIVE_OUT_DIR}"
