@@ -25,6 +25,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: latest
+          cache: npm
       - name: Set up emscripten
         uses: emscripten-core/setup-emsdk@v16
         with:
