@@ -32,7 +32,7 @@ jobs:
       - name: Configure emscripten builds
         run: emcmake cmake -B build -G Ninja
       - name: Build RGBDS and binjgb
-        run: cmake --build build
+        run: cmake --build build -- -k 0
       - name: Install node dependencies
         run: npm ci
       - name: Build with Vite
