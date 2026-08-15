@@ -75,19 +75,15 @@ add_link_options(
 add_custom_target(rgbds_live ALL)
 set(RGBDS_LIVE_OUT_DIR "${CMAKE_BINARY_DIR}/out")
 
-# get rgbds version for build
-execute_process(
-  COMMAND ${GIT_EXECUTABLE} describe --tags --always
-  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/rgbds"
-  OUTPUT_VARIABLE RGBDS_VERSION_FROM_GIT
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-  ERROR_QUIET
-)
-
 # we need only those targets from rgbds
 set(RGBDS_TARGETS rgbasm rgblink rgbfix)
 # and we will put em into this target
 add_custom_target(rgbds)
+
+# Force RGBDS to emit its auto-detected version string.
+# By default, it would read from the Git info, and pick up `-dirty` from our patches.
+# (We *could* read the info from Git ourselves, but this is simpler.)
+set(RGBDS_VERSION_STRING "")
 
 message(STATUS "Configuring RGBDS...")
 list(APPEND CMAKE_MESSAGE_INDENT "  ")
