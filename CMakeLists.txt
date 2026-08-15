@@ -116,10 +116,10 @@ foreach(TGT ${RGBDS_TARGETS})
 endforeach()
 add_dependencies(rgbds_live rgbds)
 
-# those need to be set before importing binjgb
-set(WERROR ON CACHE BOOL "" FORCE)
-set(WASM TRUE CACHE BOOL "" FORCE)
-set(RGBDS_LIVE ON CACHE BOOL "" FORCE)
+
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW) # Force binjgb to honor the variables below.
+set(WASM TRUE) # Emit WASM (for performance).
+set(RGBDS_LIVE TRUE) # Enable some tweaks.
 
 message(STATUS "Configuring binjgb...")
 list(APPEND CMAKE_MESSAGE_INDENT "  ")
