@@ -1,40 +1,38 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.15...4.4 FATAL_ERROR)
 
 project(rgbds_live)
 
+## Patch third-party subprojects as necessary.
+
 find_package(Git REQUIRED)
+# The last three options are mostly for users' sake, but should preferably be removed during development to ensure the patches are clean.
+set(patching_failed 0)
+foreach(subproject rgbds)
+    # Since it is a Git submodule, Git commands executed in that directory will remain scoped to it.
+    set(git "${GIT_EXECUTABLE}" -C "${CMAKE_CURRENT_SOURCE_DIR}/${subproject}")
+    set(PATCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/patches/${subproject}.patch")
 
-# it will apply patches/xxx.patch to xxx project (submodule)
-function(apply_git_patch PROJECT_NAME)
-    set(TARGET_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}")
-    set(PATCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/patches/${PROJECT_NAME}.patch")
-
+    # First, revert the subproject to a pristine state so that the patch can be applied cleanly.
     execute_process(
-        COMMAND ${GIT_EXECUTABLE} apply 
-            --ignore-space-change 
-            --ignore-whitespace 
-            --whitespace=nowarn    
-            --check "${PATCH_FILE}"
+        COMMAND ${git} reset --hard --quiet
         WORKING_DIRECTORY "${TARGET_DIR}"
-        RESULT_VARIABLE PATCH_NEEDED
-        OUTPUT_QUIET
-        ERROR_QUIET
     )
+    # Then, apply the patch...
+    execute_process(
+        COMMAND ${git} apply "${PATCH_FILE}" # `--quiet` would suppress any error lines.
+        WORKING_DIRECTORY "${TARGET_DIR}"
+        COMMAND_ECHO STDERR
+        RESULT_VARIABLE patch_retcode
+    )
+    # ...and record whether there was *any* patching failure.
+    math(EXPR patching_failed "${patching_failed} + ${patch_retcode}")
+endforeach()
 
-    if(PATCH_NEEDED EQUAL 0)
-        execute_process(
-            COMMAND ${GIT_EXECUTABLE} apply 
-                --ignore-space-change 
-                --ignore-whitespace 
-                --whitespace=nowarn
-                "${PATCH_FILE}"
-            WORKING_DIRECTORY "${TARGET_DIR}"
-            RESULT_VARIABLE PATCH_APPLY_RESULT
-        )
-    endif()
-endfunction()
+if(patching_failed)
+    # Do not attempt further progress, as the subprojects could configure incorrectly and generate spurious errors.
+    message(FATAL_ERROR "Failed to apply patches!")
+endif()
 
-apply_git_patch(rgbds)
 
 # this will stop cmake from searching for zlib and pnglib
 # those libs are by default in emsdk so even if we would compile rgbgfx some day this should work
