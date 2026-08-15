@@ -25,9 +25,8 @@ foreach(subproject rgbds)
   )
   # Then, apply the patch...
   execute_process(
-    COMMAND ${git} apply "${PATCH_FILE}" # `--quiet` would suppress any error lines.
+    COMMAND ${git} apply --reject "${PATCH_FILE}" # `--quiet` would suppress any error lines.
     WORKING_DIRECTORY "${TARGET_DIR}"
-    COMMAND_ECHO STDERR
     RESULT_VARIABLE patch_retcode
   )
   # ...and record whether there was *any* patching failure.
