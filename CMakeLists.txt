@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15...4.4 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16...4.4 FATAL_ERROR)
 
 project(rgbds_live)
 
@@ -80,8 +80,10 @@ set(RGBDS_TARGETS rgbasm rgblink rgbfix)
 # and we will put em into this target
 add_custom_target(rgbds)
 
-# importing rgbds
+message(STATUS "Configuring RGBDS...")
+list(APPEND CMAKE_MESSAGE_INDENT "  ")
 add_subdirectory(rgbds EXCLUDE_FROM_ALL)
+list(POP_BACK CMAKE_MESSAGE_INDENT)
 
 # target specific configuration for rgbds
 foreach(TGT ${RGBDS_TARGETS})
@@ -109,8 +111,10 @@ set(WERROR ON CACHE BOOL "" FORCE)
 set(WASM TRUE CACHE BOOL "" FORCE)
 set(RGBDS_LIVE ON CACHE BOOL "" FORCE)
 
-# importing binjgb
+message(STATUS "Configuring binjgb...")
+list(APPEND CMAKE_MESSAGE_INDENT "  ")
 add_subdirectory(binjgb EXCLUDE_FROM_ALL)
+list(POP_BACK CMAKE_MESSAGE_INDENT)
 
 #target specific configuration for binjgb
 if(TARGET binjgb)
