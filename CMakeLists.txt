@@ -8,29 +8,29 @@ find_package(Git REQUIRED)
 # The last three options are mostly for users' sake, but should preferably be removed during development to ensure the patches are clean.
 set(patching_failed 0)
 foreach(subproject rgbds)
-    # Since it is a Git submodule, Git commands executed in that directory will remain scoped to it.
-    set(git "${GIT_EXECUTABLE}" -C "${CMAKE_CURRENT_SOURCE_DIR}/${subproject}")
-    set(PATCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/patches/${subproject}.patch")
+  # Since it is a Git submodule, Git commands executed in that directory will remain scoped to it.
+  set(git "${GIT_EXECUTABLE}" -C "${CMAKE_CURRENT_SOURCE_DIR}/${subproject}")
+  set(PATCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/patches/${subproject}.patch")
 
-    # First, revert the subproject to a pristine state so that the patch can be applied cleanly.
-    execute_process(
-        COMMAND ${git} reset --hard --quiet
-        WORKING_DIRECTORY "${TARGET_DIR}"
-    )
-    # Then, apply the patch...
-    execute_process(
-        COMMAND ${git} apply "${PATCH_FILE}" # `--quiet` would suppress any error lines.
-        WORKING_DIRECTORY "${TARGET_DIR}"
-        COMMAND_ECHO STDERR
-        RESULT_VARIABLE patch_retcode
-    )
-    # ...and record whether there was *any* patching failure.
-    math(EXPR patching_failed "${patching_failed} + ${patch_retcode}")
+  # First, revert the subproject to a pristine state so that the patch can be applied cleanly.
+  execute_process(
+    COMMAND ${git} reset --hard --quiet
+    WORKING_DIRECTORY "${TARGET_DIR}"
+  )
+  # Then, apply the patch...
+  execute_process(
+    COMMAND ${git} apply "${PATCH_FILE}" # `--quiet` would suppress any error lines.
+    WORKING_DIRECTORY "${TARGET_DIR}"
+    COMMAND_ECHO STDERR
+    RESULT_VARIABLE patch_retcode
+  )
+  # ...and record whether there was *any* patching failure.
+  math(EXPR patching_failed "${patching_failed} + ${patch_retcode}")
 endforeach()
 
 if(patching_failed)
-    # Do not attempt further progress, as the subprojects could configure incorrectly and generate spurious errors.
-    message(FATAL_ERROR "Failed to apply patches!")
+  # Do not attempt further progress, as the subprojects could configure incorrectly and generate spurious errors.
+  message(FATAL_ERROR "Failed to apply patches!")
 endif()
 
 
@@ -55,11 +55,11 @@ set(RGBDS_LIVE_C_OPT_FLAGS "-O3;-flto")
 set(RGBDS_LIVE_C_COMMON_FLAGS "${RGBDS_LIVE_C_OPT_FLAGS};-msimd128;-ffast-math;-DNDEBUG")
 add_compile_options(${RGBDS_LIVE_C_COMMON_FLAGS})
 add_link_options(
-    ${RGBDS_LIVE_C_OPT_FLAGS}
-    "-sEXPORT_ES6=1"
-    "-sALLOW_MEMORY_GROWTH=1"
-    "-sENVIRONMENT=web"
-    "-sMODULARIZE=1"
+  ${RGBDS_LIVE_C_OPT_FLAGS}
+  "-sEXPORT_ES6=1"
+  "-sALLOW_MEMORY_GROWTH=1"
+  "-sENVIRONMENT=web"
+  "-sMODULARIZE=1"
 )
 
 # this is our main target and out directory
@@ -68,11 +68,11 @@ set(RGBDS_LIVE_OUT_DIR "${CMAKE_BINARY_DIR}/out")
 
 # get rgbds version for build
 execute_process(
-    COMMAND ${GIT_EXECUTABLE} describe --tags --always
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/rgbds"
-    OUTPUT_VARIABLE RGBDS_VERSION_FROM_GIT
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_QUIET
+  COMMAND ${GIT_EXECUTABLE} describe --tags --always
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/rgbds"
+  OUTPUT_VARIABLE RGBDS_VERSION_FROM_GIT
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  ERROR_QUIET
 )
 
 # we need only those targets from rgbds
@@ -87,22 +87,22 @@ list(POP_BACK CMAKE_MESSAGE_INDENT)
 
 # target specific configuration for rgbds
 foreach(TGT ${RGBDS_TARGETS})
-    if(TARGET ${TGT})
-        set_target_properties(${TGT} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RGBDS_LIVE_OUT_DIR}")
-        if("${TGT}" STREQUAL "rgbasm")
-            set(EXP_NAME "createRgbAsm")
-        elseif("${TGT}" STREQUAL "rgblink")
-            set(EXP_NAME "createRgbLink")
-        elseif("${TGT}" STREQUAL "rgbfix")
-            set(EXP_NAME "createRgbFix")
-        endif()
-        target_compile_definitions(${TGT} PRIVATE BUILD_VERSION_STRING="${RGBDS_VERSION_FROM_GIT}")
-        target_link_options(${TGT} PRIVATE
-            "-sEXPORT_NAME=${EXP_NAME}"
-            "-sEXPORTED_RUNTIME_METHODS=['FS']"
-            )
-        add_dependencies(rgbds ${TGT})
+  if(TARGET ${TGT})
+    set_target_properties(${TGT} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RGBDS_LIVE_OUT_DIR}")
+    if("${TGT}" STREQUAL "rgbasm")
+      set(EXP_NAME "createRgbAsm")
+    elseif("${TGT}" STREQUAL "rgblink")
+      set(EXP_NAME "createRgbLink")
+    elseif("${TGT}" STREQUAL "rgbfix")
+      set(EXP_NAME "createRgbFix")
     endif()
+    target_compile_definitions(${TGT} PRIVATE BUILD_VERSION_STRING="${RGBDS_VERSION_FROM_GIT}")
+    target_link_options(${TGT} PRIVATE
+      "-sEXPORT_NAME=${EXP_NAME}"
+      "-sEXPORTED_RUNTIME_METHODS=['FS']"
+    )
+    add_dependencies(rgbds ${TGT})
+  endif()
 endforeach()
 add_dependencies(rgbds_live rgbds)
 
@@ -118,20 +118,20 @@ list(POP_BACK CMAKE_MESSAGE_INDENT)
 
 #target specific configuration for binjgb
 if(TARGET binjgb)
-    # binjgb sets EXPORTED_JSON as LINK_DEPENDS
-    # we need to get it back to after ...(next comment)
-    get_target_property(EXPORTED_JSON binjgb LINK_DEPENDS)
-    set_target_properties(binjgb PROPERTIES
-        # removing original LINK_FLAGS
-        LINK_FLAGS ""
-        RUNTIME_OUTPUT_DIRECTORY "${RGBDS_LIVE_OUT_DIR}"
-    )
-    target_link_options(binjgb PRIVATE
-        "-sMALLOC=emmalloc"
-        "-sEXIT_RUNTIME=0"
-        "-sFILESYSTEM=0"
-        "-sEXPORTED_RUNTIME_METHODS=['HEAP8']"
-        "-sEXPORTED_FUNCTIONS=@${EXPORTED_JSON}"
-    )
-    add_dependencies(rgbds_live binjgb)
+  # binjgb sets EXPORTED_JSON as LINK_DEPENDS
+  # we need to get it back to after ...(next comment)
+  get_target_property(EXPORTED_JSON binjgb LINK_DEPENDS)
+  set_target_properties(binjgb PROPERTIES
+    # removing original LINK_FLAGS
+    LINK_FLAGS ""
+    RUNTIME_OUTPUT_DIRECTORY "${RGBDS_LIVE_OUT_DIR}"
+  )
+  target_link_options(binjgb PRIVATE
+    "-sMALLOC=emmalloc"
+    "-sEXIT_RUNTIME=0"
+    "-sFILESYSTEM=0"
+    "-sEXPORTED_RUNTIME_METHODS=['HEAP8']"
+    "-sEXPORTED_FUNCTIONS=@${EXPORTED_JSON}"
+  )
+  add_dependencies(rgbds_live binjgb)
 endif()
