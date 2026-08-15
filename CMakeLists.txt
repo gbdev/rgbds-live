@@ -26,6 +26,9 @@ foreach(subproject rgbds)
   )
   # ...and record whether there was *any* patching failure.
   math(EXPR patching_failed "${patching_failed} + ${patch_retcode}")
+
+  # Re-run CMake automatically if the patch file is changed.
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${PATCH_FILE}")
 endforeach()
 
 if(patching_failed)
