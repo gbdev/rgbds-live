@@ -185,6 +185,22 @@ export function loadZip(file) {
   });
 }
 
+export async function loadFromLocalServer(port) {
+  const resp = await fetch(`http://localhost:${port}/manifest`);//Fetch the list of files from the local server
+  if (!resp.ok) {
+    throw new Error('Failed to load file manifest from local server');
+  }
+  const fileList = await resp.json();
+
+  for (const name of fileList) {//For each file, fetch its content and store in files object
+    const fileResp = await fetch(`http://localhost:${port}/files/${encodeURIComponent(name)}`);
+    if (!fileResp.ok) {
+      throw new Error(`Failed to load file: ${name}`);
+    }
+    files[name] = await fileResp.text();
+  }
+}
+
 export function loadSingleUrl(url) {
   files = getHardwareFiles();
   var req = new XMLHttpRequest();
