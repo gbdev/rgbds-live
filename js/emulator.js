@@ -128,6 +128,9 @@ export function getPC() {
 export function setPC(pc) {
   Module._emulator_set_PC(e, pc);
 }
+export function getBankedPC() {
+  return Module._emulator_get_banked_PC(e);
+}
 export function getSP() {
   return Module._emulator_get_SP(e);
 }
