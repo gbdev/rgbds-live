@@ -368,9 +368,28 @@ export function init(event) {
     compiler.setFixOptions(fixOptions.split(' '));
   }
 
-  storage.autoLoad();
-  editors.setCurrentFile(Object.keys(storage.getFiles()).pop());
-  updateFileList();
+  // If ?local=PORT is present, load files from the local CLI server
+  const localPort = urlParams.get('local');//Read the parameters following the URL 
+  const hasLocalFiles = localPort && /^\d+$/.test(localPort);//Check if the local parameter is a valid port number
+  if (hasLocalFiles) {//if use local server, load files from it
+    storage.loadFromLocalServer(parseInt(localPort)).then(function () {
+      const fileNames = Object.keys(storage.getFiles());
+      const mainFile = fileNames.find(function (name) { return name.toLowerCase().indexOf('main') >= 0; });
+      editors.setCurrentFile(mainFile || fileNames[0]);
+      updateFileList();
+      compileCode();
+    }).catch(function (err) {//If failed to load from local server, fallback to local storage
+      console.error('Failed to load files from local server:', err);
+      storage.autoLoad();
+      editors.setCurrentFile(Object.keys(storage.getFiles()).pop());
+      updateFileList();
+      compileCode();
+    });
+  } else {//If not using local server, load from local storage as usual
+    storage.autoLoad();
+    editors.setCurrentFile(Object.keys(storage.getFiles()).pop());
+    updateFileList();
+  }
 
   document.getElementById('filelist').onclick = function (e) {
     if (!e.target.childNodes[0].wholeText) return;
@@ -433,7 +452,21 @@ export function init(event) {
     updateFileList();
   };
 
-  compileCode();
+  if (!hasLocalFiles) compileCode();
+
+  document.getElementById('output').onclick = function (e) {
+    var target = e.target;
+    if (target.classList.contains('error-link')) {
+      var file = target.getAttribute('data-file');
+      var line = parseInt(target.getAttribute('data-line'));
+      //check if the file exists and line is a number before navigating
+      if (file && !isNaN(line) && storage.getFiles()[file] !== undefined) {
+        editors.setCurrentFile(file);
+        updateFileList();
+        textEditor.gotoLine(line);
+      }
+    }
+  };
 
   document.getElementById('output').onclick = function (e) {
     var target = e.target;

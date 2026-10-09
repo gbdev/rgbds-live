@@ -1,9 +1,14 @@
 {
   "name": "rgbds-live",
-  "private": true,
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A live RGBDS programming environment in the browser",
+  "bin": {
+    "rgbds-live": "cli.js"
+  },
+  "files": [
+    "cli.js"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
